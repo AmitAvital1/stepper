@@ -2,12 +2,14 @@ package project.java.stepper.dd.impl;
 
 import project.java.stepper.dd.api.DataDefinition;
 import project.java.stepper.dd.impl.number.DoubleDataDefinition;
+import project.java.stepper.dd.impl.number.IntegerDataDefinition;
 import project.java.stepper.dd.impl.relation.RelationDataDefinition;
 import project.java.stepper.dd.impl.string.StringDataDefinition;
 
 public enum DataDefinitionRegistry implements DataDefinition{
     STRING(new StringDataDefinition()),
     DOUBLE(new DoubleDataDefinition()),
+    INTEGER(new IntegerDataDefinition()),
     RELATION(new RelationDataDefinition())
     ;
 
