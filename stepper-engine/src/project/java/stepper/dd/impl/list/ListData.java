@@ -5,17 +5,18 @@ import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListData {
-    private List<DataDefinitionRegistry> list;
+public class ListData <T> {
+    private List<T> list;
 
     public ListData(){
         list =  new ArrayList<>();
     }
-    public void addData(DataDefinitionRegistry dataDefinitionRegistry){
-        list.add(dataDefinitionRegistry);
+    public void addData(T data){
+        list.add(data);
     }
-    public List<DataDefinitionRegistry> getList(){
+    public List<T> getList(){
         return list;
     }
-    //and more stuff if neended
+    public int size() {return list.size();}
+    //and more stuff if needed
 }

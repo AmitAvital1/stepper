@@ -7,4 +7,5 @@ public interface DataDefinitionDeclaration {
     DataNecessity necessity();
     String userString();
     DataDefinition dataDefinition();
+
 }

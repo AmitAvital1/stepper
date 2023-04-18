@@ -13,7 +13,6 @@ public enum DataDefinitionRegistry implements DataDefinition{
     DOUBLE(new DoubleDataDefinition()),
     INTEGER(new IntegerDataDefinition()),
     RELATION(new RelationDataDefinition()),
-
     LIST(new ListDataDefinition()),
     FILE(new FileDataDefinition())
     ;
