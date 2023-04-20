@@ -1,6 +1,5 @@
 package project.java.stepper.dd.impl.list;
 
-import project.java.stepper.dd.impl.DataDefinitionRegistry;
 
 import java.util.ArrayList;
 import java.util.List;

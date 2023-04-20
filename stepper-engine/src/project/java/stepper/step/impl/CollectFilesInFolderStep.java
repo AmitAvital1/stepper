@@ -48,7 +48,7 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
                     .collect(Collectors.toList());
             ListData<FileData> filesList = new ListData();
             for (Path path : fileList) {
-                FileData f = new FileData(filePath.toString());
+                FileData f = new FileData(path.toString());
                 filesList.addData(f);
             }
             context.storeDataValue("FILES_LIST", filesList);
@@ -59,15 +59,19 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
             {
                 //System.out.println("WARNING:THERE ARE NO FILES EXISST IN THE FOLDER PATH");
                 logs.addLogLine("STEP WARNING:There are no files exist in the folder path");
+                context.addStepLog(logs);
                 return StepResult.WARNING;
             }
-            else
+            else{
+                context.addStepLog(logs);
                 return StepResult.SUCCESS;
+            }
         }
         catch (IOException e)
         {
            // System.out.println("FAILUR:THERE IS NO FOLDER OR WRONG PATH FOLDER");
             logs.addLogLine("STEP FAILUR: There is no folder or wrong path folder");
+            context.addStepLog(logs);
             return StepResult.FAILURE;
         }
     }
