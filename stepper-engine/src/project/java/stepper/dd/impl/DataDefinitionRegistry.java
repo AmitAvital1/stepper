@@ -39,4 +39,22 @@ public enum DataDefinitionRegistry implements DataDefinition{
     public Class<?> getType() {
         return dataDefinition.getType();
     }
+    public <T> T convertUserInputToDataType(String input, Class<T> expectedDataType) throws NumberFormatException{
+        if(this == STRING)
+        {
+            return expectedDataType.cast(input);
+        }
+        if(this == INTEGER)
+        {
+            Integer num = Integer.parseInt(input);
+            return expectedDataType.cast(num);
+        }
+        else if(this == DOUBLE)
+        {
+            Double num = Double.parseDouble(input);
+            return expectedDataType.cast(num);
+        }
+        return null;
+    }
+
 }

@@ -40,7 +40,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
         List<String> filesFailedList = new ArrayList<>();
 
         if (filesList.size() == 0) {//Do not have files to delete
-            context.addStepSummaryLine("no file to change");
+            context.addStepSummaryLine("no files to change");
         }
         else {
             Optional<String> maybePrefix = Optional.ofNullable(context.getDataValue("PREFIX", String.class));
@@ -58,6 +58,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
                 File oldFile = new File(fileData.getFilePath());
                 File newFile = new File(oldFile.getParentFile() + "\\" + newName);
                 if (oldFile.renameTo(newFile)) {
+                    renameResult.addData(columnCounter.toString(), columnCounter.toString());
                     renameResult.addData(columnCounter.toString(), oldFile.getName());
                     renameResult.addData(columnCounter.toString(), newFile.getName());
                     columnCounter++;
@@ -71,6 +72,8 @@ public class FilesRenamerStep extends AbstractStepDefinition {
         if(res == StepResult.WARNING)
             context.addStepSummaryLine("problem on renaming files: " + filesFailedList.toString());
 
+        context.storeDataValue("RENAME_RESULT", renameResult);
+        context.addStepLog(logs);
         return res;
     }
 }

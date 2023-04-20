@@ -26,4 +26,8 @@ public abstract class AbstractDataDefinition implements DataDefinition {
     public Class<?> getType() {
         return type;
     }
+    public <T> T convertUserInputToDataType(String input, Class<T> expectedDataType){
+        //Ghost implement
+        return null;
+    }
 }

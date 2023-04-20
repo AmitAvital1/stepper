@@ -9,7 +9,8 @@ public enum StepDefinitionRegistry {
     COLLECT_FILES_FOLDER_STEP(new CollectFilesInFolderStep()),
     SPEND_SOME_TIME_STEP(new SpendSomeTimeStep()),
     FILES_DELETER_STEP(new FilesDeleterStep()),
-    FILES_RENAMER_STEP(new FilesRenamerStep())
+    FILES_RENAMER_STEP(new FilesRenamerStep()),
+    FILES_CONTENT_EXTRACTOR_STEP(new FilesContentExtractorStep())
     ;
 
     private final StepDefinition stepDefinition;

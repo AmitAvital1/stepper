@@ -4,6 +4,7 @@ import javafx.util.Pair;
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,9 +69,9 @@ public class FlowDefinitionImpl implements FlowDefinition {
     }
 
     @Override
-    public boolean addFreeInputForStart(DataDefinitionDeclaration dataDefinitionDeclaration, Object data) {
-        //Need to check the exist type;
-        startersFreeInputForContext.put(dataDefinitionDeclaration.getName(),data);
+    public boolean addFreeInputForStart(DataDefinitionDeclaration dataDefinitionDeclaration, String data) {
+        Object newData = dataDefinitionDeclaration.dataDefinition().convertUserInputToDataType(data,dataDefinitionDeclaration.dataDefinition().getType());
+        startersFreeInputForContext.put(dataDefinitionDeclaration.getName(),newData);
         return true;
     }
 

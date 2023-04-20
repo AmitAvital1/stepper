@@ -39,6 +39,8 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
         String filter = maybeFilter.orElse(""); // "" says not filter
 
+        ListData<FileData> filesList = new ListData();
+
         try {
             logs.addLogLine("Reading folder " + filePath + (filter != "" ? (" content with filter" + filter) : ""));
             List<Path> fileList = Files.walk(new File(filePath).toPath())
@@ -46,7 +48,6 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
                     .filter((path) -> path.toString().endsWith(filter))
                     .map(Path::toAbsolutePath)
                     .collect(Collectors.toList());
-            ListData<FileData> filesList = new ListData();
             for (Path path : fileList) {
                 FileData f = new FileData(path.toString());
                 filesList.addData(f);
@@ -69,7 +70,6 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
         }
         catch (IOException e)
         {
-           // System.out.println("FAILUR:THERE IS NO FOLDER OR WRONG PATH FOLDER");
             logs.addLogLine("STEP FAILUR: There is no folder or wrong path folder");
             context.addStepLog(logs);
             return StepResult.FAILURE;

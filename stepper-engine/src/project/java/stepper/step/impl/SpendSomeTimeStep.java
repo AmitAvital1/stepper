@@ -12,10 +12,10 @@ public class SpendSomeTimeStep extends AbstractStepDefinition {
     public SpendSomeTimeStep() {
         super("Spend Some Time", true);
 
-        addInput(new DataDefinitionDeclarationImpl("TIME_TO_SPEND", DataNecessity.MANDATORY, "Total sleeping time (sec)", DataDefinitionRegistry.STRING));
+        addInput(new DataDefinitionDeclarationImpl("TIME_TO_SPEND", DataNecessity.MANDATORY, "Total sleeping time (sec)", DataDefinitionRegistry.INTEGER));
     }
     public StepResult invoke(StepExecutionContext context) {
-        int seconds = Integer.parseInt(context.getDataValue("TIME_TO_SPEND", String.class));
+        int seconds = context.getDataValue("TIME_TO_SPEND", Integer.class);
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
         if (seconds <= 0) {
             logs.addLogLine("STEP FAILURE:non natural number of seconds");
