@@ -9,6 +9,7 @@ public interface StepExecutionContext {
     void updateCurrentWorkingStep(StepUsageDeclaration newStep);
     StepUsageDeclaration getCurrentWorkingStep();
     void addStepLog(StepLogs stepLogsToAdd);
+    void addStepSummaryLine(String line);
 
     // some more utility methods:
     // allow step to store log lines

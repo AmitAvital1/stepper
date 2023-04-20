@@ -12,10 +12,12 @@ public class StepExecutionContextImpl implements StepExecutionContext {
     private final Map<String, Object> dataValues;
     private StepUsageDeclaration currentWorkingStep;
     private List<StepLogs> flowLogs;
+    private List<String> stepSummaryLine;
 
     public StepExecutionContextImpl() {
         dataValues = new HashMap<>();
         flowLogs = new ArrayList<>();
+        stepSummaryLine = new ArrayList<>();
     }
 
     @Override
@@ -63,5 +65,6 @@ public class StepExecutionContextImpl implements StepExecutionContext {
     public void addStepLog(StepLogs stepLogsToAdd) {
         flowLogs.add(stepLogsToAdd);
     }
+    public void addStepSummaryLine(String line){ stepSummaryLine.add("Summary of " + currentWorkingStep.getFinalStepName() + ": " + line); }
 
 }

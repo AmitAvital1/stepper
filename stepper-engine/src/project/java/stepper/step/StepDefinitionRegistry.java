@@ -8,7 +8,8 @@ public enum StepDefinitionRegistry {
     PERSON_DETAILS(new PersonDetailsStep()),
     COLLECT_FILES_FOLDER_STEP(new CollectFilesInFolderStep()),
     SPEND_SOME_TIME_STEP(new SpendSomeTimeStep()),
-    FILES_DELETER_STEP(new FilesDeleterStep())
+    FILES_DELETER_STEP(new FilesDeleterStep()),
+    FILES_RENAMER_STEP(new FilesRenamerStep())
     ;
 
     private final StepDefinition stepDefinition;

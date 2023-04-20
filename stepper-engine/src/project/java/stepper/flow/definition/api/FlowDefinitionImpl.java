@@ -55,13 +55,6 @@ public class FlowDefinitionImpl implements FlowDefinition {
             dataDefinitionDeclarationStream.forEach(theOutput -> inputsFlow.add(theOutput));
 
         }
-        /*System.out.println("The free inputs is:");
-        freeInputsStepToDataDefinitionDeclaration.forEach((theStep, freeInput) -> {
-            if (freeInput.size() > 0) {
-                System.out.println("Step:" + theStep.getFinalStepName());
-                freeInput.forEach(i -> System.out.println(i.getName() + ":" + i.userString() + " " + i.necessity()));
-            }
-        });*/
     }
 
     @Override
