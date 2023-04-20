@@ -10,7 +10,8 @@ public enum StepDefinitionRegistry {
     SPEND_SOME_TIME_STEP(new SpendSomeTimeStep()),
     FILES_DELETER_STEP(new FilesDeleterStep()),
     FILES_RENAMER_STEP(new FilesRenamerStep()),
-    FILES_CONTENT_EXTRACTOR_STEP(new FilesContentExtractorStep())
+    FILES_CONTENT_EXTRACTOR_STEP(new FilesContentExtractorStep()),
+    CSV_EXPORTER_STEP(new CSVExporterStep())
     ;
 
     private final StepDefinition stepDefinition;

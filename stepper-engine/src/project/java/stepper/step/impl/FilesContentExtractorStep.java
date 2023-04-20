@@ -54,7 +54,7 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
 
                 if(!extension.equals(".txt")){
                     logs.addLogLine("Problem extracting line number " + lineNumber + " from file " + workingFile.getName());
-                    dataRelation.addData(columnCounter.toString(), workingFile.getName());
+                    dataRelation.addData(columnCounter.toString(), "Not txt file");
                 }
                 else if(!workingFile.exists()){
                     dataRelation.addData(columnCounter.toString(), "File not found");
@@ -67,13 +67,13 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
                         while ((line = reader.readLine()) != null) {
                             if (currentLine == lineNumber) {
                                 dataRelation.addData(columnCounter.toString(), line);
-                                System.out.println(columnCounter.toString() + line);
                                 reader.close();
+                                currentLine++;
                                 break;
                             }
                             currentLine++;
                         }
-                        if (lineNumber > currentLine) {
+                        if (lineNumber + 1 > currentLine) {
                             dataRelation.addData(columnCounter.toString(), "Not such line");
                         }
                         reader.close();
@@ -85,6 +85,7 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
                 columnCounter++;
             }
         }
+        context.storeDataValue("DATA",dataRelation);
         context.addStepLog(logs);
         return res;
     }

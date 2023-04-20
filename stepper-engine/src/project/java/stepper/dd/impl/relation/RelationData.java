@@ -28,6 +28,7 @@ public void addData(String column,String data){
             if(!row.checkSpace(column)) {
                 row.addData(column, data);
                 addedFlag = true;
+                break;
             }
 
         }
@@ -39,14 +40,16 @@ public void addData(String column,String data){
 
 
     public List<String> getRowDataByColumnsOrder(int rowId) {
-        String rowString = columns.get(rowId - 1);
-        List<String> rowData = new ArrayList<>();
-
-        for(SingleRow row : rows) {
-            rowData.add(row.getRowDataByColumn(rowString));
+        List<String> row = new ArrayList<>();
+        for(String colum : columns)
+        {
+            row.add(rows.get(rowId).getRowDataByColumn(colum));
         }
-        return rowData;
+        return row;
     }
+
+    public List<String> getColumns(){return columns;}
+    public int getRowsSize(){return rows.size();}
 
     private static class SingleRow {
         private Map<String, String> data;

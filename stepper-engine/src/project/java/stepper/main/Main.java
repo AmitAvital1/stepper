@@ -19,8 +19,8 @@ public class Main {
 
         FlowDefinition flow1 = new FlowDefinitionImpl("Flow 1", "Checker");
         flow1.getFlowSteps().add(new StepUsageDeclarationImpl(StepDefinitionRegistry.COLLECT_FILES_FOLDER_STEP.getStepDefinition()));
-        flow1.getFlowSteps().add(new StepUsageDeclarationImpl(StepDefinitionRegistry.FILES_CONTENT_EXTRACTOR_STEP.getStepDefinition()));
-        flow1.getFlowSteps().add(new StepUsageDeclarationImpl(StepDefinitionRegistry.SPEND_SOME_TIME_STEP.getStepDefinition()));
+        flow1.getFlowSteps().add(new StepUsageDeclarationImpl(StepDefinitionRegistry.FILES_RENAMER_STEP.getStepDefinition()));
+        flow1.getFlowSteps().add(new StepUsageDeclarationImpl(StepDefinitionRegistry.CSV_EXPORTER_STEP.getStepDefinition()));
 
 
 
