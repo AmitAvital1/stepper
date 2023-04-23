@@ -1,16 +1,14 @@
 package project.java.stepper.flow.definition.api;
 
-import javafx.util.Pair;
-import project.java.stepper.dd.impl.DataDefinitionRegistry;
+import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
+import project.java.stepper.step.api.DataNecessity;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FlowDefinitionImpl implements FlowDefinition {
 
@@ -22,6 +20,8 @@ public class FlowDefinitionImpl implements FlowDefinition {
     private Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> freeInputsStepToDataDefinitionDeclaration;
     private Map<String, Object> startersFreeInputForContext;
 
+
+
     public FlowDefinitionImpl(String name, String description) {
         this.name = name;
         this.description = description;
@@ -32,6 +32,23 @@ public class FlowDefinitionImpl implements FlowDefinition {
 
     public void addFlowOutput(String outputName) {
         flowOutputs.add(outputName);
+    }
+
+    @Override
+    public boolean validateToExecute() throws MissMandatoryInput {
+        boolean res = true;
+
+        for (Map.Entry<StepUsageDeclaration,List<DataDefinitionDeclaration>> entry : freeInputsStepToDataDefinitionDeclaration.entrySet()) {
+            StepUsageDeclaration key = entry.getKey();
+            List<DataDefinitionDeclaration> value = entry.getValue();
+            for (DataDefinitionDeclaration dd : value) {
+                if (!getStartersFreeInputForContext().containsKey(dd.getName()) && dd.necessity() == DataNecessity.MANDATORY) {
+                    throw new MissMandatoryInput("Missing Mandatory input: " + dd.getName());
+                }
+            }
+
+        }
+        return res;
     }
 
     @Override

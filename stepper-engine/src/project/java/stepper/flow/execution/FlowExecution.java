@@ -25,8 +25,16 @@ public class FlowExecution {
     public FlowDefinition getFlowDefinition() {
         return flowDefinition;
     }
-
+    public void setFlowExecutionResult(FlowExecutionResult result) {
+        flowExecutionResult = result;
+    }
     public FlowExecutionResult getFlowExecutionResult() {
         return flowExecutionResult;
+    }
+    public void setDuration(Duration time){
+        totalTime = time;
+    }
+    public long getDuration(){
+        return totalTime.toMillis();
     }
 }
