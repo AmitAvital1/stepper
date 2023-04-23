@@ -11,7 +11,9 @@ public enum StepDefinitionRegistry {
     FILES_DELETER_STEP(new FilesDeleterStep()),
     FILES_RENAMER_STEP(new FilesRenamerStep()),
     FILES_CONTENT_EXTRACTOR_STEP(new FilesContentExtractorStep()),
-    CSV_EXPORTER_STEP(new CSVExporterStep())
+    CSV_EXPORTER_STEP(new CSVExporterStep()),
+    PROPERTIES_EXPORTER_STEP(new PropertiesExporterStep()),
+    FILE_DUMPER_STEP(new FileDumperStep())
     ;
 
     private final StepDefinition stepDefinition;

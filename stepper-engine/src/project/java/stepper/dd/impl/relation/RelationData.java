@@ -47,7 +47,15 @@ public void addData(String column,String data){
         }
         return row;
     }
-
+    public List<String> getColumnsData(int columnsNum)
+    {
+        List<String> columnsAllData = new ArrayList<>();
+        String columnsData = columns.get(columnsNum);
+        for(int i = 1; i < rows.size(); i++) {
+            columnsAllData.add(rows.get(i).getRowDataByColumn(columnsData));
+        }
+        return columnsAllData;
+    }
     public List<String> getColumns(){return columns;}
     public int getRowsSize(){return rows.size();}
 
