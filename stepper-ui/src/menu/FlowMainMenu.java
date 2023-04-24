@@ -1,8 +1,6 @@
 package menu;
 
 import exeptions.InvalidChoiseExeption;
-import menu.methods.MenuMethodsRegisty;
-import menu.user.input.UserInputContext;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
@@ -13,24 +11,56 @@ import project.java.stepper.step.api.DataDefinitionDeclaration;
 import java.util.*;
 
 public class FlowMainMenu {
-    private UserInputContext context;
     private List<FlowDefinition> flows;
     List<FlowExecution> flowExecutions;
     private List<DataDefinitionDeclaration> freeInputListToPrint;
 
 
     public FlowMainMenu(){
-        context = new UserInputContext();
         flowExecutions = new ArrayList<>();
     }
 
+
     public void showFlowMenu(FlowDefinition flow) {
+        int userChoice = -1;
+        Scanner scanner = new Scanner(System.in);
+        do{
+            System.out.println("Flow name:" + flow.getName());
+            System.out.println("Tons of details on the flow");
+            System.out.println("1.Execute flow");
+        try {
+            userChoice = scanner.nextInt();
+            scanner.nextLine(); // consume the newline character
+            if (userChoice == 1) {
+                FLowExecutor fLowExecutor = new FLowExecutor();
+                FlowExecution flowExecution = new FlowExecution("200", flow);
+                showFlowDecMenu(flowExecution);
+            }
+            else if(userChoice == 0){
+                break;
+            }
+            else
+                throw new InvalidChoiseExeption("Invalid choose.");
+
+        }catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption e){
+            if(e.getClass() == InvalidChoiseExeption.class || e.getClass() == MissMandatoryInput.class)
+                System.out.println(e.getMessage());
+            else
+                System.out.println("Please enter a number");
+
+            userChoice = -1;
+        }
+        }while(userChoice != 0);
+
+
+    }
+    public void showFlowDecMenu(FlowExecution flow) {
         int userChoice = -1;
         int index = 0;
         Scanner scanner = new Scanner(System.in);
-        Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs = flow.getFlowFreeInputs();
+        Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs = flow.getFlowDefinition().getFlowFreeInputs();
         do{
-            System.out.println("Flow name:" + flow.getName());
+            System.out.println("Flow name:" + flow.getFlowDefinition().getName());
 
                 index = printAllFreeInputsAndReturnSize(flow,freeInputs);
 
@@ -44,6 +74,7 @@ public class FlowMainMenu {
                         System.out.println("Please add:" + freeInputListToPrint.get(userChoice - 1).userString());
                         String input = scanner.nextLine();
                         flow.addFreeInputForStart(freeInputListToPrint.get(userChoice - 1), input);
+                        userChoice = -1;
                     }
                     else if(userChoice == freeInputListToPrint.size() + 1){
                             executeFlow(flow);
@@ -65,7 +96,7 @@ public class FlowMainMenu {
         }while(userChoice != 0);
 
     }
-    private int printAllFreeInputsAndReturnSize(FlowDefinition flow, Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs) {
+    private int printAllFreeInputsAndReturnSize(FlowExecution flow, Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs) {
         int index = 0;
         if (freeInputs.size() > 0) {
             System.out.println("You have free inputs:");
@@ -84,13 +115,12 @@ public class FlowMainMenu {
         }
         return index;
     }
-    private void executeFlow(FlowDefinition flow) throws MissMandatoryInput
+    private void executeFlow(FlowExecution flow) throws MissMandatoryInput
     {
         if(flow.validateToExecute()){
             FLowExecutor fLowExecutor = new FLowExecutor();
-            FlowExecution flowExecution = new FlowExecution("200", flow);
-            flowExecutions.add(flowExecution);
-            fLowExecutor.executeFlow(flowExecution);
+            flowExecutions.add(flow);
+            fLowExecutor.executeFlow(flow);
         }
     }
 

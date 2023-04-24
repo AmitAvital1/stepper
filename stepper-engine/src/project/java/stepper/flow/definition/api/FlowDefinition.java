@@ -13,8 +13,6 @@ public interface FlowDefinition {
     List<String> getFlowFormalOutputs();
 
     void validateFlowStructure();
-    boolean validateToExecute() throws MissMandatoryInput;
     Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> getFlowFreeInputs();
-    boolean addFreeInputForStart(DataDefinitionDeclaration dataDefinitionDeclaration,String data);
-    Map<String,Object> getStartersFreeInputForContext();
+    List<DataDefinitionDeclaration> getfreeInputsDataDefinitionDeclaration();
 }

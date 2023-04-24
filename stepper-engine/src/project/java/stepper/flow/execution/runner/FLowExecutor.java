@@ -18,7 +18,7 @@ public class FLowExecutor {
         System.out.println("Starting execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]");
 
         StepExecutionContext context = new StepExecutionContextImpl(); // actual object goes here...
-        flowExecution.getFlowDefinition().getStartersFreeInputForContext().forEach((key,val) -> context.storeDataValue(key,val));
+        flowExecution.getStartersFreeInputForContext().forEach((key,val) -> context.storeDataValue(key,val));
 
         // start actual execution
         for (int i = 0; i < flowExecution.getFlowDefinition().getFlowSteps().size(); i++) {
@@ -27,6 +27,7 @@ public class FLowExecutor {
             System.out.println("Starting to execute step: " + stepUsageDeclaration.getFinalStepName());
             StepResult stepResult = stepUsageDeclaration.getStepDefinition().invoke(context);
             System.out.println("Done executing step: " + stepUsageDeclaration.getFinalStepName() + ". Result: " + stepResult);
+
             if(!stepUsageDeclaration.skipIfFail() && stepResult == StepResult.FAILURE){
                 context.addStepSummaryLine("The step failed before finish: " + stepUsageDeclaration.getFinalStepName() + " FAILED");
                 StepLogs log = new StepLogs(stepUsageDeclaration.getFinalStepName());

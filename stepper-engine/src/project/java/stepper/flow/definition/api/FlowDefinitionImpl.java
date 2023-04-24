@@ -18,37 +18,18 @@ public class FlowDefinitionImpl implements FlowDefinition {
     private final List<StepUsageDeclaration> steps;
     private List<DataDefinitionDeclaration> freeInputsDataDefinitionDeclaration;
     private Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> freeInputsStepToDataDefinitionDeclaration;
-    private Map<String, Object> startersFreeInputForContext;
 
-
+    public List<DataDefinitionDeclaration> getfreeInputsDataDefinitionDeclaration(){ return freeInputsDataDefinitionDeclaration;}
 
     public FlowDefinitionImpl(String name, String description) {
         this.name = name;
         this.description = description;
         flowOutputs = new ArrayList<>();
         steps = new ArrayList<>();
-        startersFreeInputForContext = new HashMap<>();
     }
 
     public void addFlowOutput(String outputName) {
         flowOutputs.add(outputName);
-    }
-
-    @Override
-    public boolean validateToExecute() throws MissMandatoryInput {
-        boolean res = true;
-
-        for (Map.Entry<StepUsageDeclaration,List<DataDefinitionDeclaration>> entry : freeInputsStepToDataDefinitionDeclaration.entrySet()) {
-            StepUsageDeclaration key = entry.getKey();
-            List<DataDefinitionDeclaration> value = entry.getValue();
-            for (DataDefinitionDeclaration dd : value) {
-                if (!getStartersFreeInputForContext().containsKey(dd.getName()) && dd.necessity() == DataNecessity.MANDATORY) {
-                    throw new MissMandatoryInput("Missing Mandatory input: " + dd.getName());
-                }
-            }
-
-        }
-        return res;
     }
 
     @Override
@@ -78,18 +59,6 @@ public class FlowDefinitionImpl implements FlowDefinition {
     @Override
     public Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> getFlowFreeInputs() {
         return freeInputsStepToDataDefinitionDeclaration;
-    }
-
-    @Override
-    public Map<String, Object> getStartersFreeInputForContext() {
-        return startersFreeInputForContext;
-    }
-
-    @Override
-    public boolean addFreeInputForStart(DataDefinitionDeclaration dataDefinitionDeclaration, String data) {
-        Object newData = dataDefinitionDeclaration.dataDefinition().convertUserInputToDataType(data,dataDefinitionDeclaration.dataDefinition().getType());
-        startersFreeInputForContext.put(dataDefinitionDeclaration.getName(),newData);
-        return true;
     }
 
     @Override
