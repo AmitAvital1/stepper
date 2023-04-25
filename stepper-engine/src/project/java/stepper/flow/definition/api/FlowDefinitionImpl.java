@@ -1,5 +1,6 @@
 package project.java.stepper.flow.definition.api;
 
+import project.java.stepper.exceptions.CustomeMappingInvalid;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 import project.java.stepper.step.api.DataNecessity;
@@ -14,24 +15,63 @@ public class FlowDefinitionImpl implements FlowDefinition {
 
     private final String name;
     private final String description;
-    private final List<String> flowOutputs;
     private final List<StepUsageDeclaration> steps;
-    private List<DataDefinitionDeclaration> freeInputsDataDefinitionDeclaration;
-    private Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> freeInputsStepToDataDefinitionDeclaration;
+    private Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> stepToFreeInputFinalNameToDD;
+    private Map<String,DataDefinitionDeclaration> freeInputFinalNameToDD;
+    private  Map<String,DataDefinitionDeclaration> formalFinalOutPutNameToDD;
 
-    public List<DataDefinitionDeclaration> getfreeInputsDataDefinitionDeclaration(){ return freeInputsDataDefinitionDeclaration;}
+    @Override
+    public void addFormalOutput(String name, DataDefinitionDeclaration data) {
+        formalFinalOutPutNameToDD.put(name,data);
+    }
+    @Override
+    public Map<String,DataDefinitionDeclaration> getFormalOutput() {
+        return formalFinalOutPutNameToDD;
+    }
 
     public FlowDefinitionImpl(String name, String description) {
         this.name = name;
         this.description = description;
-        flowOutputs = new ArrayList<>();
         steps = new ArrayList<>();
+        formalFinalOutPutNameToDD = new HashMap<>();
     }
 
-    public void addFlowOutput(String outputName) {
-        flowOutputs.add(outputName);
+    public void validateFlowStructure() throws CustomeMappingInvalid {
+        Map<String,DataDefinitionDeclaration> inputOnTheWay = new HashMap<>();
+        freeInputFinalNameToDD = new HashMap<>();
+        stepToFreeInputFinalNameToDD = new HashMap<>();
+        for(StepUsageDeclaration step : steps) {
+            List<DataDefinitionDeclaration> freeInputStepDD = new ArrayList<>();
+            List<DataDefinitionDeclaration> stepInputs = step.getStepDefinition().inputs();
+            for(DataDefinitionDeclaration data : stepInputs) {
+                String customMappingData = step.thisInputHaveCustomeMapping(step.getinputToFinalName().get(data.getName()));
+                if (customMappingData != null) {
+                    if (!inputOnTheWay.containsKey(customMappingData))
+                        throw new CustomeMappingInvalid("The input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take as the custome mapping says.");
+                } else {
+                    boolean exist = false;
+                    for (Map.Entry<String, DataDefinitionDeclaration> entry : inputOnTheWay.entrySet()) {
+                        String key = entry.getKey();
+                        DataDefinitionDeclaration value = entry.getValue();
+                        if (key.equals(step.getinputToFinalName().get(data.getName())) && value.dataDefinition().getType() == data.dataDefinition().getType()) {
+                            exist = true;
+                        }
+                    }
+                    if (!exist) {
+                        freeInputFinalNameToDD.put(step.getinputToFinalName().get(data.getName()), data);
+                        freeInputStepDD.add(data);
+                    }
+                }
+            }
+            step.getStepDefinition().outputs().stream().forEach(outPut -> inputOnTheWay.put(step.getoutputToFinalName().get(outPut.getName()),outPut));
+            if(freeInputStepDD.size() > 0)
+                stepToFreeInputFinalNameToDD.put(step,freeInputStepDD);
+        }
+        //In the last over all dd to check if non freindly
+
     }
 
+/*
     @Override
     public void validateFlowStructure() {
         freeInputsStepToDataDefinitionDeclaration = new HashMap<>();
@@ -54,11 +94,11 @@ public class FlowDefinitionImpl implements FlowDefinition {
             dataDefinitionDeclarationStream.forEach(theOutput -> inputsFlow.add(theOutput));
 
         }
-    }
+    }*/
 
     @Override
     public Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> getFlowFreeInputs() {
-        return freeInputsStepToDataDefinitionDeclaration;
+        return stepToFreeInputFinalNameToDD;
     }
 
     @Override
@@ -74,10 +114,5 @@ public class FlowDefinitionImpl implements FlowDefinition {
     @Override
     public List<StepUsageDeclaration> getFlowSteps() {
         return steps;
-    }
-
-    @Override
-    public List<String> getFlowFormalOutputs() {
-        return flowOutputs;
     }
 }

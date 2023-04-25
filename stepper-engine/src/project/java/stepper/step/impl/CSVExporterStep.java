@@ -45,7 +45,6 @@ public class CSVExporterStep extends AbstractStepDefinition {
 
         }
         context.storeDataValue("RESULT", output);
-        System.out.println(output);
         context.addStepLog(logs);
         return res;
     }

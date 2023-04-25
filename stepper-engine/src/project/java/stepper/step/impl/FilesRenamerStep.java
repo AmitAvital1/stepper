@@ -21,7 +21,7 @@ import java.util.Optional;
 public class FilesRenamerStep extends AbstractStepDefinition {
 
     public FilesRenamerStep() {
-        super("Files Rename", false);
+        super("Files Renamer", false);
 
         addInput(new DataDefinitionDeclarationImpl("FILES_LIST", DataNecessity.MANDATORY, "Files to rename", DataDefinitionRegistry.LIST));
         addInput(new DataDefinitionDeclarationImpl("PREFIX", DataNecessity.OPTIONAL, "Add this prefix", DataDefinitionRegistry.STRING));

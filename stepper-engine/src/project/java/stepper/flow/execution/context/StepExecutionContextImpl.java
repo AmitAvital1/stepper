@@ -23,16 +23,22 @@ public class StepExecutionContextImpl implements StepExecutionContext {
     @Override
     public <T> T getDataValue(String dataName, Class<T> expectedDataType) {
        //Find of there is an input match
+        String finalDataName = currentWorkingStep.getinputToFinalName().get(dataName);
+
+        if(currentWorkingStep.thisInputHaveCustomeMapping(finalDataName) != null)
+            finalDataName = currentWorkingStep.thisInputHaveCustomeMapping(finalDataName);
+
+        String finalName = finalDataName;
         DataDefinitionDeclaration theExpectedDataDefinition = null;
         Optional<DataDefinitionDeclaration> maybeTheExpectedDataDefinition =
                 currentWorkingStep.getStepDefinition().inputs().stream()
-                .filter((input) -> input.getName() == dataName)
+                .filter((input) -> input.getName() == finalName)////////Continue here
                 .findFirst();
 
         if(maybeTheExpectedDataDefinition.isPresent()){
             theExpectedDataDefinition = maybeTheExpectedDataDefinition.get();
             if (expectedDataType.isAssignableFrom(theExpectedDataDefinition.dataDefinition().getType())) {
-                Object aValue = dataValues.get(dataName);
+                Object aValue = dataValues.get(finalDataName);
                 return expectedDataType.cast(aValue);
             }
         }
@@ -44,7 +50,12 @@ public class StepExecutionContextImpl implements StepExecutionContext {
 
     @Override
     public boolean storeDataValue(String dataName, Object value) {
-        dataValues.put(dataName, value);
+        if(currentWorkingStep != null) {
+            String finalDataName = currentWorkingStep.getoutputToFinalName().get(dataName);
+            dataValues.put(finalDataName, value);
+        }
+        else
+            dataValues.put(dataName, value);
        /* DataDefinition theData = null;
 
         // we have the DD type so we can make sure that its from the same type

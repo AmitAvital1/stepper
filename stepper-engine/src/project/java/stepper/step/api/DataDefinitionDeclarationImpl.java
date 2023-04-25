@@ -2,6 +2,9 @@ package project.java.stepper.step.api;
 
 import project.java.stepper.dd.api.DataDefinition;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DataDefinitionDeclarationImpl implements DataDefinitionDeclaration {
 
     private final String name;

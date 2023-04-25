@@ -3,6 +3,9 @@ package project.java.stepper.step;
 import project.java.stepper.step.api.StepDefinition;
 import project.java.stepper.step.impl.*;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum StepDefinitionRegistry {
     HELLO_WORLD(new HelloWorldStep()),
     PERSON_DETAILS(new PersonDetailsStep()),
@@ -25,5 +28,10 @@ public enum StepDefinitionRegistry {
 
     public StepDefinition getStepDefinition() {
         return stepDefinition;
+    }
+
+    public static StepDefinitionRegistry getStepRegistryByName(String stepName){
+        Optional<StepDefinitionRegistry> stepDR = Arrays.stream(StepDefinitionRegistry.values()).filter(step -> stepName.equals(step.getStepDefinition().name())).findFirst();
+        return stepDR.get();
     }
 }

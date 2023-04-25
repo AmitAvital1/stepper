@@ -59,8 +59,8 @@ public class FlowExecution {
             StepUsageDeclaration key = entry.getKey();
             List<DataDefinitionDeclaration> value = entry.getValue();
             for (DataDefinitionDeclaration dd : value) {
-                if (!startersFreeInputForContext.containsKey(dd.getName()) && dd.necessity() == DataNecessity.MANDATORY) {
-                    throw new MissMandatoryInput("Missing Mandatory input: " + dd.getName());
+                if (!startersFreeInputForContext.containsKey(key.getinputToFinalName().get(dd.getName())) && dd.necessity() == DataNecessity.MANDATORY) {
+                    throw new MissMandatoryInput("Missing Mandatory input: " + key.getinputToFinalName().get(dd.getName()));
                 }
             }
 
@@ -68,9 +68,9 @@ public class FlowExecution {
         return res;
     }
 
-    public boolean addFreeInputForStart(DataDefinitionDeclaration dataDefinitionDeclaration, String data) {
+    public boolean addFreeInputForStart(StepUsageDeclaration step,DataDefinitionDeclaration dataDefinitionDeclaration, String data) {
         Object newData = dataDefinitionDeclaration.dataDefinition().convertUserInputToDataType(data,dataDefinitionDeclaration.dataDefinition().getType());
-        startersFreeInputForContext.put(dataDefinitionDeclaration.getName(),newData);
+        startersFreeInputForContext.put(step.getinputToFinalName().get(dataDefinitionDeclaration.getName()),newData);
         return true;
     }
     public Map<String, Object> getStartersFreeInputForContext() {

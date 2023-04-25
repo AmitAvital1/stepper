@@ -18,6 +18,7 @@ public class FLowExecutor {
         System.out.println("Starting execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]");
 
         StepExecutionContext context = new StepExecutionContextImpl(); // actual object goes here...
+        context.updateCurrentWorkingStep(null);
         flowExecution.getStartersFreeInputForContext().forEach((key,val) -> context.storeDataValue(key,val));
 
         // start actual execution

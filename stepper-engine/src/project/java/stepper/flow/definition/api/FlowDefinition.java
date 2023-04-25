@@ -1,5 +1,6 @@
 package project.java.stepper.flow.definition.api;
 
+import project.java.stepper.exceptions.CustomeMappingInvalid;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 
@@ -10,9 +11,9 @@ public interface FlowDefinition {
     String getName();
     String getDescription();
     List<StepUsageDeclaration> getFlowSteps();
-    List<String> getFlowFormalOutputs();
 
-    void validateFlowStructure();
+    void validateFlowStructure() throws CustomeMappingInvalid;
     Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> getFlowFreeInputs();
-    List<DataDefinitionDeclaration> getfreeInputsDataDefinitionDeclaration();
+    void addFormalOutput(String name, DataDefinitionDeclaration data);
+    Map<String,DataDefinitionDeclaration> getFormalOutput();
 }
