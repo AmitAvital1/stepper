@@ -46,7 +46,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
             Optional<String> maybePrefix = Optional.ofNullable(context.getDataValue("PREFIX", String.class));
             Optional<String> maybeSuffix = Optional.ofNullable(context.getDataValue("SUFFIX", String.class));
 
-            logs.addLogLine("About to start rename " + filesList.size() + "files. " + (maybePrefix.isPresent() ? "Adding prefix: " + maybePrefix.get() + ";" : "") + (maybeSuffix.isPresent() ? "Adding suffix: " + maybeSuffix.get() : ""));
+            logs.addLogLine("About to start rename " + filesList.size() + " files. " + (maybePrefix.isPresent() ? "Adding prefix: " + maybePrefix.get() + ";" : "") + (maybeSuffix.isPresent() ? "Adding suffix: " + maybeSuffix.get() : ""));
 
             for (FileData fileData : filesList) {
                 String fileName = new String(fileData.getFileName());

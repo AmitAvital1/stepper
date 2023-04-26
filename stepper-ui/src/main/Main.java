@@ -39,7 +39,7 @@ public class Main {
                         menu.FlowsExicuteMenu(flows);
                         break;
                     case 4://Flows History
-
+                        menu.showExecutionsHistoty();
                         break;
                     case 5://Stats
 

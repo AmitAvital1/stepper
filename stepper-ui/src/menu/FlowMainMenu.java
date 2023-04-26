@@ -13,7 +13,7 @@ import java.util.*;
 
 public class FlowMainMenu {
     private List<FlowDefinition> flows;
-    List<FlowExecution> flowExecutions;
+    private final List<FlowExecution> flowExecutions;
     private List<StepAndDD> freeInputListToPrint;
     FLowExecutor fLowExecutor;
     private class StepAndDD{
@@ -53,6 +53,7 @@ public class FlowMainMenu {
                     }
                     else if(userChoice == freeInputListToPrint.size() + 1){
                             executeFlow(flow);
+                            break;
                     }
                     else if(userChoice == 0){
                         break;
@@ -203,9 +204,48 @@ public class FlowMainMenu {
 
     public void showExecutionsHistoty() {
         int i = 1;
-        for(FlowExecution flow : flowExecutions){
-
+        int userChoice;
+        if(flowExecutions.size() == 0){
+            System.out.println("There are no flows that executed to get details");
+            return;
         }
+        do{
+            System.out.println("Please choose the flow to get details:");
+            for(FlowExecution flow : flowExecutions){
+                 System.out.println(i + "." + flow.getFlowDefinition().getName() + "-" + flow.getUniqueId() + "(" + flow.getStartedTime() + ")");
+             }
+            System.out.println("\n 0.EXIT");
+            Scanner scanner = new Scanner(System.in);
+            try {
+                userChoice = scanner.nextInt();
+                scanner.nextLine(); // consume the newline character
+                if (userChoice > 0 && userChoice <= flowExecutions.size()) {
+                    FlowExecution flow = flowExecutions.get(userChoice-1);
+                    System.out.println(flow.getUniqueId() + ":" + flow.getFlowDefinition().getName());
+                    System.out.println("Result:" + flow.getFlowExecutionResult() + ", Started Time:" + flow.getStartedTime());
+                    System.out.println("Free inputs details:");
+                    flow.getAllFreeInputsWithDataToPrintList().stream().forEach(System.out::println);
+                    System.out.println("All flow outputs:");
+                    flow.getAllOutPutsWithDataToPrintList().stream().forEach(System.out::println);
+                    System.out.println("All steps details:");
+                    flow.getAllStepsWithDataToPrintList().stream().forEach(System.out::println);
+                    userChoice = -1;
+                }
+                else if(userChoice == 0){
+                    break;
+                }
+                else
+                    throw new InvalidChoiseExeption("Invalid choose.");
+
+            }catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption e){
+                if(e.getClass() == InvalidChoiseExeption.class )
+                    System.out.println(e.getMessage());
+                else
+                    System.out.println("Please enter only a number");
+
+                userChoice = -1;
+            }
+        }while(userChoice != 0);
     }
 
 }

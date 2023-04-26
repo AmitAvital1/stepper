@@ -35,7 +35,6 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
 
         String filePath = context.getDataValue("FOLDER_NAME", String.class);
         Optional<String> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", String.class));
-
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
         String filter = maybeFilter.orElse(""); // "" says not filter
 
@@ -54,11 +53,11 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
             }
             context.storeDataValue("FILES_LIST", filesList);
             context.storeDataValue("TOTAL_FOUND", filesList.size());
-            logs.addLogLine("Found " +  filesList.size() + "files in folder matching the filter");
+            logs.addLogLine("Found " +  filesList.size() + " files in folder" + (filter != "" ? (" matching the filter") : ""));
             context.addStepLog(logs);
             if(filesList.size() == 0)
             {
-                //System.out.println("WARNING:THERE ARE NO FILES EXISST IN THE FOLDER PATH");
+                context.addStepSummaryLine("Step finith with no files to collect");
                 logs.addLogLine("STEP WARNING:There are no files exist in the folder path");
                 context.addStepLog(logs);
                 return StepResult.WARNING;
@@ -70,7 +69,8 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
         }
         catch (IOException e)
         {
-            logs.addLogLine("STEP FAILUR: There is no folder or wrong path folder");
+            context.addStepSummaryLine("Failure because there is no folder in the path");
+            logs.addLogLine("STEP FAILURE: There is no folder or wrong path folder");
             context.addStepLog(logs);
             return StepResult.FAILURE;
         }

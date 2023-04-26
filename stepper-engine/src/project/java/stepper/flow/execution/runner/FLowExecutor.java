@@ -40,6 +40,9 @@ public class FLowExecutor {
             stepUsageDeclaration.setDuration(duration);
             stepUsageDeclaration.setSummaryLine(context.getLastStepSummaryLine());
             System.out.println("Done executing step: " + stepUsageDeclaration.getFinalStepName() + ". Result: " + stepResult);
+            if(stepResult == StepResult.SUCCESS)
+                context.addStepSummaryLine(stepUsageDeclaration.getFinalStepName() + " succeed");
+
             if(!stepUsageDeclaration.skipIfFail() && stepResult == StepResult.FAILURE){
                 context.addStepSummaryLine("The step failed before finish: " + stepUsageDeclaration.getFinalStepName() + " FAILED");
                 StepLogs log = new StepLogs(stepUsageDeclaration.getFinalStepName());
@@ -58,5 +61,6 @@ public class FLowExecutor {
 
         //Inject all the data to the flow execution
         flowExecution.setAllDataValues(context.getDataValuesMap());
+        flowExecution.addFlowOutputsData(context.getFlowOutputsData());
     }
 }

@@ -136,7 +136,7 @@ public class FlowExecution {
     public List<String> getAllOutPutsWithDataToPrintList() {
         List<String> outputsString = new ArrayList<>();
         for(flowOutputsData output : outputsStepData){
-            String outputLine = output.finalName + "," + output.outputDD.userString() + output.outputDD.dataDefinition().getName();
+            String outputLine = output.finalName + "," + output.outputDD.userString() + "(" + output.outputDD.dataDefinition().getName() + ")";
             if(output.data.getClass() == String.class)
                 if(output.data.equals("Not created due to failure in flow"))
                     outputLine += "-NOTE:Not created due to failure in flow";
@@ -151,8 +151,8 @@ public class FlowExecution {
             line = step.getFinalStepName();
             if(!step.getFinalStepName().equals(step.getStepDefinition().name()))
                 line += "(" + step.getStepDefinition().name() + ")";
-            line += ", Total Time:" + step.getDuration() + ".ms" + ", Result:" + step.getStepResult();
-            line += "\nSummary line: " + step.getSummaryLine() + ",Total logs(" + step.getStepLogs().getStepLogs().size() + "):";
+            line += ", Total Time:[" + step.getDuration() + ".ms]" + ", Result:" + step.getStepResult();
+            line += "\n" + step.getSummaryLine() + ",Total logs(" + step.getStepLogs().getStepLogs().size() + "):";
             for(String log : step.getStepLogs().getStepLogs())
                 line += "\n" + log;
 
