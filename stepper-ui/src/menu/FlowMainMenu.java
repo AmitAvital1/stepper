@@ -1,5 +1,6 @@
 package menu;
 
+import java.util.UUID;
 import exeptions.InvalidChoiseExeption;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.flow.definition.api.FlowDefinition;
@@ -14,6 +15,7 @@ public class FlowMainMenu {
     private List<FlowDefinition> flows;
     List<FlowExecution> flowExecutions;
     private List<StepAndDD> freeInputListToPrint;
+    FLowExecutor fLowExecutor;
     private class StepAndDD{
         public StepUsageDeclaration step;
         public DataDefinitionDeclaration data;
@@ -22,6 +24,7 @@ public class FlowMainMenu {
 
     public FlowMainMenu(){
         flowExecutions = new ArrayList<>();
+        fLowExecutor = new FLowExecutor();
     }
 
 
@@ -99,7 +102,7 @@ public class FlowMainMenu {
             counter++;
         }
         counter = 1;
-        System.out.println("Read only: ");
+        System.out.println("Read only:" + flow.isReadOnly());
         System.out.println("Steps: ");
         for(StepUsageDeclaration step : flow.getFlowSteps())
         {
@@ -177,8 +180,8 @@ public class FlowMainMenu {
                 if(userChoice < 0 || userChoice > flows.size())
                     throw new InvalidChoiseExeption("Invalid choose.");
                 if(userChoice != 0) {
-                    FLowExecutor fLowExecutor = new FLowExecutor();
-                    FlowExecution flowExecution = new FlowExecution("200", flows.get(userChoice - 1));
+                    UUID uuid = UUID.randomUUID();
+                    FlowExecution flowExecution = new FlowExecution(uuid.toString(), flows.get(userChoice - 1));
                     showFlowDecMenu(flowExecution);
                 }
             } catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption e){
@@ -193,9 +196,15 @@ public class FlowMainMenu {
     }
     private void executeFlow(FlowExecution flow) throws MissMandatoryInput {
         if(flow.validateToExecute()){
-            FLowExecutor fLowExecutor = new FLowExecutor();
-            flowExecutions.add(flow);
             fLowExecutor.executeFlow(flow);
+            flowExecutions.add(flow);
+        }
+    }
+
+    public void showExecutionsHistoty() {
+        int i = 1;
+        for(FlowExecution flow : flowExecutions){
+
         }
     }
 

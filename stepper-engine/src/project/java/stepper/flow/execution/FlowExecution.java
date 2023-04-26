@@ -7,20 +7,37 @@ import project.java.stepper.step.api.DataDefinitionDeclaration;
 import project.java.stepper.step.api.DataNecessity;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FlowExecution {
 
     private final String uniqueId;
     private final FlowDefinition flowDefinition;
     private Duration totalTime;
+    private String startedTime;
     private FlowExecutionResult flowExecutionResult;
+    private final Map<String, Object> startersFreeInputForContext;
+    private Map<String, Object> allDataValues;
+    private List<flowOutputsData> outputsStepData;
 
 
-    private Map<String, Object> startersFreeInputForContext;
+    public static class flowOutputsData{
+        private String finalName;
+        private StepUsageDeclaration outputStep;
+        private DataDefinitionDeclaration outputDD;
+        private Object data;
+        public flowOutputsData(String finalName, StepUsageDeclaration outputStep, DataDefinitionDeclaration outputDD,Object data){
+            this.finalName = finalName;
+            this.outputStep = outputStep;
+            this.outputDD = outputDD;
+            this.data = data;
+        }
+        public boolean isOutputExist(String finalName,DataDefinitionDeclaration dd){
+               if(this.finalName.equals(finalName) && this.outputDD.dataDefinition().getName().equals(dd.dataDefinition().getName()))
+                   return true;
+               else return false;
+        }
+    }
 
     // lots more data that needed to be stored while flow is being executed...
 
@@ -31,8 +48,15 @@ public class FlowExecution {
 
     }
 
+    public void setAllDataValues(Map<String, Object> allDataValues) {this.allDataValues = allDataValues;}
     public String getUniqueId() {
         return uniqueId;
+    }
+    public String getStartedTime() {
+        return startedTime;
+    }
+    public void setStartedTime(String time) {
+        startedTime = time;
     }
 
     public FlowDefinition getFlowDefinition() {
@@ -77,4 +101,76 @@ public class FlowExecution {
         return startersFreeInputForContext;
     }
 
+    public List<String> getAllFreeInputsWithDataToPrintList(){
+        //First print all the mandatories input:
+        List<String> data = new ArrayList<>();
+        for (Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : flowDefinition.getFlowFreeInputs().entrySet()) {
+            StepUsageDeclaration key = entry.getKey();
+            List<DataDefinitionDeclaration> value = entry.getValue();
+            for (DataDefinitionDeclaration dd : value) {
+                if(dd.necessity() == DataNecessity.MANDATORY) {
+                    String inputFinalName = key.getinputToFinalName().get(dd.getName());
+                    Object inputContext = startersFreeInputForContext.get(inputFinalName);
+                    data.add(inputFinalName + "[" + inputContext + "]" + "(" + dd.dataDefinition().getName() + ") - " +
+                            dd.necessity());
+                }
+            }
+        }
+        //Print optional free inputs
+        for (Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : flowDefinition.getFlowFreeInputs().entrySet()) {
+            StepUsageDeclaration key = entry.getKey();
+            List<DataDefinitionDeclaration> value = entry.getValue();
+            for (DataDefinitionDeclaration dd : value) {
+                if(dd.necessity() == DataNecessity.OPTIONAL) {
+                    String inputFinalName = key.getinputToFinalName().get(dd.getName());
+                    Optional<Object> inputContext = Optional.ofNullable(startersFreeInputForContext.get(inputFinalName));
+                    if(inputContext.isPresent()) {
+                        data.add(inputFinalName + "[" + inputContext + "]" + "(" + dd.dataDefinition().getName() + ") - " +
+                                dd.necessity());
+                    }
+                }
+            }
+        }
+        return data;
+    }
+    public List<String> getAllOutPutsWithDataToPrintList() {
+        List<String> outputsString = new ArrayList<>();
+        for(flowOutputsData output : outputsStepData){
+            String outputLine = output.finalName + "," + output.outputDD.userString() + output.outputDD.dataDefinition().getName();
+            if(output.data.getClass() == String.class)
+                if(output.data.equals("Not created due to failure in flow"))
+                    outputLine += "-NOTE:Not created due to failure in flow";
+            outputsString.add(outputLine);
+        }
+        return outputsString;
+    }
+    public List<String> getAllStepsWithDataToPrintList() {
+        List<String> stepsString = new ArrayList<>();
+        for(StepUsageDeclaration step : flowDefinition.getFlowSteps()){
+            String line;
+            line = step.getFinalStepName();
+            if(!step.getFinalStepName().equals(step.getStepDefinition().name()))
+                line += "(" + step.getStepDefinition().name() + ")";
+            line += ", Total Time:" + step.getDuration() + ".ms" + ", Result:" + step.getStepResult();
+            line += "\nSummary line: " + step.getSummaryLine() + ",Total logs(" + step.getStepLogs().getStepLogs().size() + "):";
+            for(String log : step.getStepLogs().getStepLogs())
+                line += "\n" + log;
+
+            stepsString.add(line);
+        }
+        return stepsString;
+    }
+    public void addFlowOutputsData(List<flowOutputsData> outputsData){
+        //This function get from context all the outputs that success. If there are failure output this function will add him.
+        outputsStepData = outputsData;
+        for (StepUsageDeclaration key : flowDefinition.getFlowSteps()) {
+            List<DataDefinitionDeclaration> value = key.getStepDefinition().outputs();
+            for (DataDefinitionDeclaration dd : value) {
+                String outputFinalName = key.getoutputToFinalName().get(dd.getName());
+                if(outputsStepData.stream().noneMatch(outputData -> outputData.isOutputExist(outputFinalName,dd))) {
+                    outputsStepData.add(new flowOutputsData(outputFinalName,key,dd,"Not created due to failure in flow"));
+                }
+            }
+        }
+    }
 }

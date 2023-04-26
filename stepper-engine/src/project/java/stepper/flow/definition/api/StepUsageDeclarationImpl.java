@@ -1,7 +1,10 @@
 package project.java.stepper.flow.definition.api;
 
+import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.StepDefinition;
+import project.java.stepper.step.api.StepResult;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +12,10 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     private final StepDefinition stepDefinition;
     private final boolean skipIfFail;
     private final String stepName;
+    private StepResult stepResult;
+    private StepLogs stepLogs;
+    private Duration totalTime;
+    private String summaryLine;
     private final Map<String,String> inputsToFinalNames;
     private final Map<String,String> outputsToFinalNames;
     private final Map<String,String> finalNamesToInput;
@@ -21,6 +28,7 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     public StepUsageDeclarationImpl(StepDefinition stepDefinition) {
         this(stepDefinition, false, stepDefinition.name());
     }
+
 
     public StepUsageDeclarationImpl(StepDefinition stepDefinition, String name) {
         this(stepDefinition, false, name);
@@ -60,6 +68,26 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     }
 
     @Override
+    public StepResult getStepResult() {
+        return stepResult;
+    }
+
+    @Override
+    public StepLogs getStepLogs() {
+        return stepLogs;
+    }
+
+    @Override
+    public void setStepLogs(StepLogs logs) {
+        stepLogs = logs;
+    }
+
+    @Override
+    public void setStepResult(StepResult result) {
+        stepResult = result;
+    }
+
+    @Override
     public Map<String, String> getinputToFinalName() {
         return inputsToFinalNames;
     }
@@ -77,6 +105,26 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     @Override
     public Map<String, String> getFinalNameToOutput() {
         return finalNamesToOutput;
+    }
+
+    @Override
+    public void setDuration(Duration time){
+        totalTime = time;
+    }
+
+    @Override
+    public long getDuration(){
+        return totalTime.toMillis();
+    }
+
+    @Override
+    public void setSummaryLine(String line) {
+        summaryLine = line;
+    }
+
+    @Override
+    public String getSummaryLine() {
+        return summaryLine;
     }
 
     @Override

@@ -64,8 +64,7 @@ public class FileDumperStep extends AbstractStepDefinition {
                 writer.write(content);
                 writer.close();
             } catch (IOException e) {
-                System.out.println("An error occurred while writing to the file.");
-                res = StepResult.WARNING;
+                res = StepResult.FAILURE;
                 logs.addLogLine("WARNING: An error occurred while writing to the file.");
                 context.addStepSummaryLine("WARNING: An error occurred while writing to the file.");
                 result = "WARNING: An error occurred while writing to the file.";

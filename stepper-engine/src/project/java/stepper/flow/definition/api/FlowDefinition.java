@@ -11,6 +11,8 @@ public interface FlowDefinition {
     String getName();
     String getDescription();
     List<StepUsageDeclaration> getFlowSteps();
+    boolean isReadOnly();
+    void setReadOnly(boolean bool);
 
     void validateFlowStructure() throws CustomeMappingInvalid;
     Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> getFlowFreeInputs();

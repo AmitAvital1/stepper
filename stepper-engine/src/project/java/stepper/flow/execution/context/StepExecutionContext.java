@@ -1,7 +1,11 @@
 package project.java.stepper.flow.execution.context;
 
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
+import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
+
+import java.util.List;
+import java.util.Map;
 
 public interface StepExecutionContext {
     <T> T getDataValue(String dataName, Class<T> expectedDataType);
@@ -10,6 +14,10 @@ public interface StepExecutionContext {
     StepUsageDeclaration getCurrentWorkingStep();
     void addStepLog(StepLogs stepLogsToAdd);
     void addStepSummaryLine(String line);
+    StepLogs getLastStepLogs();
+    String getLastStepSummaryLine();
+    Map<String, Object> getDataValuesMap();
+    List<FlowExecution.flowOutputsData> getFlowOutputsData();
 
     // some more utility methods:
     // allow step to store log lines

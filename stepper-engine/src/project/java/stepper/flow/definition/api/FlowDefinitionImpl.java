@@ -15,6 +15,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
 
     private final String name;
     private final String description;
+    private boolean readOnly;
     private final List<StepUsageDeclaration> steps;
     private Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> stepToFreeInputFinalNameToDD;
     private Map<String,DataDefinitionDeclaration> freeInputFinalNameToDD;
@@ -24,6 +25,14 @@ public class FlowDefinitionImpl implements FlowDefinition {
     public void addFormalOutput(String name, DataDefinitionDeclaration data) {
         formalFinalOutPutNameToDD.put(name,data);
     }
+
+    public boolean isReadOnly(){return readOnly;}
+
+    @Override
+    public void setReadOnly(boolean bool) {
+        readOnly = bool;
+    }
+
     @Override
     public Map<String,DataDefinitionDeclaration> getFormalOutput() {
         return formalFinalOutPutNameToDD;
@@ -32,6 +41,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
     public FlowDefinitionImpl(String name, String description) {
         this.name = name;
         this.description = description;
+        readOnly = true;
         steps = new ArrayList<>();
         formalFinalOutPutNameToDD = new HashMap<>();
     }
@@ -70,31 +80,6 @@ public class FlowDefinitionImpl implements FlowDefinition {
         //In the last over all dd to check if non freindly
 
     }
-
-/*
-    @Override
-    public void validateFlowStructure() {
-        freeInputsStepToDataDefinitionDeclaration = new HashMap<>();
-        freeInputsDataDefinitionDeclaration = new ArrayList<>();
-        List<DataDefinitionDeclaration> inputsFlow = new ArrayList<>();
-        for(StepUsageDeclaration step : steps) {
-            List<DataDefinitionDeclaration> dataDefinitionDeclarationStream =
-                    step.getStepDefinition().inputs().stream()
-                            .filter(input ->  (inputsFlow.stream().allMatch(i -> (i.getName() != input.getName()) || i.dataDefinition().getType() != input.dataDefinition().getType() )))
-                            .collect(Collectors.toList());
-
-            if(dataDefinitionDeclarationStream.size() > 0) {
-                dataDefinitionDeclarationStream.forEach(freeInput -> freeInputsDataDefinitionDeclaration.add(freeInput));
-                freeInputsStepToDataDefinitionDeclaration.put(step, dataDefinitionDeclarationStream);
-            }
-
-            dataDefinitionDeclarationStream =  step.getStepDefinition().outputs().stream()
-                    .collect(Collectors.toList());
-
-            dataDefinitionDeclarationStream.forEach(theOutput -> inputsFlow.add(theOutput));
-
-        }
-    }*/
 
     @Override
     public Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> getFlowFreeInputs() {

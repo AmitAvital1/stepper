@@ -51,6 +51,8 @@ public class LoadStepperDataFromXml {
                 ifFailing = step.isContinueIfFailing();
 
             flow1.getFlowSteps().add(new StepUsageDeclarationImpl(StepDefinitionRegistry.getStepRegistryByName(step.getName()).getStepDefinition(),ifFailing,stepFinalName));
+            if(!StepDefinitionRegistry.getStepRegistryByName(step.getName()).getStepDefinition().isReadonly())
+                flow1.setReadOnly(false);
         }
         if(Optional.ofNullable(flow.getSTFlowLevelAliasing()).isPresent()) {
             for (STFlowLevelAlias flowAlias : flow.getSTFlowLevelAliasing().getSTFlowLevelAlias()) {
@@ -71,7 +73,7 @@ public class LoadStepperDataFromXml {
             boolean found = false;
             for(StepUsageDeclaration s : flow1.getFlowSteps()){
                 if(Optional.ofNullable(s.getFinalNameToOutput().get(flowOut)).isPresent()) {
-                    outPutRealName = s.getoutputToFinalName().get(flowOut);
+                    outPutRealName = s.getFinalNameToOutput().get(flowOut);
                     found = true;
                     break;
                 }
@@ -87,7 +89,6 @@ public class LoadStepperDataFromXml {
                         break;
                     }
                 }
-                break;
             }
             else
                 throw new SyntaxErrorInXML("In xml given wrong flow output");
