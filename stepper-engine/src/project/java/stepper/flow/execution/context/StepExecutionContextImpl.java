@@ -5,7 +5,9 @@ import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
+import project.java.stepper.step.api.StepResult;
 
+import java.time.Duration;
 import java.util.*;
 
 public class StepExecutionContextImpl implements StepExecutionContext {
@@ -15,14 +17,31 @@ public class StepExecutionContextImpl implements StepExecutionContext {
     private List<StepLogs> flowLogs;
     private List<String> stepSummaryLine;
     private final List<FlowExecution.flowOutputsData> outputsData;
+    private List<stepData> flowStepsData;
 
     public StepExecutionContextImpl() {
         dataValues = new HashMap<>();
         flowLogs = new ArrayList<>();
         stepSummaryLine = new ArrayList<>();
         outputsData = new ArrayList<>();
+        flowStepsData = new ArrayList<>();
     }
 
+    public class stepData{
+        public StepUsageDeclaration step;
+        public String stepSummaryLine;
+        public StepLogs logs;
+        public Duration time;
+        public StepResult result;
+
+        public stepData(StepUsageDeclaration step,String stepSummaryLine,StepLogs logs, Duration time, StepResult result){
+            this.step = step;
+            this.result = result;
+            this.stepSummaryLine = stepSummaryLine;
+            this.logs = logs;
+            this.time = time;
+        }
+    }
     @Override
     public Map<String, Object> getDataValuesMap(){return dataValues;}
 
@@ -101,5 +120,14 @@ public class StepExecutionContextImpl implements StepExecutionContext {
     public String getLastStepSummaryLine() {
         return stepSummaryLine.get(stepSummaryLine.size()-1);
     }
-
+    public void addStepData(StepUsageDeclaration step,String stepSummaryLine,StepLogs logs, Duration time, StepResult result){
+        flowStepsData.add(new stepData(step,stepSummaryLine,logs,time,result));
+    }
+    public stepData getStepData(StepUsageDeclaration step){
+        for(stepData data : flowStepsData){
+            if(data.step == step)
+                return data;
+        }
+        return null;
+    }
 }

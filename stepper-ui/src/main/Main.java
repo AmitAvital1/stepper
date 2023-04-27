@@ -43,7 +43,7 @@ public class Main {
                         menu.showExecutionsHistoty();
                         break;
                     case 5://Stats
-
+                        menu.showFlowStatistics(flows);
                         break;
                     case 6://Exit
                         break;

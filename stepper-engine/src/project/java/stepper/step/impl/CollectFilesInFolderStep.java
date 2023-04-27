@@ -57,7 +57,7 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
             context.addStepLog(logs);
             if(filesList.size() == 0)
             {
-                context.addStepSummaryLine("Step finith with no files to collect");
+                context.addStepSummaryLine("Step finish with no files to collect");
                 logs.addLogLine("STEP WARNING:There are no files exist in the folder path");
                 context.addStepLog(logs);
                 return StepResult.WARNING;

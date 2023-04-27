@@ -4,9 +4,11 @@ import project.java.stepper.exceptions.CustomeMappingInvalid;
 import project.java.stepper.exceptions.FreeInputNotUserFriendly;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.exceptions.StepperExeption;
+import project.java.stepper.flow.statistics.FlowStats;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 import project.java.stepper.step.api.DataNecessity;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,16 +20,27 @@ public class FlowDefinitionImpl implements FlowDefinition {
     private final String name;
     private final String description;
     private boolean readOnly;
+    private final FlowStats flowStatistics;
     private final List<StepUsageDeclaration> steps;
     private Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> stepToFreeInputFinalNameToDD;
     private Map<String,DataDefinitionDeclaration> freeInputFinalNameToDD;
     private  Map<String,DataDefinitionDeclaration> formalFinalOutPutNameToDD;
+
+    public FlowDefinitionImpl(String name, String description) {
+        this.name = name;
+        this.description = description;
+        readOnly = true;
+        steps = new ArrayList<>();
+        formalFinalOutPutNameToDD = new HashMap<>();
+        flowStatistics = new FlowStats();
+    }
 
     @Override
     public void addFormalOutput(String name, DataDefinitionDeclaration data) {
         formalFinalOutPutNameToDD.put(name,data);
     }
 
+    @Override
     public boolean isReadOnly(){return readOnly;}
 
     @Override
@@ -40,12 +53,18 @@ public class FlowDefinitionImpl implements FlowDefinition {
         return formalFinalOutPutNameToDD;
     }
 
-    public FlowDefinitionImpl(String name, String description) {
-        this.name = name;
-        this.description = description;
-        readOnly = true;
-        steps = new ArrayList<>();
-        formalFinalOutPutNameToDD = new HashMap<>();
+    @Override
+    public void addFlowRunStepStats(StepUsageDeclaration step, Duration time) {
+        flowStatistics.addStepStats(step,time);
+    }
+
+    @Override
+    public void addFlowRunStats(Duration time) {
+        flowStatistics.addFlowRunStats(time);
+    }
+
+    public FlowStats getFlowStatistics() {
+        return flowStatistics;
     }
 
     public void validateFlowStructure() throws StepperExeption {
@@ -73,7 +92,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
                     }
                     if (!exist) {
                         //There is no output to take for the input - so its free input
-                        if(data.dataDefinition().isUserFriendly() == false)//If the free input does not user friendly
+                        if(!data.dataDefinition().isUserFriendly())//If the free input does not user friendly
                             throw new FreeInputNotUserFriendly("The free input: " + step.getinputToFinalName().get(data.getName()) + " cannot get input from user");
 
                         freeInputFinalNameToDD.put(step.getinputToFinalName().get(data.getName()), data);

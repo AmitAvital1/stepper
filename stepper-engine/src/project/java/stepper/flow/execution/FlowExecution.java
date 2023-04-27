@@ -3,6 +3,8 @@ package project.java.stepper.flow.execution;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
+import project.java.stepper.flow.execution.context.StepExecutionContext;
+import project.java.stepper.flow.execution.context.StepExecutionContextImpl;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 import project.java.stepper.step.api.DataNecessity;
 
@@ -13,6 +15,7 @@ public class FlowExecution {
 
     private final String uniqueId;
     private final FlowDefinition flowDefinition;
+    private StepExecutionContext flowContexts;
     private Duration totalTime;
     private String startedTime;
     private FlowExecutionResult flowExecutionResult;
@@ -47,7 +50,7 @@ public class FlowExecution {
         startersFreeInputForContext = new HashMap<>();
 
     }
-
+    public void setFlowContexts(StepExecutionContext context){flowContexts = context;}
     public void setAllDataValues(Map<String, Object> allDataValues) {this.allDataValues = allDataValues;}
     public String getUniqueId() {
         return uniqueId;
@@ -58,7 +61,6 @@ public class FlowExecution {
     public void setStartedTime(String time) {
         startedTime = time;
     }
-
     public FlowDefinition getFlowDefinition() {
         return flowDefinition;
     }
@@ -74,8 +76,6 @@ public class FlowExecution {
     public long getDuration(){
         return totalTime.toMillis();
     }
-
-
     public boolean validateToExecute() throws MissMandatoryInput {
         boolean res = true;
 
@@ -91,7 +91,6 @@ public class FlowExecution {
         }
         return res;
     }
-
     public boolean addFreeInputForStart(StepUsageDeclaration step,DataDefinitionDeclaration dataDefinitionDeclaration, String data) {
         Object newData = dataDefinitionDeclaration.dataDefinition().convertUserInputToDataType(data,dataDefinitionDeclaration.dataDefinition().getType());
         startersFreeInputForContext.put(step.getinputToFinalName().get(dataDefinitionDeclaration.getName()),newData);
@@ -100,7 +99,6 @@ public class FlowExecution {
     public Map<String, Object> getStartersFreeInputForContext() {
         return startersFreeInputForContext;
     }
-
     public List<String> getAllFreeInputsWithDataToPrintList(){
         //First print all the mandatories input:
         List<String> data = new ArrayList<>();
@@ -147,14 +145,19 @@ public class FlowExecution {
     public List<String> getAllStepsWithDataToPrintList() {
         List<String> stepsString = new ArrayList<>();
         for(StepUsageDeclaration step : flowDefinition.getFlowSteps()){
+            StepExecutionContextImpl.stepData data = flowContexts.getStepData(step);
             String line;
             line = step.getFinalStepName();
-            if(!step.getFinalStepName().equals(step.getStepDefinition().name()))
-                line += "(" + step.getStepDefinition().name() + ")";
-            line += ", Total Time:[" + step.getDuration() + ".ms]" + ", Result:" + step.getStepResult();
-            line += "\n" + step.getSummaryLine() + ",Total logs(" + step.getStepLogs().getStepLogs().size() + "):";
-            for(String log : step.getStepLogs().getStepLogs())
-                line += "\n" + log;
+            if(data != null) {
+                if (!step.getFinalStepName().equals(step.getStepDefinition().name()))
+                    line += "(" + data.step.getStepDefinition().name() + ")";
+                line += ", Total Time:[" + data.time.toMillis() + ".ms]" + ", Result:" + data.result;
+                line += "\n" + data.stepSummaryLine + ",Total logs(" + data.logs.getStepLogs().size() + "):";
+                for (String log : data.logs.getStepLogs())
+                    line += "\n" + log;
+            }
+            else
+                line += " don't have data during failure of the step";
 
             stepsString.add(line);
         }

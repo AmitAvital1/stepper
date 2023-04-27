@@ -1,10 +1,7 @@
 package project.java.stepper.flow.definition.api;
 
-import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.StepDefinition;
-import project.java.stepper.step.api.StepResult;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,10 +9,6 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     private final StepDefinition stepDefinition;
     private final boolean skipIfFail;
     private final String stepName;
-    private StepResult stepResult;
-    private StepLogs stepLogs;
-    private Duration totalTime;
-    private String summaryLine;
     private final Map<String,String> inputsToFinalNames;
     private final Map<String,String> outputsToFinalNames;
     private final Map<String,String> finalNamesToInput;
@@ -68,26 +61,6 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     }
 
     @Override
-    public StepResult getStepResult() {
-        return stepResult;
-    }
-
-    @Override
-    public StepLogs getStepLogs() {
-        return stepLogs;
-    }
-
-    @Override
-    public void setStepLogs(StepLogs logs) {
-        stepLogs = logs;
-    }
-
-    @Override
-    public void setStepResult(StepResult result) {
-        stepResult = result;
-    }
-
-    @Override
     public Map<String, String> getinputToFinalName() {
         return inputsToFinalNames;
     }
@@ -108,26 +81,6 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     }
 
     @Override
-    public void setDuration(Duration time){
-        totalTime = time;
-    }
-
-    @Override
-    public long getDuration(){
-        return totalTime.toMillis();
-    }
-
-    @Override
-    public void setSummaryLine(String line) {
-        summaryLine = line;
-    }
-
-    @Override
-    public String getSummaryLine() {
-        return summaryLine;
-    }
-
-    @Override
     public boolean addLevelAlias(String name, String finalName) {
         if(inputsToFinalNames.containsKey(name)) {
             inputsToFinalNames.put(name, finalName);
@@ -141,5 +94,18 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
         }
         else
             return false;
+    }
+    @Override
+    public boolean equals(Object o) {
+
+        if(o.getClass() != StepUsageDeclaration.class )
+            return false;
+        StepUsageDeclaration other = (StepUsageDeclaration)o;
+
+        if(this.stepName.equals(other.getFinalStepName()) && this.stepDefinition.name().equals(other.getStepDefinition().name()))
+            return true;
+
+        return false;
+
     }
 }

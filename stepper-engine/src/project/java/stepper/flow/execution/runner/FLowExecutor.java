@@ -15,30 +15,29 @@ import java.time.LocalTime;
 public class FLowExecutor {
 
     public void executeFlow(FlowExecution flowExecution) {
+        boolean stopTheFlow = false;
         Instant flowStartTime = Instant.now();
         LocalTime time = LocalTime.now();
         String formattedTime = time.getHour() + ":" + time.getMinute() + ":" + time.getSecond();
         flowExecution.setStartedTime(formattedTime);
+
         System.out.println("Starting execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]");
 
         StepExecutionContext context = new StepExecutionContextImpl(); // actual object goes here...
+        flowExecution.setFlowContexts(context);
         context.updateCurrentWorkingStep(null);
         flowExecution.getStartersFreeInputForContext().forEach((key,val) -> context.storeDataValue(key,val));
 
         // start actual execution
-        for (int i = 0; i < flowExecution.getFlowDefinition().getFlowSteps().size(); i++) {
+        for (int i = 0; i < flowExecution.getFlowDefinition().getFlowSteps().size() && !stopTheFlow; i++) {
             StepUsageDeclaration stepUsageDeclaration = flowExecution.getFlowDefinition().getFlowSteps().get(i);
             context.updateCurrentWorkingStep(stepUsageDeclaration);
 
             Instant stepStartTime = Instant.now();
             System.out.println("Starting to execute step: " + stepUsageDeclaration.getFinalStepName());
             StepResult stepResult = stepUsageDeclaration.getStepDefinition().invoke(context);
-            stepUsageDeclaration.setStepResult(stepResult);
-            stepUsageDeclaration.setStepLogs(context.getLastStepLogs());
             Instant stepEndTime = Instant.now();
             Duration duration = Duration.between(stepStartTime, stepEndTime);
-            stepUsageDeclaration.setDuration(duration);
-            stepUsageDeclaration.setSummaryLine(context.getLastStepSummaryLine());
             System.out.println("Done executing step: " + stepUsageDeclaration.getFinalStepName() + ". Result: " + stepResult);
             if(stepResult == StepResult.SUCCESS)
                 context.addStepSummaryLine(stepUsageDeclaration.getFinalStepName() + " succeed");
@@ -49,10 +48,13 @@ public class FLowExecutor {
                 log.addLogLine("FAILED and stopped the flow");
                 context.addStepLog(log);
                 flowExecution.setFlowExecutionResult(FlowExecutionResult.FAILURE);
-                break;
+                stopTheFlow = true;
             }
-            flowExecution.setFlowExecutionResult(FlowExecutionResult.SUCCESS);
+            context.addStepData(stepUsageDeclaration,context.getLastStepSummaryLine(),context.getLastStepLogs(),duration,stepResult);//Add all step datas
+            flowExecution.getFlowDefinition().addFlowRunStepStats(stepUsageDeclaration,duration);
         }
+        if(!stopTheFlow)
+            flowExecution.setFlowExecutionResult(FlowExecutionResult.SUCCESS);
 
         Instant flowEndTime = Instant.now();
         Duration duration = Duration.between(flowStartTime, flowEndTime);
@@ -62,5 +64,6 @@ public class FLowExecutor {
         //Inject all the data to the flow execution
         flowExecution.setAllDataValues(context.getDataValuesMap());
         flowExecution.addFlowOutputsData(context.getFlowOutputsData());
+        flowExecution.getFlowDefinition().addFlowRunStats(duration);
     }
 }

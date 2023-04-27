@@ -7,12 +7,12 @@ import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.runner.FLowExecutor;
+import project.java.stepper.flow.statistics.FlowStats;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 
 import java.util.*;
 
 public class FlowMainMenu {
-    private List<FlowDefinition> flows;
     private final List<FlowExecution> flowExecutions;
     private List<StepAndDD> freeInputListToPrint;
     FLowExecutor fLowExecutor;
@@ -44,6 +44,7 @@ public class FlowMainMenu {
 
                 try {
                     userChoice = scanner.nextInt();
+                    scanner.nextLine();
                     if (userChoice > 0 && userChoice <= freeInputListToPrint.size()) {
                         System.out.println("Please add:" + freeInputListToPrint.get(userChoice - 1).data.userString());
                         String input = scanner.nextLine();
@@ -67,8 +68,8 @@ public class FlowMainMenu {
                         System.out.println("Please enter a number");
 
                     userChoice = -1;
+                    scanner.nextLine();
                 }
-            scanner.nextLine();
         }while(userChoice != 0);
 
     }
@@ -213,12 +214,13 @@ public class FlowMainMenu {
             System.out.println("Please choose the flow to get details:");
             for(FlowExecution flow : flowExecutions){
                  System.out.println(i + "." + flow.getFlowDefinition().getName() + "-" + flow.getUniqueId() + "(" + flow.getStartedTime() + ")");
+                 i++;
              }
+            i=1;
             System.out.println("\n 0.EXIT");
             Scanner scanner = new Scanner(System.in);
             try {
                 userChoice = scanner.nextInt();
-                scanner.nextLine(); // consume the newline character
                 if (userChoice > 0 && userChoice <= flowExecutions.size()) {
                     FlowExecution flow = flowExecutions.get(userChoice-1);
                     System.out.println(flow.getUniqueId() + ":" + flow.getFlowDefinition().getName());
@@ -242,6 +244,57 @@ public class FlowMainMenu {
                     System.out.println(e.getMessage());
                 else
                     System.out.println("Please enter only a number");
+                userChoice = -1;
+            }
+            scanner.nextLine(); // consume the newline character
+        }while(userChoice != 0);
+    }
+
+    public void showFlowStatistics(List<FlowDefinition> flows){
+        if(flows.size() == 0) {
+            System.out.println("There are no loaded flows.");
+            return;
+        }
+        int userChoice = 0;
+        Scanner scanner = new Scanner(System.in);
+        do{
+            System.out.println("Please choose flow to get statistics:");
+            for(int i = 0; i < flows.size(); i++)
+            {
+                System.out.print(i+1 + ".");
+                System.out.println(flows.get(i).getName());
+            }
+            System.out.println("\n0.EXIT");
+            try {
+                userChoice = scanner.nextInt();
+                if(userChoice < 0 || userChoice > flows.size())
+                    throw new InvalidChoiseExeption("Invalid choose.");
+                if(userChoice != 0) {
+                    FlowDefinition cFlow = flows.get(userChoice-1);
+                    FlowStats flowStats = cFlow.getFlowStatistics();
+                    if(flowStats.getExecutesRunTimes() == 0)
+                        System.out.println(cFlow.getName() + " did not executed yet therefore have no statistics to present.");
+                    else {
+                        System.out.println(cFlow.getName() + " statistics:");
+                        System.out.println("Numbers of executed times: " + flowStats.getExecutesRunTimes());
+                        System.out.println("Average execution time: " + flowStats.getAvgExecutesRunTimes() + ".ms");
+                        System.out.println("Flow steps stats: " + flowStats.getAvgExecutesRunTimes());
+                        int index = 1;
+                        for(StepUsageDeclaration step : cFlow.getFlowSteps()){
+                            int stepTimesExecuted = flowStats.getStepTimesExecuted(step);
+                            System.out.println(index + "." + step.getFinalStepName() + " Numbers of executed times[" + stepTimesExecuted + "]" +
+                                    " Average execution time: " + (stepTimesExecuted > 0 ? (flowStats.getStepAverageTimeExecuted(step) + ".ms") : "NA"));
+                            index++;
+                        }
+                    }
+
+
+                }
+            } catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption e){
+                if(e.getClass() == InvalidChoiseExeption.class)
+                    System.out.println(((InvalidChoiseExeption) e).getMessage());
+                else
+                    System.out.println("Please enter only numbers");
                 userChoice = -1;
             }
             scanner.nextLine();
