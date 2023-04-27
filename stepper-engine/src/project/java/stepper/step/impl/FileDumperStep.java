@@ -45,7 +45,7 @@ public class FileDumperStep extends AbstractStepDefinition {
             result = "Warning: No content to write to the file";
         }
             try {
-                logs.addLogLine("About to create file named  " + fileName);
+                logs.addLogLine("About to create file named " + fileName);
                 if (!file.createNewFile()) {
                     res = StepResult.FAILURE;
                     logs.addLogLine("Failure: An error occurred while creating the file");

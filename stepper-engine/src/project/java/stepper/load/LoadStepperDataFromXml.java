@@ -36,22 +36,27 @@ public class LoadStepperDataFromXml {
         return flowList;
     }
 
-    private static FlowDefinition cloneFlowDetails(STFlow flow) throws SyntaxErrorInXML{
+    private static FlowDefinition cloneFlowDetails(STFlow flow) throws StepperExeption{
         String flowName = flow.getName();
         String flowDescription = flow.getSTFlowDescription();
         FlowDefinition flow1 = new FlowDefinitionImpl(flowName, flowDescription);
         for(STStepInFlow step : flow.getSTStepsInFlow().getSTStepInFlow()) {
-
             String stepFinalName = step.getName();;
             boolean ifFailing = false;
+
+            if(!StepDefinitionRegistry.getStepRegistryByName(step.getName()).isPresent())
+                throw new StepInFlowNotExist("The step " + stepFinalName + " does not exist step");
+
+            StepDefinitionRegistry stepDefinition = StepDefinitionRegistry.getStepRegistryByName(step.getName()).get();
+
             if (Optional.ofNullable(step.getAlias()).isPresent())
                 stepFinalName = step.getAlias();
 
             if (Optional.ofNullable(step.isContinueIfFailing()).isPresent())
                 ifFailing = step.isContinueIfFailing();
 
-            flow1.getFlowSteps().add(new StepUsageDeclarationImpl(StepDefinitionRegistry.getStepRegistryByName(step.getName()).getStepDefinition(),ifFailing,stepFinalName));
-            if(!StepDefinitionRegistry.getStepRegistryByName(step.getName()).getStepDefinition().isReadonly())
+            flow1.getFlowSteps().add(new StepUsageDeclarationImpl(stepDefinition.getStepDefinition(),ifFailing,stepFinalName));
+            if(!stepDefinition.getStepDefinition().isReadonly())
                 flow1.setReadOnly(false);
         }
         if(Optional.ofNullable(flow.getSTFlowLevelAliasing()).isPresent()) {

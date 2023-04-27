@@ -1,7 +1,9 @@
 package project.java.stepper.flow.definition.api;
 
 import project.java.stepper.exceptions.CustomeMappingInvalid;
+import project.java.stepper.exceptions.FreeInputNotUserFriendly;
 import project.java.stepper.exceptions.MissMandatoryInput;
+import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 import project.java.stepper.step.api.DataNecessity;
 
@@ -46,19 +48,21 @@ public class FlowDefinitionImpl implements FlowDefinition {
         formalFinalOutPutNameToDD = new HashMap<>();
     }
 
-    public void validateFlowStructure() throws CustomeMappingInvalid {
+    public void validateFlowStructure() throws StepperExeption {
         Map<String,DataDefinitionDeclaration> inputOnTheWay = new HashMap<>();
         freeInputFinalNameToDD = new HashMap<>();
         stepToFreeInputFinalNameToDD = new HashMap<>();
+        //Over all the steps, and his inputs, and check if there are have output from the lasts steps
         for(StepUsageDeclaration step : steps) {
             List<DataDefinitionDeclaration> freeInputStepDD = new ArrayList<>();
             List<DataDefinitionDeclaration> stepInputs = step.getStepDefinition().inputs();
             for(DataDefinitionDeclaration data : stepInputs) {
-                String customMappingData = step.thisInputHaveCustomeMapping(step.getinputToFinalName().get(data.getName()));
-                if (customMappingData != null) {
-                    if (!inputOnTheWay.containsKey(customMappingData))
-                        throw new CustomeMappingInvalid("The input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take as the custome mapping says.");
+                String customMappingData = step.thisInputHaveCustomeMapping(step.getinputToFinalName().get(data.getName())); //Check if this input have custom mapping
+                if (customMappingData != null) {//If there is custom mapping to the input
+                    if (!inputOnTheWay.containsKey(customMappingData))//If there is custom mapping but there is no output that return from other steps to take ---> exception
+                        throw new CustomeMappingInvalid("The input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take as the custom mapping says.");
                 } else {
+                    //If there is no custom mapping - check if there is an output to the input
                     boolean exist = false;
                     for (Map.Entry<String, DataDefinitionDeclaration> entry : inputOnTheWay.entrySet()) {
                         String key = entry.getKey();
@@ -68,6 +72,10 @@ public class FlowDefinitionImpl implements FlowDefinition {
                         }
                     }
                     if (!exist) {
+                        //There is no output to take for the input - so its free input
+                        if(data.dataDefinition().isUserFriendly() == false)//If the free input does not user friendly
+                            throw new FreeInputNotUserFriendly("The free input: " + step.getinputToFinalName().get(data.getName()) + " cannot get input from user");
+
                         freeInputFinalNameToDD.put(step.getinputToFinalName().get(data.getName()), data);
                         freeInputStepDD.add(data);
                     }

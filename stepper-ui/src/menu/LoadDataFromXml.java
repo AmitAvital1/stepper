@@ -2,10 +2,7 @@ package menu;
 
 import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
-import project.java.stepper.flow.definition.api.FlowDefinitionImpl;
-import project.java.stepper.flow.definition.api.StepUsageDeclarationImpl;
 import project.java.stepper.load.LoadStepperDataFromXml;
-import project.java.stepper.step.StepDefinitionRegistry;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
@@ -15,15 +12,19 @@ import java.util.List;
 public class LoadDataFromXml {
 
     public static List<FlowDefinition> LoadData(String xmlNative) {
+
         List<FlowDefinition> flowList = new ArrayList<>();
+        if(xmlNative.equals("0"))
+            return flowList;
+
         try {
-                flowList = LoadStepperDataFromXml.load("C:\\Users\\USER\\Desktop\\checker\\ex1.xml");
+                flowList = LoadStepperDataFromXml.load(xmlNative);
         }catch(FileNotFoundException e) {
-            System.out.println("XML path not found");
+            System.out.println("Error: XML path not found");
         }catch (JAXBException e) {
             System.out.println("Error while trying get your data from XML");
         }catch (StepperExeption e){
-            System.out.println(e.getMessage());
+            System.out.println("Error:" + e.getMessage());
         }
         return flowList;
 

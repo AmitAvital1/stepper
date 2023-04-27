@@ -30,8 +30,8 @@ public enum StepDefinitionRegistry {
         return stepDefinition;
     }
 
-    public static StepDefinitionRegistry getStepRegistryByName(String stepName){
+    public static  Optional<StepDefinitionRegistry> getStepRegistryByName(String stepName){
         Optional<StepDefinitionRegistry> stepDR = Arrays.stream(StepDefinitionRegistry.values()).filter(step -> stepName.equals(step.getStepDefinition().name())).findFirst();
-        return stepDR.get();
+        return stepDR;
     }
 }

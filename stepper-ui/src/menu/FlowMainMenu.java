@@ -44,7 +44,6 @@ public class FlowMainMenu {
 
                 try {
                     userChoice = scanner.nextInt();
-                    scanner.nextLine(); // consume the newline character
                     if (userChoice > 0 && userChoice <= freeInputListToPrint.size()) {
                         System.out.println("Please add:" + freeInputListToPrint.get(userChoice - 1).data.userString());
                         String input = scanner.nextLine();
@@ -69,6 +68,7 @@ public class FlowMainMenu {
 
                     userChoice = -1;
                 }
+            scanner.nextLine();
         }while(userChoice != 0);
 
     }
@@ -84,7 +84,7 @@ public class FlowMainMenu {
             List<DataDefinitionDeclaration> value = entry.getValue();
             for (DataDefinitionDeclaration dd : value) {
                 System.out.println((index + 1) + ". Step '" + key.getFinalStepName() + ", " + dd.userString() +
-                        "(" + dd.necessity() + ")" + (flow.getStartersFreeInputForContext().containsKey(key.getinputToFinalName().get(dd.getName())) ? "(ADDED)" : "(NOT ADDED)"));
+                        "(" + dd.necessity() + ")" + "[" + dd.dataDefinition().getName() + "]" + (flow.getStartersFreeInputForContext().containsKey(key.getinputToFinalName().get(dd.getName())) ? "(ADDED)" : "(NOT ADDED)"));
                 index++;
                 freeInputListToPrint.add(new StepAndDD(key,dd));
             }
@@ -157,7 +157,7 @@ public class FlowMainMenu {
                     System.out.println("Please enter only numbers");
                 userChoice = -1;
             }
-
+            scanner.nextLine();
         }while(userChoice != 0);
     }
     public void FlowsExicuteMenu(List<FlowDefinition> flows) {
@@ -192,7 +192,7 @@ public class FlowMainMenu {
                     System.out.println("Please enter only numbers");
                 userChoice = -1;
             }
-
+            scanner.nextLine();
         }while(userChoice != 0);
     }
     private void executeFlow(FlowExecution flow) throws MissMandatoryInput {
@@ -242,9 +242,9 @@ public class FlowMainMenu {
                     System.out.println(e.getMessage());
                 else
                     System.out.println("Please enter only a number");
-
                 userChoice = -1;
             }
+            scanner.nextLine();
         }while(userChoice != 0);
     }
 

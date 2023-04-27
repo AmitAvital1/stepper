@@ -23,12 +23,13 @@ public class Main {
         do {
             System.out.println("Stepper main menu");
             Arrays.stream(MenuOptions.values()).forEach(item -> item.print());
-            userChoice = scanner.nextInt();
-            try {
+            try{
+                userChoice = scanner.nextInt();
+                scanner.nextLine(); // consume the newline character
+
                 switch (userChoice) {
                     case 1://Load Data from xml
-                        scanner.nextLine();
-                        System.out.println("Please enter a xml native to import flows");
+                        System.out.println("Please enter a xml native to import flows or 0 to exit");
                         String input = scanner.nextLine();
                         flows = LoadDataFromXml.LoadData(input);
                         break;
@@ -53,8 +54,9 @@ public class Main {
                 if (e.getClass() == InvalidChoiseExeption.class)
                     System.out.println(((InvalidChoiseExeption) e).getMessage());
                 else
-                    System.out.println("Please enter a number");
+                    System.out.println("Please enter only a number");
                 userChoice = -1;
+                scanner.nextLine(); // consume the newline character
             }
         } while (userChoice != MenuOptions.Exit.ordinal() + 1);
 
