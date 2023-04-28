@@ -1,9 +1,6 @@
 package project.java.stepper.flow.definition.api;
 
-import project.java.stepper.exceptions.CustomeMappingInvalid;
-import project.java.stepper.exceptions.FreeInputNotUserFriendly;
-import project.java.stepper.exceptions.MissMandatoryInput;
-import project.java.stepper.exceptions.StepperExeption;
+import project.java.stepper.exceptions.*;
 import project.java.stepper.flow.statistics.FlowStats;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 import project.java.stepper.step.api.DataNecessity;
@@ -80,6 +77,8 @@ public class FlowDefinitionImpl implements FlowDefinition {
                 if (customMappingData != null) {//If there is custom mapping to the input
                     if (!inputOnTheWay.containsKey(customMappingData))//If there is custom mapping but there is no output that return from other steps to take ---> exception
                         throw new CustomeMappingInvalid("The input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take as the custom mapping says.");
+                    if(inputOnTheWay.get(customMappingData).dataDefinition().getType() != data.dataDefinition().getType())
+                        throw new CustomeMappingInvalid("The input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take with the same data type as the custom mapping says.");
                 } else {
                     //If there is no custom mapping - check if there is an output to the input
                     boolean exist = false;
@@ -100,12 +99,20 @@ public class FlowDefinitionImpl implements FlowDefinition {
                     }
                 }
             }
-            step.getStepDefinition().outputs().stream().forEach(outPut -> inputOnTheWay.put(step.getoutputToFinalName().get(outPut.getName()),outPut));
+            //Check if there are two outputs in the flow with the same name
+            final boolean[] thereIsTwoOutputsInTheSameName = {false};
+            step.getStepDefinition().outputs().stream().forEach(outPut -> {
+                    if (!inputOnTheWay.containsKey(step.getoutputToFinalName().get(outPut.getName())))
+                        inputOnTheWay.put(step.getoutputToFinalName().get(outPut.getName()), outPut);
+                    else
+                        thereIsTwoOutputsInTheSameName[0] = true;
+                });
+            if(thereIsTwoOutputsInTheSameName[0])
+                throw new DuplicateOutputsNames("Error while reading the flow - there are two outputs with the same name");
+
             if(freeInputStepDD.size() > 0)
                 stepToFreeInputFinalNameToDD.put(step,freeInputStepDD);
         }
-        //In the last over all dd to check if non freindly
-
     }
 
     @Override

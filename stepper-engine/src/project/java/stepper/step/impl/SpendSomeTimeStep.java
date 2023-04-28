@@ -18,7 +18,9 @@ public class SpendSomeTimeStep extends AbstractStepDefinition {
         int seconds = context.getDataValue("TIME_TO_SPEND", Integer.class);
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
         if (seconds <= 0) {
+            context.addStepSummaryLine("Failure:there is non natural number of seconds in the input");
             logs.addLogLine("STEP FAILURE:non natural number of seconds");
+            context.addStepLog(logs);
             return StepResult.FAILURE;
         }
         else {
@@ -26,9 +28,13 @@ public class SpendSomeTimeStep extends AbstractStepDefinition {
                 logs.addLogLine("About to sleep for " + seconds + " seconds…");
                 Thread.sleep(seconds * 1000);
                 logs.addLogLine("Done sleeping…");
+                context.addStepSummaryLine("Finish with sleep of " + seconds + " seconds");
+                context.addStepLog(logs);
                 return StepResult.SUCCESS;
             }catch (InterruptedException e) {
+                context.addStepSummaryLine("Failure:Error occured");
                 logs.addLogLine("STEP FAILURE:Error occured");
+                context.addStepLog(logs);
                 return StepResult.FAILURE;
             }
         }

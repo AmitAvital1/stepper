@@ -13,7 +13,7 @@ import project.java.stepper.step.api.DataDefinitionDeclaration;
 import java.util.*;
 
 public class FlowMainMenu {
-    private final List<FlowExecution> flowExecutions;
+    private final List<FlowExecution> flowExecutions;//Save all the executions flows
     private List<StepAndDD> freeInputListToPrint;
     FLowExecutor fLowExecutor;
     private class StepAndDD{
@@ -27,20 +27,18 @@ public class FlowMainMenu {
         fLowExecutor = new FLowExecutor();
     }
 
-
-
     public void showFlowDecMenu(FlowExecution flow) {
         int userChoice = -1;
         int index = 0;
         Scanner scanner = new Scanner(System.in);
         Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs = flow.getFlowDefinition().getFlowFreeInputs();
         do{
-            System.out.println("Flow name:" + flow.getFlowDefinition().getName());
+            System.out.println("\nFlow name:" + flow.getFlowDefinition().getName());
 
                 index = printAllFreeInputsAndReturnSize(flow,freeInputs);
 
                 System.out.println((index+1) + ". Execute flow");
-                System.out.println("\n\n\n 0.EXIT");
+                System.out.println("\n 0.EXIT");
 
                 try {
                     userChoice = scanner.nextInt();
@@ -64,11 +62,12 @@ public class FlowMainMenu {
                 }catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption | MissMandatoryInput e){
                     if(e.getClass() == InvalidChoiseExeption.class || e.getClass() == MissMandatoryInput.class)
                         System.out.println(e.getMessage());
-                    else
+                    else {
                         System.out.println("Please enter a number");
+                        scanner.nextLine();
+                    }
 
                     userChoice = -1;
-                    scanner.nextLine();
                 }
         }while(userChoice != 0);
 
@@ -94,7 +93,7 @@ public class FlowMainMenu {
     }
     public void FlowDecDefenitionsMenu(FlowDefinition flow) {
         int counter = 1;
-        System.out.println("Flow name:" + flow.getName());
+        System.out.println("\nFlow name:" + flow.getName());
         System.out.println("Description:" + flow.getDescription());
         System.out.println("Formal outputs:");
         for(Map.Entry<String, DataDefinitionDeclaration> entry : flow.getFormalOutput().entrySet()) {
@@ -137,7 +136,7 @@ public class FlowMainMenu {
         int userChoice = 0;
         Scanner scanner = new Scanner(System.in);
         do{
-            System.out.println("Flows definitions menu:");
+            System.out.println("\nFlows definitions menu:");
             for(int i = 0; i < flows.size(); i++)
             {
                 System.out.print(i+1 + ".");
@@ -170,7 +169,7 @@ public class FlowMainMenu {
         int userChoice = 0;
         Scanner scanner = new Scanner(System.in);
         do{
-            System.out.println("Please choose flow to execute:");
+            System.out.println("\nPlease choose flow to execute:");
             for(int i = 0; i < flows.size(); i++)
             {
                 System.out.print(i+1 + ".");
@@ -211,7 +210,7 @@ public class FlowMainMenu {
             return;
         }
         do{
-            System.out.println("Please choose the flow to get details:");
+            System.out.println("\nPlease choose the flow to get details:");
             for(FlowExecution flow : flowExecutions){
                  System.out.println(i + "." + flow.getFlowDefinition().getName() + "-" + flow.getUniqueId() + "(" + flow.getStartedTime() + ")");
                  i++;
@@ -258,7 +257,7 @@ public class FlowMainMenu {
         int userChoice = 0;
         Scanner scanner = new Scanner(System.in);
         do{
-            System.out.println("Please choose flow to get statistics:");
+            System.out.println("\nPlease choose flow to get statistics:");
             for(int i = 0; i < flows.size(); i++)
             {
                 System.out.print(i+1 + ".");
@@ -278,7 +277,7 @@ public class FlowMainMenu {
                         System.out.println(cFlow.getName() + " statistics:");
                         System.out.println("Numbers of executed times: " + flowStats.getExecutesRunTimes());
                         System.out.println("Average execution time: " + flowStats.getAvgExecutesRunTimes() + ".ms");
-                        System.out.println("Flow steps stats: " + flowStats.getAvgExecutesRunTimes());
+                        System.out.println("Flow steps stats:");
                         int index = 1;
                         for(StepUsageDeclaration step : cFlow.getFlowSteps()){
                             int stepTimesExecuted = flowStats.getStepTimesExecuted(step);

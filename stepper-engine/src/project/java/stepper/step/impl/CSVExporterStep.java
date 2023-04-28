@@ -42,7 +42,7 @@ public class CSVExporterStep extends AbstractStepDefinition {
                     output = output + "," + data;
                 output = output + "\n";
             }
-
+            logs.addLogLine("finish with exporting the data");
         }
         context.storeDataValue("RESULT", output);
         context.addStepLog(logs);

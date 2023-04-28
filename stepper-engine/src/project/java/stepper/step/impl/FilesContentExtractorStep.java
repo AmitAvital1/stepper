@@ -37,6 +37,7 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
         StepResult res = StepResult.SUCCESS;
 
         if (filesList.size() == 0) {//Do not have files to delete
+            logs.addLogLine("no files to extract data");
             context.addStepSummaryLine("no files to extract data");
         }
         else {
@@ -84,6 +85,7 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
                 }
                 columnCounter++;
             }
+            context.addStepSummaryLine("finish with extracting the data");
         }
         context.storeDataValue("DATA",dataRelation);
         context.addStepLog(logs);

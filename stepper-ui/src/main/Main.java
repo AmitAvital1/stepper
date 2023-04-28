@@ -31,7 +31,9 @@ public class Main {
                     case 1://Load Data from xml
                         System.out.println("Please enter a xml native to import flows or 0 to exit");
                         String input = scanner.nextLine();
-                        flows = LoadDataFromXml.LoadData(input);
+                        List<FlowDefinition> tempFlow = LoadDataFromXml.LoadData(input);
+                        if(tempFlow.size() != 0)//To not override the last xml flows
+                            flows = tempFlow;
                         break;
                     case 2://Show flow details
                         menu.FlowDefenitionsMenu(flows);
@@ -59,6 +61,5 @@ public class Main {
                 scanner.nextLine(); // consume the newline character
             }
         } while (userChoice != MenuOptions.Exit.ordinal() + 1);
-
     }
 }

@@ -45,6 +45,7 @@ public class PropertiesExporterStep extends AbstractStepDefinition {
                 }
             }
             logs.addLogLine("Extracted total of " + (propertiesCounter - 1));
+            context.addStepSummaryLine("Extracted total of " + (propertiesCounter - 1));
 
         }
         context.storeDataValue("RESULT", output);

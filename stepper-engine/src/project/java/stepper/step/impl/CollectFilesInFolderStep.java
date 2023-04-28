@@ -41,12 +41,12 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
         ListData<FileData> filesList = new ListData();
 
         try {
-            logs.addLogLine("Reading folder " + filePath + (filter != "" ? (" content with filter" + filter) : ""));
             List<Path> fileList = Files.walk(new File(filePath).toPath())
                     .filter(Files::isRegularFile)
                     .filter((path) -> path.toString().endsWith(filter))
                     .map(Path::toAbsolutePath)
                     .collect(Collectors.toList());
+            logs.addLogLine("Reading folder " + filePath + (filter != "" ? (" content with filter " + filter) : ""));
             for (Path path : fileList) {
                 FileData f = new FileData(path.toString());
                 filesList.addData(f);
@@ -63,6 +63,7 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
                 return StepResult.WARNING;
             }
             else{
+                context.addStepSummaryLine("Finish to collect all " + filesList.size() + " files");
                 context.addStepLog(logs);
                 return StepResult.SUCCESS;
             }

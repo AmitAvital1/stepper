@@ -43,7 +43,7 @@ public class FilesDeleterStep extends AbstractStepDefinition {
         logs.addLogLine("About to start delete " + filesList.size() + " files");
 
         if (filesList.size() == 0) {//Do not have files to delete
-            //Summary line
+            context.addStepSummaryLine("Finish with no files in the folder to delete");
         }
         else {
             for (FileData fileData : filesList) {
@@ -61,15 +61,25 @@ public class FilesDeleterStep extends AbstractStepDefinition {
                     numOfDeletedFiles++;
                 } else { //The file does not exist
                     res = StepResult.WARNING;
-                    logs.addLogLine("Failed to delete file " + filePath);
+                    logs.addLogLine("Failed to delete file " + filePath + " because not exist");
                     numOfFailedDeletedFiles++;
                     listOfFailedDeletedFiles.add(filePath);
                 }
             }
-            if (res == StepResult.WARNING) {
+            if(numOfDeletedFiles == 0)
+            {
+                res = StepResult.FAILURE;
+                context.addStepSummaryLine("The step failure due that none files are deleted");
+                logs.addLogLine("FAILURE: Problem with deleting all the files");
+            }
+            else if (res == StepResult.WARNING) {
+                context.addStepSummaryLine("The delete request have finish with delete problem on some files");
                 logs.addLogLine("WARNING: The delete request have finish with delete problem on some files");
             }
+            else if(res == StepResult.SUCCESS)
+                context.addStepSummaryLine("The step finish with deleting the files");
         }
+
         context.storeDataValue("DELETED_LIST", filesList);
         context.storeDataValue("DELETION_STATS", new MappingData<Integer, Integer>(numOfDeletedFiles, numOfFailedDeletedFiles));
         context.addStepLog(logs);

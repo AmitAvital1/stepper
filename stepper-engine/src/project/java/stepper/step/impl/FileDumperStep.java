@@ -52,8 +52,7 @@ public class FileDumperStep extends AbstractStepDefinition {
                     context.addStepSummaryLine("Failure: An error occurred while creating the file");
                     result = "Failure: An error occurred while creating the file";
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 res = StepResult.FAILURE;
                 logs.addLogLine("Failure: An error occurred while creating the file");
                 context.addStepSummaryLine("Failure: An error occurred while creating the file");
@@ -70,7 +69,8 @@ public class FileDumperStep extends AbstractStepDefinition {
                 result = "WARNING: An error occurred while writing to the file.";
             }
 
-
+        if( res == StepResult.SUCCESS)
+            context.addStepSummaryLine("success to dump the file");
         context.storeDataValue("RESULT", result);
         context.addStepLog(logs);
         return res;

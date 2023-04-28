@@ -39,11 +39,10 @@ public class FLowExecutor {
             Instant stepEndTime = Instant.now();
             Duration duration = Duration.between(stepStartTime, stepEndTime);
             System.out.println("Done executing step: " + stepUsageDeclaration.getFinalStepName() + ". Result: " + stepResult);
-            if(stepResult == StepResult.SUCCESS)
-                context.addStepSummaryLine(stepUsageDeclaration.getFinalStepName() + " succeed");
+
 
             if(!stepUsageDeclaration.skipIfFail() && stepResult == StepResult.FAILURE){
-                context.addStepSummaryLine("The step failed before finish: " + stepUsageDeclaration.getFinalStepName() + " FAILED");
+                //context.addStepSummaryLine("The step failed before finish: " + stepUsageDeclaration.getFinalStepName() + " FAILED");
                 StepLogs log = new StepLogs(stepUsageDeclaration.getFinalStepName());
                 log.addLogLine("FAILED and stopped the flow");
                 context.addStepLog(log);
