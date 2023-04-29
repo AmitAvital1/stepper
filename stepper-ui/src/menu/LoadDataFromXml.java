@@ -18,7 +18,7 @@ public class LoadDataFromXml {
             return flowList;
 
         try {
-                flowList = LoadStepperDataFromXml.load("C:\\Users\\USER\\Desktop\\checker\\ex1.xml");
+                flowList = LoadStepperDataFromXml.load(xmlNative);
         }catch(FileNotFoundException e) {
             System.out.println("Error: XML path not found");
         }catch (JAXBException e) {

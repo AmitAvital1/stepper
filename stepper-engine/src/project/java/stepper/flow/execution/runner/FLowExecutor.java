@@ -15,6 +15,7 @@ import java.time.LocalTime;
 public class FLowExecutor {
 
     public void executeFlow(FlowExecution flowExecution) {
+        boolean theStepFinishWithFailure = false;
         boolean stopTheFlow = false;
         Instant flowStartTime = Instant.now();
         LocalTime time = LocalTime.now();
@@ -47,12 +48,17 @@ public class FLowExecutor {
                 log.addLogLine("FAILED and stopped the flow");
                 context.addStepLog(log);
                 flowExecution.setFlowExecutionResult(FlowExecutionResult.FAILURE);
+                theStepFinishWithFailure = true;
                 stopTheFlow = true;
+            }
+            else if(stepResult == StepResult.FAILURE){
+                flowExecution.setFlowExecutionResult(FlowExecutionResult.WARNING);
+                theStepFinishWithFailure = true;
             }
             context.addStepData(stepUsageDeclaration,context.getLastStepSummaryLine(),context.getLastStepLogs(),duration,stepResult);//Add all step datas
             flowExecution.getFlowDefinition().addFlowRunStepStats(stepUsageDeclaration,duration);
         }
-        if(!stopTheFlow)
+        if(!theStepFinishWithFailure)
             flowExecution.setFlowExecutionResult(FlowExecutionResult.SUCCESS);
 
         Instant flowEndTime = Instant.now();

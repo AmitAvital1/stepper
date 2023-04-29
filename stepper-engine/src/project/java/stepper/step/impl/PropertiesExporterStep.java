@@ -37,8 +37,9 @@ public class PropertiesExporterStep extends AbstractStepDefinition {
 
             for (int i = 0; i < table.getColumns().size(); i++) {
                 List<String> eachColumn = table.getColumnsData(i);
-                for(int j =0; j < eachColumn.size(); j++){
-                    output += propertiesCounter + "." + table.getColumns().get(i) + "=" + eachColumn.get(j);
+                for(int j =0; j < eachColumn.size()-1; j++){
+                    //output += propertiesCounter + "." + table.getColumns().get(i+1) + "=" + eachColumn.get(j);
+                    output += eachColumn.get(j) + "=" + eachColumn.get(j+1);
                     if(i != table.getColumns().size()-1 || j != eachColumn.size() - 1)
                         output += "\n";
                     propertiesCounter++;

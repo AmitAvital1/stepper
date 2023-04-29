@@ -1,6 +1,7 @@
 package project.java.stepper.flow.execution;
 
 import project.java.stepper.exceptions.MissMandatoryInput;
+import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
@@ -41,9 +42,6 @@ public class FlowExecution {
                else return false;
         }
     }
-
-    // lots more data that needed to be stored while flow is being executed...
-
     public FlowExecution(String uniqueId, FlowDefinition flowDefinition) {
         this.uniqueId = uniqueId;
         this.flowDefinition = flowDefinition;
@@ -91,7 +89,7 @@ public class FlowExecution {
         }
         return res;
     }
-    public boolean addFreeInputForStart(StepUsageDeclaration step,DataDefinitionDeclaration dataDefinitionDeclaration, String data) {
+    public boolean addFreeInputForStart(StepUsageDeclaration step,DataDefinitionDeclaration dataDefinitionDeclaration, String data) throws StepperExeption {
         Object newData = dataDefinitionDeclaration.dataDefinition().convertUserInputToDataType(data,dataDefinitionDeclaration.dataDefinition().getType());
         startersFreeInputForContext.put(step.getinputToFinalName().get(dataDefinitionDeclaration.getName()),newData);
         return true;
@@ -123,7 +121,7 @@ public class FlowExecution {
                     String inputFinalName = key.getinputToFinalName().get(dd.getName());
                     Optional<Object> inputContext = Optional.ofNullable(startersFreeInputForContext.get(inputFinalName));
                     if(inputContext.isPresent()) {
-                        data.add(inputFinalName + "[" + inputContext + "]" + "(" + dd.dataDefinition().getName() + ") - " +
+                        data.add(inputFinalName + "[" + inputContext.get() + "]" + "(" + dd.dataDefinition().getName() + ") - " +
                                 dd.necessity());
                     }
                 }

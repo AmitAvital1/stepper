@@ -21,7 +21,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
     private final List<StepUsageDeclaration> steps;
     private Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> stepToFreeInputFinalNameToDD;
     private Map<String,DataDefinitionDeclaration> freeInputFinalNameToDD;
-    private  Map<String,DataDefinitionDeclaration> formalFinalOutPutNameToDD;
+    private Map<String,DataDefinitionDeclaration> formalFinalOutPutNameToDD;
 
     public FlowDefinitionImpl(String name, String description) {
         this.name = name;
@@ -76,9 +76,9 @@ public class FlowDefinitionImpl implements FlowDefinition {
                 String customMappingData = step.thisInputHaveCustomeMapping(step.getinputToFinalName().get(data.getName())); //Check if this input have custom mapping
                 if (customMappingData != null) {//If there is custom mapping to the input
                     if (!inputOnTheWay.containsKey(customMappingData))//If there is custom mapping but there is no output that return from other steps to take ---> exception
-                        throw new CustomeMappingInvalid("The input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take as the custom mapping says.");
+                        throw new CustomeMappingInvalid("In flow: " + name + " the input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take as the custom mapping says.");
                     if(inputOnTheWay.get(customMappingData).dataDefinition().getType() != data.dataDefinition().getType())
-                        throw new CustomeMappingInvalid("The input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take with the same data type as the custom mapping says.");
+                        throw new CustomeMappingInvalid("In flow: " + name + " the input: " + step.getinputToFinalName().get(data.getName()) + " have no data to take with the same data type as the custom mapping says.");
                 } else {
                     //If there is no custom mapping - check if there is an output to the input
                     boolean exist = false;
@@ -91,8 +91,8 @@ public class FlowDefinitionImpl implements FlowDefinition {
                     }
                     if (!exist) {
                         //There is no output to take for the input - so its free input
-                        if(!data.dataDefinition().isUserFriendly())//If the free input does not user friendly
-                            throw new FreeInputNotUserFriendly("The free input: " + step.getinputToFinalName().get(data.getName()) + " cannot get input from user");
+                        if(!data.dataDefinition().isUserFriendly())//If the free input does not user-friendly
+                            throw new FreeInputNotUserFriendly("In flow: " + name + " the free input: " + step.getinputToFinalName().get(data.getName()) + " cannot get input from user");
 
                         freeInputFinalNameToDD.put(step.getinputToFinalName().get(data.getName()), data);
                         freeInputStepDD.add(data);
@@ -108,7 +108,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
                         thereIsTwoOutputsInTheSameName[0] = true;
                 });
             if(thereIsTwoOutputsInTheSameName[0])
-                throw new DuplicateOutputsNames("Error while reading the flow - there are two outputs with the same name");
+                throw new DuplicateOutputsNames("In flow: " + name + " Error while reading the flow - there are two outputs with the same name");
 
             if(freeInputStepDD.size() > 0)
                 stepToFreeInputFinalNameToDD.put(step,freeInputStepDD);

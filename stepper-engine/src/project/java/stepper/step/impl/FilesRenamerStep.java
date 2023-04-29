@@ -23,7 +23,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
     public FilesRenamerStep() {
         super("Files Renamer", false);
 
-        addInput(new DataDefinitionDeclarationImpl("FILES_LIST", DataNecessity.MANDATORY, "Files to rename", DataDefinitionRegistry.LIST));
+        addInput(new DataDefinitionDeclarationImpl("FILES_TO_RENAME", DataNecessity.MANDATORY, "Files to rename", DataDefinitionRegistry.LIST));
         addInput(new DataDefinitionDeclarationImpl("PREFIX", DataNecessity.OPTIONAL, "Add this prefix", DataDefinitionRegistry.STRING));
         addInput(new DataDefinitionDeclarationImpl("SUFFIX", DataNecessity.OPTIONAL, "Append this suffix", DataDefinitionRegistry.STRING));
 
@@ -32,7 +32,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
 
     public StepResult invoke(StepExecutionContext context) {
 
-        List<FileData> filesList = context.getDataValue("FILES_LIST", ListData.class).getList();
+        List<FileData> filesList = context.getDataValue("FILES_TO_RENAME", ListData.class).getList();
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
         RelationData renameResult = new RelationData();
         Integer columnCounter = 1;

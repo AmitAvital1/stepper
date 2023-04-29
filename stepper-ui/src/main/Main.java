@@ -55,10 +55,11 @@ public class Main {
             } catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption e) {
                 if (e.getClass() == InvalidChoiseExeption.class)
                     System.out.println(((InvalidChoiseExeption) e).getMessage());
-                else
+                else {
                     System.out.println("Please enter only a number");
+                    scanner.nextLine(); // consume the newline character
+                }
                 userChoice = -1;
-                scanner.nextLine(); // consume the newline character
             }
         } while (userChoice != MenuOptions.Exit.ordinal() + 1);
     }

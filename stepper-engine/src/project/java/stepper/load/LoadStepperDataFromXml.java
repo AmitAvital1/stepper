@@ -40,38 +40,24 @@ public class LoadStepperDataFromXml {
         String flowName = flow.getName();
         String flowDescription = flow.getSTFlowDescription();
         FlowDefinition flow1 = new FlowDefinitionImpl(flowName, flowDescription);
-        for(STStepInFlow step : flow.getSTStepsInFlow().getSTStepInFlow()) {
-            String stepFinalName = step.getName();;
-            boolean ifFailing = false;
 
-            if(!StepDefinitionRegistry.getStepRegistryByName(step.getName()).isPresent())
-                throw new StepInFlowNotExist("The step " + stepFinalName + " does not exist step");
+        getFlowsStep(flow, flowName, flow1);
+        makeStepAliasing(flow, flowName, flow1);
+        getFormalOutputs(flow, flowName, flow1);
 
-            StepDefinitionRegistry stepDefinition = StepDefinitionRegistry.getStepRegistryByName(step.getName()).get();
+        if(Optional.ofNullable(flow.getSTCustomMappings()).isPresent())
+            addCustomMapping(flow1,flow.getSTCustomMappings().getSTCustomMapping());
 
-            if (Optional.ofNullable(step.getAlias()).isPresent())
-                stepFinalName = step.getAlias();
+        return flow1;
+    }
 
-            if (Optional.ofNullable(step.isContinueIfFailing()).isPresent())
-                ifFailing = step.isContinueIfFailing();
-
-            flow1.getFlowSteps().add(new StepUsageDeclarationImpl(stepDefinition.getStepDefinition(),ifFailing,stepFinalName));
-            if(!stepDefinition.getStepDefinition().isReadonly())
-                flow1.setReadOnly(false);
-        }
-        if(Optional.ofNullable(flow.getSTFlowLevelAliasing()).isPresent()) {
-            for (STFlowLevelAlias flowAlias : flow.getSTFlowLevelAliasing().getSTFlowLevelAlias()) {
-                Optional<StepUsageDeclaration> maybeStepToAlias = flow1.getFlowSteps().stream().filter(step -> flowAlias.getStep().equals(step.getFinalStepName())).findFirst();
-                if (!maybeStepToAlias.isPresent())
-                    throw new SyntaxErrorInXML("Error in FlowLevelAlias: Trying to flow level alias the step:" + flowAlias.getStep() + " but its not exist in the flow steps");
-                if (!maybeStepToAlias.get().addLevelAlias(flowAlias.getSourceDataName(), flowAlias.getAlias()))
-                    throw new SyntaxErrorInXML("Error in FlowLevelAlias: Trying to alias some data in step:" + flowAlias.getStep() + " called:" + flowAlias.getSourceDataName() + " but its not exist in the flow definition");
-            }
-        }
+    private static void getFormalOutputs(STFlow flow, String flowName, FlowDefinition flow1) throws SyntaxErrorInXML {
         List<String> formalOutputs = new ArrayList<>();
         String[] splitString = flow.getSTFlowOutput().split(",");
         for (String word : splitString) {
-            formalOutputs.add(word.trim());
+            word = word.trim();
+            if(word.length() > 0)
+                formalOutputs.add(word.trim());
         }
         for(String flowOut : formalOutputs){
             String outPutRealName = "";
@@ -96,12 +82,44 @@ public class LoadStepperDataFromXml {
                 }
             }
             else
-                throw new SyntaxErrorInXML("In xml given wrong flow output");
+                throw new SyntaxErrorInXML("In flow " + flowName + " given wrong flow formal output as the flow real output");
         }
-        if(Optional.ofNullable(flow.getSTCustomMappings()).isPresent())
-            addCustomMapping(flow1,flow.getSTCustomMappings().getSTCustomMapping());
-        return flow1;
     }
+
+    private static void makeStepAliasing(STFlow flow, String flowName, FlowDefinition flow1) throws SyntaxErrorInXML {
+        if(Optional.ofNullable(flow.getSTFlowLevelAliasing()).isPresent()) {
+            for (STFlowLevelAlias flowAlias : flow.getSTFlowLevelAliasing().getSTFlowLevelAlias()) {
+                Optional<StepUsageDeclaration> maybeStepToAlias = flow1.getFlowSteps().stream().filter(step -> flowAlias.getStep().equals(step.getFinalStepName())).findFirst();
+                if (!maybeStepToAlias.isPresent())
+                    throw new SyntaxErrorInXML("Error in FlowLevelAlias:" + "In flow " + flowName + " trying to flow level alias the step:" + flowAlias.getStep() + " but its not exist in the flow steps");
+                if (!maybeStepToAlias.get().addLevelAlias(flowAlias.getSourceDataName(), flowAlias.getAlias()))
+                    throw new SyntaxErrorInXML("Error in FlowLevelAlias:" + "In flow " + flowName + " trying to alias some data in step:" + flowAlias.getStep() + " called:" + flowAlias.getSourceDataName() + " but its not exist in the flow definition");
+            }
+        }
+    }
+
+    private static void getFlowsStep(STFlow flow, String flowName, FlowDefinition flow1) throws StepInFlowNotExist {
+        for(STStepInFlow step : flow.getSTStepsInFlow().getSTStepInFlow()) {
+            String stepFinalName = step.getName();;
+            boolean ifFailing = false;
+
+            if(!StepDefinitionRegistry.getStepRegistryByName(step.getName()).isPresent())
+                throw new StepInFlowNotExist("In flow " + flowName + " The step " + stepFinalName + " does not exist step");
+
+            StepDefinitionRegistry stepDefinition = StepDefinitionRegistry.getStepRegistryByName(step.getName()).get();
+
+            if (Optional.ofNullable(step.getAlias()).isPresent())
+                stepFinalName = step.getAlias();
+
+            if (Optional.ofNullable(step.isContinueIfFailing()).isPresent())
+                ifFailing = step.isContinueIfFailing();
+
+            flow1.getFlowSteps().add(new StepUsageDeclarationImpl(stepDefinition.getStepDefinition(),ifFailing,stepFinalName));
+            if(!stepDefinition.getStepDefinition().isReadonly())
+                flow1.setReadOnly(false);
+        }
+    }
+
     private static void addCustomMapping(FlowDefinition flow, List<STCustomMapping> flowMapping){
         for(STCustomMapping custome : flowMapping){
             for(StepUsageDeclaration step : flow.getFlowSteps()){
@@ -109,7 +127,6 @@ public class LoadStepperDataFromXml {
                     step.addCustomeMapInput(custome.getTargetData(), custome.getSourceData());
                 }
             }
-
         }
     }
     private static STStepper deserializeFrom(InputStream in) throws JAXBException {

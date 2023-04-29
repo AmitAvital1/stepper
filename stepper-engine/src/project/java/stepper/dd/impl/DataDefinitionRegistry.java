@@ -8,6 +8,8 @@ import project.java.stepper.dd.impl.number.DoubleDataDefinition;
 import project.java.stepper.dd.impl.number.IntegerDataDefinition;
 import project.java.stepper.dd.impl.relation.RelationDataDefinition;
 import project.java.stepper.dd.impl.string.StringDataDefinition;
+import project.java.stepper.exceptions.InvalidUserDataTypeInput;
+import project.java.stepper.exceptions.StepperExeption;
 
 public enum DataDefinitionRegistry implements DataDefinition{
     STRING(new StringDataDefinition()),
@@ -39,20 +41,20 @@ public enum DataDefinitionRegistry implements DataDefinition{
     public Class<?> getType() {
         return dataDefinition.getType();
     }
-    public <T> T convertUserInputToDataType(String input, Class<T> expectedDataType) throws NumberFormatException{
-        if(this == STRING)
-        {
-            return expectedDataType.cast(input);
-        }
-        if(this == INTEGER)
-        {
-            Integer num = Integer.parseInt(input);
-            return expectedDataType.cast(num);
-        }
-        else if(this == DOUBLE)
-        {
-            Double num = Double.parseDouble(input);
-            return expectedDataType.cast(num);
+    public <T> T convertUserInputToDataType(String input, Class<T> expectedDataType) throws StepperExeption {
+        try {
+            if (this == STRING) {
+                return expectedDataType.cast(input);
+            }
+            if (this == INTEGER) {
+                Integer num = Integer.parseInt(input);
+                return expectedDataType.cast(num);
+            } else if (this == DOUBLE) {
+                Double num = Double.parseDouble(input);
+                return expectedDataType.cast(num);
+            }
+        }catch (NumberFormatException e) {
+            throw new InvalidUserDataTypeInput("This input have to be a " + expectedDataType.getSimpleName());
         }
         return null;
     }

@@ -21,7 +21,7 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
         addInput(new DataDefinitionDeclarationImpl("FILES_LIST", DataNecessity.MANDATORY, "Files to extract", DataDefinitionRegistry.LIST));
         addInput(new DataDefinitionDeclarationImpl("LINE", DataNecessity.MANDATORY, "Line number to extract", DataDefinitionRegistry.INTEGER));
 
-        addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data extraction", DataDefinitionRegistry.RELATION));
+        addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Da0ta extraction", DataDefinitionRegistry.RELATION));
     }
     @Override
     public StepResult invoke(StepExecutionContext context) {

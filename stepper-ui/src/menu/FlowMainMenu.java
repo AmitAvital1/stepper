@@ -3,6 +3,7 @@ package menu;
 import java.util.UUID;
 import exeptions.InvalidChoiseExeption;
 import project.java.stepper.exceptions.MissMandatoryInput;
+import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
@@ -27,7 +28,7 @@ public class FlowMainMenu {
         fLowExecutor = new FLowExecutor();
     }
 
-    public void showFlowDecMenu(FlowExecution flow) {
+    public void getFlowInputToExecute(FlowExecution flow) {
         int userChoice = -1;
         int index = 0;
         Scanner scanner = new Scanner(System.in);
@@ -59,8 +60,9 @@ public class FlowMainMenu {
                     else
                         throw new InvalidChoiseExeption("Invalid choose.");
 
-                }catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption | MissMandatoryInput e){
-                    if(e.getClass() == InvalidChoiseExeption.class || e.getClass() == MissMandatoryInput.class)
+                }catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption |
+                        StepperExeption e){
+                    if(e.getClass() != InputMismatchException.class)
                         System.out.println(e.getMessage());
                     else {
                         System.out.println("Please enter a number");
@@ -93,9 +95,9 @@ public class FlowMainMenu {
     }
     public void FlowDecDefenitionsMenu(FlowDefinition flow) {
         int counter = 1;
-        System.out.println("\nFlow name:" + flow.getName());
-        System.out.println("Description:" + flow.getDescription());
-        System.out.println("Formal outputs:");
+        System.out.println("\n-Flow name:" + flow.getName());
+        System.out.println("-Description:" + flow.getDescription());
+        System.out.println("-Formal outputs:" + (flow.getFormalOutput().size() == 0 ? "Do not have formal outputs" : ""));
         for(Map.Entry<String, DataDefinitionDeclaration> entry : flow.getFormalOutput().entrySet()) {
             String key = entry.getKey();
             DataDefinitionDeclaration value = entry.getValue();
@@ -103,8 +105,8 @@ public class FlowMainMenu {
             counter++;
         }
         counter = 1;
-        System.out.println("Read only:" + flow.isReadOnly());
-        System.out.println("Steps: ");
+        System.out.println("-Read only:" + flow.isReadOnly());
+        System.out.println("-Steps: ");
         for(StepUsageDeclaration step : flow.getFlowSteps())
         {
             if(step.getFinalStepName().equals(step.getStepDefinition().name()))
@@ -114,7 +116,7 @@ public class FlowMainMenu {
             counter++;
         }
         counter = 1;
-        System.out.println("Free inputs: ");
+        System.out.println("-Free inputs: ");
         for(Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : flow.getFlowFreeInputs().entrySet()) {
             StepUsageDeclaration key = entry.getKey();
             List<DataDefinitionDeclaration> value = entry.getValue();
@@ -183,7 +185,7 @@ public class FlowMainMenu {
                 if(userChoice != 0) {
                     UUID uuid = UUID.randomUUID();
                     FlowExecution flowExecution = new FlowExecution(uuid.toString(), flows.get(userChoice - 1));
-                    showFlowDecMenu(flowExecution);
+                    getFlowInputToExecute(flowExecution);
                 }
             } catch (InputMismatchException | IllegalStateException | InvalidChoiseExeption e){
                 if(e.getClass() == InvalidChoiseExeption.class)
@@ -223,12 +225,12 @@ public class FlowMainMenu {
                 if (userChoice > 0 && userChoice <= flowExecutions.size()) {
                     FlowExecution flow = flowExecutions.get(userChoice-1);
                     System.out.println(flow.getUniqueId() + ":" + flow.getFlowDefinition().getName());
-                    System.out.println("Result:" + flow.getFlowExecutionResult() + ", Started Time:" + flow.getStartedTime());
-                    System.out.println("Free inputs details:");
+                    System.out.println("-Result:" + flow.getFlowExecutionResult() + ", Started Time:" + flow.getStartedTime());
+                    System.out.println("-Free inputs details:" + (flow.getAllFreeInputsWithDataToPrintList().size() == 0 ? "No free inputs in the flow" : ""));
                     flow.getAllFreeInputsWithDataToPrintList().stream().forEach(System.out::println);
-                    System.out.println("All flow outputs:");
+                    System.out.println("-All flow outputs:" + (flow.getAllOutPutsWithDataToPrintList().size() == 0 ? "No outputs in the flow" : ""));
                     flow.getAllOutPutsWithDataToPrintList().stream().forEach(System.out::println);
-                    System.out.println("All steps details:");
+                    System.out.println("-All steps details:");
                     flow.getAllStepsWithDataToPrintList().stream().forEach(System.out::println);
                     userChoice = -1;
                 }
