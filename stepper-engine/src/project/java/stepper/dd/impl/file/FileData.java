@@ -14,4 +14,8 @@ public class FileData {
     public String getFilePath() {return filePath;}
     public String getFileName() {return fileName;}
 
+    @Override
+    public String toString() {
+        return this.getFileName();
+    }
 }

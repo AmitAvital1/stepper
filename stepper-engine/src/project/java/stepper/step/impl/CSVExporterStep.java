@@ -36,12 +36,20 @@ public class CSVExporterStep extends AbstractStepDefinition {
         else {
             logs.addLogLine("About to process " + table.getRowsSize() + " lines of data");
 
+            for(String col : table.getColumns())
+                output += col + ",";
+
+            output = output.substring(0,output.length()-1);//Remove the last comma
+            output += "\n";
 
             for (int i = 0; i < table.getRowsSize(); i++) {
                 for (String data : table.getRowDataByColumnsOrder(i))
-                    output = output + "," + data;
-                output = output + "\n";
+                    output += data + ",";
+
+                output = output.substring(0,output.length()-1);//Remove the last comma
+                output += "\n";
             }
+            output = output.substring(0,output.length()-1);//Remove last \n
             logs.addLogLine("finish with exporting the data");
         }
         context.storeDataValue("RESULT", output);

@@ -17,5 +17,19 @@ public class ListData <T> {
         return list;
     }
     public int size() {return list.size();}
-    //and more stuff if needed
+
+    @Override
+    public String toString() {
+        String userString = "[";
+        int i = 1;
+        for(T var : list){
+            userString += i + "." + var.toString();
+            if(i < list.size())
+                userString += ",";
+            else
+                userString += "]";
+            i++;
+        }
+        return userString;
+    }
 }

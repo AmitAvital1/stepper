@@ -144,7 +144,9 @@ public class FlowExecution {
                     noOutput = true;
                 }
             }
-            if(!noOutput)
+            if(!noOutput){
+                outputLine += "\nData:" + output.data.toString();
+            }
 
             outputsString.add(outputLine);
             i++;

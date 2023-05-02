@@ -15,35 +15,47 @@ public class RelationData {
         rows = new ArrayList<>();
     }
 
-    public RelationData(List<String> columns) {
-        this.columns = columns;
+    @Override
+    public String toString() {
+        String res = "Cols:[";
+        for(String str : columns)
+            res+= str + ",";
+        res = res.substring(0,res.length()-1);
+        res += "], Nums of rows:" + rows.size();
+        return res;
+    }
+
+    public RelationData(String[] columns) {
+        this.columns = new ArrayList<>();
+        for(String str : columns)
+            this.columns.add(str);
+
         rows = new ArrayList<>();
     }
 
-public void addData(String column,String data){
-        if(!columns.contains(column))
-            columns.add(column);
-        boolean addedFlag = false;
-        for(SingleRow row : rows) {
-            if(!row.checkSpace(column)) {
-                row.addData(column, data);
-                addedFlag = true;
-                break;
-            }
+public void addRow(String... datas) {
 
-        }
-        if(!addedFlag){
-            rows.add(new SingleRow());
-            rows.get(rows.size() -1).addData(column, data);
-        }
+    if (datas.length > columns.size())
+        return; //Not match arguments
+
+    SingleRow newRow = new SingleRow();
+    final int sizeOfDatas = datas.length;
+    for (int i = 0; i < sizeOfDatas; i++) {
+        newRow.addData(columns.get(i), datas[i]);
     }
+    rows.add(newRow);
+}
 
 
     public List<String> getRowDataByColumnsOrder(int rowId) {
         List<String> row = new ArrayList<>();
         for(String colum : columns)
         {
-            row.add(rows.get(rowId).getRowDataByColumn(colum));
+            String str = rows.get(rowId).getRowDataByColumn(colum);
+            if(str != null)
+                row.add(str);
+            else
+                row.add("NA");
         }
         return row;
     }
@@ -51,7 +63,7 @@ public void addData(String column,String data){
     {
         List<String> columnsAllData = new ArrayList<>();
         String columnsData = columns.get(columnsNum);
-        for(int i = 1; i < rows.size(); i++) {
+        for(int i = 0; i < rows.size(); i++) {
             columnsAllData.add(rows.get(i).getRowDataByColumn(columnsData));
         }
         return columnsAllData;

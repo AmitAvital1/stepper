@@ -11,6 +11,11 @@ public class MappingData<K,V> {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return "(" + key + "," + value + ")";
+    }
+
     public K getKey() {
         return key;
     }

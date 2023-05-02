@@ -34,7 +34,8 @@ public class FilesRenamerStep extends AbstractStepDefinition {
 
         List<FileData> filesList = context.getDataValue("FILES_TO_RENAME", ListData.class).getList();
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
-        RelationData renameResult = new RelationData();
+        String[] colsName = {"No.", "File original name", "File after rename"};
+        RelationData renameResult = new RelationData(colsName);
         Integer columnCounter = 1;
         StepResult res = StepResult.SUCCESS;
         List<String> filesFailedList = new ArrayList<>();
@@ -59,9 +60,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
                 File oldFile = new File(fileData.getFilePath());
                 File newFile = new File(oldFile.getParentFile() + "\\" + newName);
                 if (oldFile.renameTo(newFile)) {
-                    renameResult.addData(columnCounter.toString(), columnCounter.toString());
-                    renameResult.addData(columnCounter.toString(), oldFile.getName());
-                    renameResult.addData(columnCounter.toString(), newFile.getName());
+                    renameResult.addRow(columnCounter.toString(), newFile.getName(), newFile.getName());
                     columnCounter++;
                 } else {
                     filesFailedList.add(oldFile.getName());

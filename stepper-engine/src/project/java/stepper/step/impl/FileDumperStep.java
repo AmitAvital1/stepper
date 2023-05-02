@@ -38,12 +38,13 @@ public class FileDumperStep extends AbstractStepDefinition {
             context.addStepSummaryLine(fileName + " is already exist. Cannot override him");
             result = "Failure: " + fileName + " is already exist. Cannot override him";
         }
-        if(content.length() == 0) {
-            res = StepResult.WARNING;
-            logs.addLogLine("No content to write to " + fileName);
-            context.addStepSummaryLine("No content to write to " + fileName);
-            result = "Warning: No content to write to the file";
-        }
+        else {
+            if (content.length() == 0) {
+                res = StepResult.WARNING;
+                logs.addLogLine("No content to write to " + fileName);
+                context.addStepSummaryLine("No content to write to " + fileName);
+                result = "Warning: No content to write to the file";
+            }
             try {
                 logs.addLogLine("About to create file named " + fileName);
                 if (!file.createNewFile()) {
@@ -68,7 +69,7 @@ public class FileDumperStep extends AbstractStepDefinition {
                 context.addStepSummaryLine("WARNING: An error occurred while writing to the file.");
                 result = "WARNING: An error occurred while writing to the file.";
             }
-
+        }
         if( res == StepResult.SUCCESS)
             context.addStepSummaryLine("success to dump the file");
         context.storeDataValue("RESULT", result);

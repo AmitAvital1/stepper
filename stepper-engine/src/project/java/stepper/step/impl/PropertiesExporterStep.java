@@ -34,17 +34,18 @@ public class PropertiesExporterStep extends AbstractStepDefinition {
         else {
             logs.addLogLine("About to process " + table.getRowsSize() + " lines of data");
 
-
-            for (int i = 0; i < table.getColumns().size(); i++) {
-                List<String> eachColumn = table.getColumnsData(i);
-                for(int j =0; j < eachColumn.size()-1; j++){
-                    //output += propertiesCounter + "." + table.getColumns().get(i+1) + "=" + eachColumn.get(j);
-                    output += eachColumn.get(j) + "=" + eachColumn.get(j+1);
-                    if(i != table.getColumns().size()-1 || j != eachColumn.size() - 1)
-                        output += "\n";
+            List<String> colsData = table.getColumns();
+            for (int i = 0; i < table.getRowsSize(); i++) {
+                List<String> eachRow = table.getRowDataByColumnsOrder(i);
+                output += "row-" + (i+1) + ".";
+                for(int j = 0; j < eachRow.size(); j++){
+                    output += colsData.get(j) + "=" + eachRow.get(j) + ",";
                     propertiesCounter++;
                 }
+                output = output.substring(0,output.length()-1);
+                output += "\n";
             }
+            output = output.substring(0,output.length()-1);
             logs.addLogLine("Extracted total of " + (propertiesCounter - 1));
             context.addStepSummaryLine("Extracted total of " + (propertiesCounter - 1));
 
