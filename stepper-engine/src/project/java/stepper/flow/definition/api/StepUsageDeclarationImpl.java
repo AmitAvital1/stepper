@@ -16,8 +16,6 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
 
     private final Map<String,String> customeMapInput;
 
-    public void addCustomeMapInput(String inputName,String inputTarget){customeMapInput.put(inputName,inputTarget);}
-
     public StepUsageDeclarationImpl(StepDefinition stepDefinition) {
         this(stepDefinition, false, stepDefinition.name());
     }
@@ -44,6 +42,9 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
         stepDefinition.outputs().stream().forEach(stepD -> finalNamesToOutput.put(stepD.getName(),stepD.getName()));
 
     }
+
+    @Override
+    public void addCustomeMapInput(String inputName,String inputTarget){customeMapInput.put(inputName,inputTarget);}
 
     @Override
     public String getFinalStepName() {

@@ -98,6 +98,7 @@ public class FlowExecution {
         return startersFreeInputForContext;
     }
     public List<String> getAllFreeInputsWithDataToPrintList(){
+        int i = 1;
         //First print all the mandatories input:
         List<String> data = new ArrayList<>();
         for (Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : flowDefinition.getFlowFreeInputs().entrySet()) {
@@ -107,8 +108,9 @@ public class FlowExecution {
                 if(dd.necessity() == DataNecessity.MANDATORY) {
                     String inputFinalName = key.getinputToFinalName().get(dd.getName());
                     Object inputContext = startersFreeInputForContext.get(inputFinalName);
-                    data.add(inputFinalName + "[" + inputContext + "]" + "(" + dd.dataDefinition().getName() + ") - " +
+                    data.add(i + "." + inputFinalName + "[" + inputContext + "]" + "(" + dd.dataDefinition().getName() + ") - " +
                             dd.necessity());
+                    i++;
                 }
             }
         }
@@ -121,8 +123,9 @@ public class FlowExecution {
                     String inputFinalName = key.getinputToFinalName().get(dd.getName());
                     Optional<Object> inputContext = Optional.ofNullable(startersFreeInputForContext.get(inputFinalName));
                     if(inputContext.isPresent()) {
-                        data.add(inputFinalName + "[" + inputContext.get() + "]" + "(" + dd.dataDefinition().getName() + ") - " +
+                        data.add(i + "." + inputFinalName + "[" + inputContext.get() + "]" + "(" + dd.dataDefinition().getName() + ") - " +
                                 dd.necessity());
+                        i++;
                     }
                 }
             }
@@ -130,22 +133,31 @@ public class FlowExecution {
         return data;
     }
     public List<String> getAllOutPutsWithDataToPrintList() {
+        int i = 1;
+        boolean noOutput = false;
         List<String> outputsString = new ArrayList<>();
         for(flowOutputsData output : outputsStepData){
-            String outputLine = output.finalName + "," + output.outputDD.userString() + "(" + output.outputDD.dataDefinition().getName() + ")";
-            if(output.data.getClass() == String.class)
-                if(output.data.equals("Not created due to failure in flow"))
+            String outputLine = i + "." + output.finalName + "," + output.outputDD.userString() + "(" + output.outputDD.dataDefinition().getName() + ")";
+            if(output.data.getClass() == String.class) {
+                if (output.data.equals("Not created due to failure in flow")) {
                     outputLine += "-NOTE:Not created due to failure in flow";
+                    noOutput = true;
+                }
+            }
+            if(!noOutput)
+
             outputsString.add(outputLine);
+            i++;
         }
         return outputsString;
     }
     public List<String> getAllStepsWithDataToPrintList() {
+        int i = 1;
         List<String> stepsString = new ArrayList<>();
         for(StepUsageDeclaration step : flowDefinition.getFlowSteps()){
             StepExecutionContextImpl.stepData data = flowContexts.getStepData(step);
-            String line;
-            line = step.getFinalStepName();
+            String line = i + ".";
+            line += step.getFinalStepName();
             if(data != null) {
                 if (!step.getFinalStepName().equals(step.getStepDefinition().name()))
                     line += "(" + data.step.getStepDefinition().name() + ")";
@@ -158,6 +170,7 @@ public class FlowExecution {
                 line += " don't have data during failure of the step";
 
             stepsString.add(line);
+            i++;
         }
         return stepsString;
     }

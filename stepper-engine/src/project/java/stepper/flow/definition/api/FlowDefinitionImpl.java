@@ -92,7 +92,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
                     if (!exist) {
                         //There is no output to take for the input - so its free input
                         if(!data.dataDefinition().isUserFriendly())//If the free input does not user-friendly
-                            throw new FreeInputNotUserFriendly("In flow: " + name + " the free input: " + step.getinputToFinalName().get(data.getName()) + " cannot get input from user");
+                            throw new FreeInputNotUserFriendly("In flow: " + name + ", the free input: " + step.getinputToFinalName().get(data.getName()) + " cannot get from user");
 
                         freeInputFinalNameToDD.put(step.getinputToFinalName().get(data.getName()), data);
                         freeInputStepDD.add(data);
