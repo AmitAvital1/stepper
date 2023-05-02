@@ -22,7 +22,7 @@ public class FLowExecutor {
         String formattedTime = time.getHour() + ":" + time.getMinute() + ":" + time.getSecond();
         flowExecution.setStartedTime(formattedTime);
 
-        System.out.println("Starting execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]");
+        //System.out.println("Starting execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]");
 
         StepExecutionContext context = new StepExecutionContextImpl(); // actual object goes here...
         flowExecution.setFlowContexts(context);
@@ -35,11 +35,11 @@ public class FLowExecutor {
             context.updateCurrentWorkingStep(stepUsageDeclaration);
 
             Instant stepStartTime = Instant.now();
-            System.out.println("Starting to execute step: " + stepUsageDeclaration.getFinalStepName());
+            //System.out.println("Starting to execute step: " + stepUsageDeclaration.getFinalStepName());
             StepResult stepResult = stepUsageDeclaration.getStepDefinition().invoke(context);
             Instant stepEndTime = Instant.now();
             Duration duration = Duration.between(stepStartTime, stepEndTime);
-            System.out.println("Done executing step: " + stepUsageDeclaration.getFinalStepName() + ". Result: " + stepResult);
+           // System.out.println("Done executing step: " + stepUsageDeclaration.getFinalStepName() + ". Result: " + stepResult);
 
 
             if(!stepUsageDeclaration.skipIfFail() && stepResult == StepResult.FAILURE){
@@ -64,7 +64,7 @@ public class FLowExecutor {
         Instant flowEndTime = Instant.now();
         Duration duration = Duration.between(flowStartTime, flowEndTime);
         flowExecution.setDuration(duration);
-        System.out.println("End execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]. Status: " + flowExecution.getFlowExecutionResult());
+       // System.out.println("End execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]. Status: " + flowExecution.getFlowExecutionResult());
 
         //Inject all the data to the flow execution
         flowExecution.setAllDataValues(context.getDataValuesMap());

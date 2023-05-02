@@ -36,13 +36,13 @@ public class Main {
                             flows = tempFlow;
                         break;
                     case 2://Show flow details
-                        menu.FlowDefenitionsMenu(flows);
+                        menu.FlowDefinitionsMenu(flows);
                         break;
                     case 3:
-                        menu.FlowsExicuteMenu(flows);
+                        menu.FlowsExecuteMenu(flows);
                         break;
                     case 4://Flows History
-                        menu.showExecutionsHistoty();
+                        menu.showExecutionsHistory();
                         break;
                     case 5://Stats
                         menu.showFlowStatistics(flows);

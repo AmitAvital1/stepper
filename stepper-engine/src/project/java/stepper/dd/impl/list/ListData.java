@@ -20,6 +20,9 @@ public class ListData <T> {
 
     @Override
     public String toString() {
+        if(list.size() == 0)
+            return "Empty list";
+
         String userString = "[";
         int i = 1;
         for(T var : list){

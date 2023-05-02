@@ -30,8 +30,8 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
         Integer lineNumber = context.getDataValue("LINE", Integer.class);
 
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
-
-        RelationData dataRelation = new RelationData();
+        String[] colsName = {"No.", "File original name", "Extracted Content"};
+        RelationData dataRelation = new RelationData(colsName);
         Integer columnCounter = 1;
 
         StepResult res = StepResult.SUCCESS;

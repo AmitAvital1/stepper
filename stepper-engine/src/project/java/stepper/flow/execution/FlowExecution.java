@@ -1,5 +1,6 @@
 package project.java.stepper.flow.execution;
 
+import javafx.util.Pair;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
@@ -82,7 +83,7 @@ public class FlowExecution {
             List<DataDefinitionDeclaration> value = entry.getValue();
             for (DataDefinitionDeclaration dd : value) {
                 if (!startersFreeInputForContext.containsKey(key.getinputToFinalName().get(dd.getName())) && dd.necessity() == DataNecessity.MANDATORY) {
-                    throw new MissMandatoryInput("Missing Mandatory input: " + key.getinputToFinalName().get(dd.getName()));
+                    throw new MissMandatoryInput("Missing Mandatory input: " + dd.userString() + "[" + key.getinputToFinalName().get(dd.getName()) + "]");
                 }
             }
 
@@ -188,5 +189,14 @@ public class FlowExecution {
                 }
             }
         }
+    }
+    public Map<String,Object> getFormalOutPutsData(){
+        Map<String,Object> formalOutputToData = new HashMap<>();
+        for (Map.Entry<String, DataDefinitionDeclaration> entry : flowDefinition.getFormalOutput().entrySet()) {
+            String newVal = entry.getKey() + "-" + entry.getValue().userString();
+            Object key = outputsStepData.stream().filter(output -> output.finalName.equals(entry.getKey())).findFirst().get().data;
+            formalOutputToData.put(newVal,key);
+        }
+        return formalOutputToData;
     }
 }

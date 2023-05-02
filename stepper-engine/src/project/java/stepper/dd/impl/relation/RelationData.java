@@ -17,6 +17,8 @@ public class RelationData {
 
     @Override
     public String toString() {
+        if(columns.size() == 0)
+            return "No data";
         String res = "Cols:[";
         for(String str : columns)
             res+= str + ",";

@@ -19,6 +19,8 @@ public class LoadDataFromXml {
 
         try {
                 flowList = LoadStepperDataFromXml.load(xmlNative);
+            System.out.println("XML load successfully");
+
         }catch(FileNotFoundException e) {
             System.out.println("Error: XML path not found");
         }catch (JAXBException e) {
