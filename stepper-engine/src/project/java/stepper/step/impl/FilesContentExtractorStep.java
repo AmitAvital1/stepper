@@ -47,6 +47,10 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
                 String filePath = new String(fileData.getFilePath());
                 File workingFile = new File(filePath);
                 int extensionIndex = fileName.lastIndexOf('.');
+
+                if(extensionIndex == -1)
+                    extensionIndex = fileName.length();
+
                 String nameWithoutExtension = fileName.substring(0, extensionIndex);
                 String extension = fileName.substring(extensionIndex);
 

@@ -17,7 +17,7 @@ public class FlowMainMenu {
     private final List<FlowExecution> flowExecutions;//Save all the executions flows
     private List<StepAndDD> freeInputListToPrint;
     FLowExecutor fLowExecutor;
-    private class StepAndDD{
+    private class StepAndDD{//Container class
         public StepUsageDeclaration step;
         public DataDefinitionDeclaration data;
         public StepAndDD(StepUsageDeclaration s,DataDefinitionDeclaration d){step = s; data = d;}
@@ -29,6 +29,9 @@ public class FlowMainMenu {
     }
 
     public void getFlowInputToExecute(FlowExecution flow) {
+        /*
+        This function prints all the free input and get them from the user
+         */
         int userChoice = -1;
         int index = 0;
         Scanner scanner = new Scanner(System.in);
@@ -76,6 +79,9 @@ public class FlowMainMenu {
 
     }
     private int printAllFreeInputsAndReturnSize(FlowExecution flow, Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs) {
+        /*
+        This function print all the free inputs and return the size of them
+         */
         int index = 0;
         if (freeInputs.size() > 0) {
             System.out.println("You have free inputs:");
@@ -95,6 +101,9 @@ public class FlowMainMenu {
         return index;
     }
     public void FlowDecDefinitionsMenu(FlowDefinition flow) {
+        /*
+        This is the flow definition menu (no 2), shows the flow details that the user chose
+         */
         int counter = 1;
         System.out.println("\nFlow name:" + flow.getName());
         System.out.println("Description:" + flow.getDescription());
@@ -130,6 +139,9 @@ public class FlowMainMenu {
         counter = 1;
     }
     public void FlowDefinitionsMenu(List<FlowDefinition> flows) {
+        /*
+        This menu shows all the flows, and the user choose the flow that he want to see all the details
+         */
         if(flows.size() == 0) {
             System.out.println("There are no loaded flows.");
             return;
@@ -163,6 +175,9 @@ public class FlowMainMenu {
         }while(userChoice != 0);
     }
     public void FlowsExecuteMenu(List<FlowDefinition> flows) {
+        /*
+        This is the menu of all the flows that you want to execute, the user choose the flow he wants and execute him
+         */
         if(flows.size() == 0) {
             System.out.println("There are no loaded flows.");
             return;
@@ -198,7 +213,10 @@ public class FlowMainMenu {
         }while(userChoice != 0);
     }
     private void executeFlow(FlowExecution flow) throws MissMandatoryInput {
-        if(flow.validateToExecute()){
+        /*
+        This function execute flow the user chose and validate all the free inputs has entered. then execute the flow.
+         */
+        if(flow.validateToExecute()){//If all the inputs are valid and entered
             System.out.println("Starting execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]");
             fLowExecutor.executeFlow(flow);
             System.out.println("End execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]. Status: " + flow.getFlowExecutionResult());
