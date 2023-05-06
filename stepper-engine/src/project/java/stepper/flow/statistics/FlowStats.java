@@ -55,15 +55,15 @@ public class FlowStats {
 
     }
     public void addStepStats(StepUsageDeclaration step,Duration time) {
-        boolean exsist = false;
+        boolean exist = false;
         for(stepStats stepToStat : stepStatsList){
             if(stepToStat.stepDeclaration == step) {
                 stepToStat.addStepExecutesRunTimes(time);
-                exsist = true;
+                exist = true;
                 break;
             }
         }
-        if(!exsist)
+        if(!exist)
             stepStatsList.add(new stepStats(step,time));
     }
 

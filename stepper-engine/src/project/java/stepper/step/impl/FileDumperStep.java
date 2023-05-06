@@ -1,7 +1,7 @@
 package project.java.stepper.step.impl;
 
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
-import project.java.stepper.dd.impl.relation.RelationData;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.AbstractStepDefinition;
@@ -23,7 +23,7 @@ public class FileDumperStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "File Creation Result", DataDefinitionRegistry.STRING));
     }
     @Override
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         String content = context.getDataValue("CONTENT", String.class);
         String fileNameWithPath = context.getDataValue("FILE_NAME", String.class);
         String result = "SUCCESS";

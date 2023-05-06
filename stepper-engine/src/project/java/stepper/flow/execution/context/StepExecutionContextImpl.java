@@ -1,10 +1,12 @@
 package project.java.stepper.flow.execution.context;
 
 import project.java.stepper.dd.api.DataDefinition;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
+import project.java.stepper.step.api.DataNecessity;
 import project.java.stepper.step.api.StepResult;
 
 import java.time.Duration;
@@ -51,7 +53,7 @@ public class StepExecutionContextImpl implements StepExecutionContext {
     }
 
     @Override
-    public <T> T getDataValue(String dataName, Class<T> expectedDataType) {
+    public <T> T getDataValue(String dataName, Class<T> expectedDataType) throws NoStepInput {
        //Find of there is an input match
         String finalDataName = currentWorkingStep.getinputToFinalName().get(dataName);
 
@@ -69,11 +71,13 @@ public class StepExecutionContextImpl implements StepExecutionContext {
             theExpectedDataDefinition = maybeTheExpectedDataDefinition.get();
             if (expectedDataType.isAssignableFrom(theExpectedDataDefinition.dataDefinition().getType())) {
                 Object aValue = dataValues.get(finalDataName);
-                return expectedDataType.cast(aValue);
+                if(theExpectedDataDefinition.necessity() == DataNecessity.MANDATORY && aValue == null)//There is missing data
+                    throw new NoStepInput("During failures in the flow, the input: " + theExpectedDataDefinition.userString() + " missed");
+                else return expectedDataType.cast(aValue);
             }
         }
         else{
-               //Handle there is no input;
+               throw new NoStepInput("During failures in the flow, the input: " + finalName + " missed");
         }
         return null;
     }

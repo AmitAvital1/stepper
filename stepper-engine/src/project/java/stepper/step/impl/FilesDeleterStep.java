@@ -4,7 +4,7 @@ import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.file.FileData;
 import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.mapping.MappingData;
-import project.java.stepper.dd.impl.mapping.MappingDataDefinition;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.AbstractStepDefinition;
@@ -13,13 +13,8 @@ import project.java.stepper.step.api.DataNecessity;
 import project.java.stepper.step.api.StepResult;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class FilesDeleterStep extends AbstractStepDefinition {
 
@@ -32,9 +27,10 @@ public class FilesDeleterStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("DELETION_STATS", DataNecessity.NA, "Deletion summary results", DataDefinitionRegistry.MAPPING));
     }
 
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         List<FileData> filesList = context.getDataValue("FILES_LIST", ListData.class).getList();
+        ListData<FileData> listOfDeletedFiles = new ListData<>();
         List<String> listOfFailedDeletedFiles = new ArrayList<>();
         int numOfDeletedFiles = 0, numOfFailedDeletedFiles = 0;
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
@@ -58,6 +54,7 @@ public class FilesDeleterStep extends AbstractStepDefinition {
                         listOfFailedDeletedFiles.add(filePath);
                         continue;
                     }
+                    listOfDeletedFiles.addData(fileData);
                     numOfDeletedFiles++;
                 } else { //The file does not exist
                     res = StepResult.WARNING;
@@ -76,11 +73,10 @@ public class FilesDeleterStep extends AbstractStepDefinition {
                 context.addStepSummaryLine("The delete request have finish with delete problem on some files");
                 logs.addLogLine("WARNING: The delete request have finish with delete problem on some files");
             }
-            else if(res == StepResult.SUCCESS)
-                context.addStepSummaryLine("The step finish with deleting the files");
+            else context.addStepSummaryLine("The step finish with deleting the files");
         }
 
-        context.storeDataValue("DELETED_LIST", filesList);
+        context.storeDataValue("DELETED_LIST", listOfDeletedFiles);
         context.storeDataValue("DELETION_STATS", new MappingData<Integer, Integer>(numOfDeletedFiles, numOfFailedDeletedFiles));
         context.addStepLog(logs);
         return res;

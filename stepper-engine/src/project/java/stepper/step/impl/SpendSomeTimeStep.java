@@ -1,6 +1,7 @@
 package project.java.stepper.step.impl;
 
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.AbstractStepDefinition;
@@ -14,7 +15,7 @@ public class SpendSomeTimeStep extends AbstractStepDefinition {
 
         addInput(new DataDefinitionDeclarationImpl("TIME_TO_SPEND", DataNecessity.MANDATORY, "Total sleeping time (sec)", DataDefinitionRegistry.INTEGER));
     }
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         int seconds = context.getDataValue("TIME_TO_SPEND", Integer.class);
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
         if (seconds <= 0) {

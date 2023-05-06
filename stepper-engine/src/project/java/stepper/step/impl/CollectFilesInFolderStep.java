@@ -3,6 +3,7 @@ package project.java.stepper.step.impl;
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.file.FileData;
 import project.java.stepper.dd.impl.list.ListData;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.AbstractStepDefinition;
@@ -13,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +31,7 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
 
 
     @Override
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         String filePath = context.getDataValue("FOLDER_NAME", String.class);
         Optional<String> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", String.class));

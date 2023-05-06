@@ -2,6 +2,7 @@ package project.java.stepper.step.impl;
 
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.relation.RelationData;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.AbstractStepDefinition;
@@ -20,7 +21,7 @@ public class PropertiesExporterStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "Properties export result", DataDefinitionRegistry.STRING));
     }
     @Override
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         RelationData table = context.getDataValue("SOURCE", RelationData.class);
         String output = "";
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());

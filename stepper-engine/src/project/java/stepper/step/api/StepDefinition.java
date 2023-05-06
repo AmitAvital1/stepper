@@ -1,5 +1,6 @@
 package project.java.stepper.step.api;
 
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 
 import java.util.List;
@@ -9,5 +10,5 @@ public interface StepDefinition {
     boolean isReadonly();
     List<DataDefinitionDeclaration> inputs();
     List<DataDefinitionDeclaration> outputs();
-    StepResult invoke(StepExecutionContext context);
+    StepResult invoke(StepExecutionContext context) throws NoStepInput;
 }

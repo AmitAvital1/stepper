@@ -1,18 +1,14 @@
 package project.java.stepper.step.impl;
 
-import org.w3c.dom.ranges.Range;
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
-import project.java.stepper.dd.impl.file.FileData;
-import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.AbstractStepDefinition;
 import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
 import project.java.stepper.step.api.DataNecessity;
 import project.java.stepper.step.api.StepResult;
-
-import java.util.List;
 
 public class CSVExporterStep extends AbstractStepDefinition {
     public CSVExporterStep() {
@@ -23,7 +19,7 @@ public class CSVExporterStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "CSV export result", DataDefinitionRegistry.STRING));
     }
     @Override
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         RelationData table = context.getDataValue("SOURCE", RelationData.class);
         String output = "";
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());

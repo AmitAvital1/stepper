@@ -60,7 +60,11 @@ public class Main {
                     scanner.nextLine(); // consume the newline character
                 }
                 userChoice = -1;
-            }
+            }//catch (Exception e){
+               // System.out.println("Error occurred from unknown reason, please contact with the support.");
+              //  userChoice = -1;
+           // }
+
         } while (userChoice != MenuOptions.Exit.ordinal() + 1);
     }
 }

@@ -1,6 +1,7 @@
 package project.java.stepper.step.impl;
 
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.step.api.AbstractStepDefinition;
 import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
@@ -22,7 +23,7 @@ public class PersonDetailsStep extends AbstractStepDefinition {
     }
 
     @Override
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         // fetch inputs here, somehow
         String firstName = context.getDataValue("STRING_1", String.class);
         String lastName = context.getDataValue("STRING_2", String.class);

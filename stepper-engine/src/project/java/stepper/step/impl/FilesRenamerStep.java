@@ -4,7 +4,7 @@ import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.file.FileData;
 import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
-import project.java.stepper.dd.impl.mapping.MappingData;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.AbstractStepDefinition;
@@ -13,7 +13,6 @@ import project.java.stepper.step.api.DataNecessity;
 import project.java.stepper.step.api.StepResult;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +29,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("RENAME_RESULT", DataNecessity.NA, "Rename operation summary", DataDefinitionRegistry.RELATION));
     }
 
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         List<FileData> filesList = context.getDataValue("FILES_TO_RENAME", ListData.class).getList();
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
@@ -54,6 +53,8 @@ public class FilesRenamerStep extends AbstractStepDefinition {
                 String fileName = new String(fileData.getFileName());
                 String filePath = new String(fileData.getFilePath());
                 int extensionIndex = fileName.lastIndexOf('.');
+                if(extensionIndex == -1) // There is no extension in the file
+                    extensionIndex = fileName.length();
                 String nameWithoutExtension = fileName.substring(0, extensionIndex);
                 String extension = fileName.substring(extensionIndex);
                 String newName = maybePrefix.orElse("") + nameWithoutExtension + maybeSuffix.orElse("") + extension;

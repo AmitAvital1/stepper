@@ -4,6 +4,7 @@ import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.file.FileData;
 import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.AbstractStepDefinition;
@@ -24,7 +25,7 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data extraction", DataDefinitionRegistry.RELATION));
     }
     @Override
-    public StepResult invoke(StepExecutionContext context) {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         List<FileData> filesList = context.getDataValue("FILES_LIST", ListData.class).getList();
         Integer lineNumber = context.getDataValue("LINE", Integer.class);

@@ -1,5 +1,6 @@
 package project.java.stepper.flow.execution.runner;
 
+import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
@@ -36,7 +37,17 @@ public class FLowExecutor {
 
             Instant stepStartTime = Instant.now();
             //System.out.println("Starting to execute step: " + stepUsageDeclaration.getFinalStepName());
-            StepResult stepResult = stepUsageDeclaration.getStepDefinition().invoke(context);
+            StepResult stepResult;
+            try{
+                stepResult = stepUsageDeclaration.getStepDefinition().invoke(context);
+            }
+            catch (NoStepInput e){
+                stepResult = StepResult.FAILURE;
+                StepLogs log = new StepLogs(stepUsageDeclaration.getFinalStepName());
+                context.addStepSummaryLine("Failed:" + e.getMessage());
+                log.addLogLine("FAILED " + e.getMessage());
+                context.addStepLog(log);
+            }
             Instant stepEndTime = Instant.now();
             Duration duration = Duration.between(stepStartTime, stepEndTime);
            // System.out.println("Done executing step: " + stepUsageDeclaration.getFinalStepName() + ". Result: " + stepResult);
