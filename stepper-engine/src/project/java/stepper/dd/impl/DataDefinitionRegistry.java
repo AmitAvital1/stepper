@@ -48,6 +48,8 @@ public enum DataDefinitionRegistry implements DataDefinition{
             }
             if (this == INTEGER) {
                 Integer num = Integer.parseInt(input);
+                if(num < 0)
+                    throw new InvalidUserDataTypeInput("This input have to be non negative number");
                 return expectedDataType.cast(num);
             } else if (this == DOUBLE) {
                 Double num = Double.parseDouble(input);

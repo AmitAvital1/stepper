@@ -32,7 +32,7 @@ public class Main {
                         System.out.println("Please enter a xml native to import flows or 0 to exit");
                         String input = scanner.nextLine();
                         List<FlowDefinition> tempFlow = LoadDataFromXml.LoadData(input);
-                        if(tempFlow.size() != 0)//To not override the last xml flows
+                        if(tempFlow.size() != 0)//To not override the last xml flows if you cannot reload it
                             flows = tempFlow;
                         break;
                     case 2://Show flow details

@@ -20,6 +20,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class LoadStepperDataFromXml {
+    /*
+    This function load data from xml path. Using JAXB to get data from xml, and make deep copy to Flows in our system
+     */
     private final static String JAXB_XML_PACKAGE_NAME = "project.java.stepper.schema.generated";
 
     public static List<FlowDefinition> load(String xmlPath) throws FileNotFoundException, JAXBException, StepperExeption {
@@ -28,9 +31,9 @@ public class LoadStepperDataFromXml {
         STStepper genStepper = deserializeFrom(inputStream);
         if (firstCheckFlowValidate(genStepper.getSTFlows().getSTFlow())) {
             for (STFlow flow : genStepper.getSTFlows().getSTFlow()) {
-                FlowDefinition systemFlow = cloneFlowDetails(flow);
+                FlowDefinition systemFlow = cloneFlowDetails(flow);//Doing the deep copy
                 systemFlow.validateFlowStructure();
-                flowList.add(systemFlow);
+                flowList.add(systemFlow);//Add the flow to the list
             }
         }
         return flowList;
@@ -120,15 +123,38 @@ public class LoadStepperDataFromXml {
         }
     }
 
-    private static void addCustomMapping(FlowDefinition flow, List<STCustomMapping> flowMapping){
-        for(STCustomMapping custome : flowMapping){
+    private static void addCustomMapping(FlowDefinition flow, List<STCustomMapping> flowMapping) throws CustomeMappingInvalid {
+        for(STCustomMapping custom : flowMapping){
+            boolean hasNotFound = true;
             for(StepUsageDeclaration step : flow.getFlowSteps()){
-                if(step.getFinalStepName().equals(custome.getTargetStep())){
-                    step.addCustomeMapInput(custome.getTargetData(), custome.getSourceData());
+                if(step.getFinalStepName().equals(custom.getTargetStep())){
+                    hasNotFound = false;
+                    if(step.getinputToFinalName().get(custom.getTargetData()) == null)
+                        throw new CustomeMappingInvalid("In custom mapping,the step " + step.getFinalStepName() + " does not have input-" + custom.getTargetData());
+                    if(checkValidSyntaxOfStepsDetails(custom,flow)) {
+                        step.addCustomeMapInput(custom.getTargetData(), custom.getSourceData());
+                    }
                 }
             }
+            if(hasNotFound)
+                throw new CustomeMappingInvalid("In custom mapping the step:" + custom.getTargetStep() + " not exist");
         }
     }
+
+    private static boolean checkValidSyntaxOfStepsDetails(STCustomMapping custom,FlowDefinition flow) throws CustomeMappingInvalid {
+        Optional<StepUsageDeclaration> opt = flow.getFlowSteps().stream()
+                .filter(st -> st.getFinalStepName().equals(custom.getSourceStep()))
+                .findFirst();
+
+        if(!opt.isPresent())
+            throw new CustomeMappingInvalid("Error in custom mapping: The step " + custom.getSourceStep() + " not exist");
+        else
+            if(opt.get().getFinalNameToOutput().get(custom.getSourceData()) == null)
+                throw new CustomeMappingInvalid("Error in custom mapping: The source output " + custom.getSourceData() + " does not exist");
+
+       return true;
+    }
+
     private static STStepper deserializeFrom(InputStream in) throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(JAXB_XML_PACKAGE_NAME);
         Unmarshaller u = jc.createUnmarshaller();
@@ -136,16 +162,20 @@ public class LoadStepperDataFromXml {
     }
 
     private static boolean firstCheckFlowValidate(List<STFlow> flows) throws DuplicateFlowName, StepInFlowNotExist {
+        /*
+        This function doing 'quick' check about the xml structure
+         */
+
         List<String> FlowNames = flows.stream()
                 .map(STFlow::getName)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());//Getting all the flows names
 
-        boolean hasDuplicateNames = FlowNames.stream().anyMatch(element -> Collections.frequency(FlowNames, element) > 1);
+        boolean hasDuplicateNames = FlowNames.stream().anyMatch(element -> Collections.frequency(FlowNames, element) > 1);//Check if there is duplicate flow name
 
         if (hasDuplicateNames)
             throw new DuplicateFlowName("Invalid read the file. There are 2 flows with the same name");
 
-        for (STFlow flow : flows) {
+        for (STFlow flow : flows) {//Check if the flows existing in our stepper
             List<String> names = flow.getSTStepsInFlow().getSTStepInFlow().stream().map(step ->
                     {
                         if (Optional.ofNullable(step.getAlias()).isPresent())

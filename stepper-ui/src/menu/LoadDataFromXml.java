@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoadDataFromXml {
+    /*
+    This function load data from xml
+     */
 
     public static List<FlowDefinition> LoadData(String xmlNative) {
 
@@ -26,7 +29,7 @@ public class LoadDataFromXml {
         }catch (JAXBException e) {
             System.out.println("Error while trying get your data from XML");
         }catch (StepperExeption e){
-            System.out.println("Error:" + e.getMessage());
+            System.out.println("Load Failed:" + e.getMessage());
         }
         return flowList;
 

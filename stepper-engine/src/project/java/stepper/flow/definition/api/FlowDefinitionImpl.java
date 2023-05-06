@@ -65,6 +65,13 @@ public class FlowDefinitionImpl implements FlowDefinition {
     }
 
     public void validateFlowStructure() throws StepperExeption {
+        /*
+        This function doing check of the flow stracture by:
+        Check and save the free input
+        Check that all input (not free) have an output to get data
+        Check the free outputs and save them
+        Check there in no problem in the aliasing
+         */
         Map<String,DataDefinitionDeclaration> inputOnTheWay = new HashMap<>();
         freeInputFinalNameToDD = new HashMap<>();
         stepToFreeInputFinalNameToDD = new HashMap<>();

@@ -60,7 +60,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
                 File oldFile = new File(fileData.getFilePath());
                 File newFile = new File(oldFile.getParentFile() + "\\" + newName);
                 if (oldFile.renameTo(newFile)) {
-                    renameResult.addRow(columnCounter.toString(), newFile.getName(), newFile.getName());
+                    renameResult.addRow(columnCounter.toString(), oldFile.getName(), newFile.getName());
                     columnCounter++;
                 } else {
                     filesFailedList.add(oldFile.getName());
