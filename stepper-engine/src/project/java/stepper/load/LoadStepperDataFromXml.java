@@ -129,7 +129,7 @@ public class LoadStepperDataFromXml {
             for(StepUsageDeclaration step : flow.getFlowSteps()){
                 if(step.getFinalStepName().equals(custom.getTargetStep())){
                     hasNotFound = false;
-                    if(step.getinputToFinalName().get(custom.getTargetData()) == null)
+                    if(step.getFinalNameToInput().get(custom.getTargetData()) == null)
                         throw new CustomeMappingInvalid("In custom mapping,the step " + step.getFinalStepName() + " does not have input-" + custom.getTargetData());
                     if(checkValidSyntaxOfStepsDetails(custom,flow)) {
                         step.addCustomeMapInput(custom.getTargetData(), custom.getSourceData());
@@ -174,20 +174,15 @@ public class LoadStepperDataFromXml {
 
         if (hasDuplicateNames)
             throw new DuplicateFlowName("Invalid read the file. There are 2 flows with the same name");
-
+        /*
         for (STFlow flow : flows) {//Check if the flows existing in our stepper
-            List<String> names = flow.getSTStepsInFlow().getSTStepInFlow().stream().map(step ->
-                    {
-                        if (Optional.ofNullable(step.getAlias()).isPresent())
-                            return step.getAlias();
-                        else
-                            return step.getName();
-                    })
+            List<String> names = flow.getSTStepsInFlow().getSTStepInFlow().stream()
+                    .map(step -> step.getName())
                     .collect(Collectors.toList());
             boolean hasNoStepName = names.stream().anyMatch(element -> Arrays.stream(StepDefinitionRegistry.values()).anyMatch(step -> element.equals(step.getStepDefinition().name())));
             if (!hasNoStepName)
                 throw new StepInFlowNotExist("In flow:" + flow.getName() + " have step that not exist.");
-        }
+        }*/
         return true;
     }
 }

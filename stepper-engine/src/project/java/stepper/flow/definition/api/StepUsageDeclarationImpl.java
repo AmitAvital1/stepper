@@ -85,11 +85,13 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     public boolean addLevelAlias(String name, String finalName) {
         if(inputsToFinalNames.containsKey(name)) {
             inputsToFinalNames.put(name, finalName);
+            finalNamesToInput.remove(name);
             finalNamesToInput.put(finalName,name);
             return true;
         }
         else if(outputsToFinalNames.containsKey(name)) {
             outputsToFinalNames.put(name, finalName);
+            finalNamesToOutput.remove(name);
             finalNamesToOutput.put(finalName,name);
             return true;
         }

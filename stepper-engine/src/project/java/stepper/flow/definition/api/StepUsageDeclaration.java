@@ -1,10 +1,7 @@
 package project.java.stepper.flow.definition.api;
 
-import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.StepDefinition;
-import project.java.stepper.step.api.StepResult;
 
-import java.time.Duration;
 import java.util.Map;
 
 public interface StepUsageDeclaration {

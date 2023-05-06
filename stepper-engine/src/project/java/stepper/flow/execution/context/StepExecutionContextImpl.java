@@ -1,6 +1,5 @@
 package project.java.stepper.flow.execution.context;
 
-import project.java.stepper.dd.api.DataDefinition;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;

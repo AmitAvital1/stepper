@@ -3,14 +3,12 @@ package project.java.stepper.flow.definition.api;
 import project.java.stepper.exceptions.*;
 import project.java.stepper.flow.statistics.FlowStats;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
-import project.java.stepper.step.api.DataNecessity;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class FlowDefinitionImpl implements FlowDefinition {
 
@@ -100,7 +98,9 @@ public class FlowDefinitionImpl implements FlowDefinition {
                         //There is no output to take for the input - so its free input
                         if(!data.dataDefinition().isUserFriendly())//If the free input does not user-friendly
                             throw new FreeInputNotUserFriendly("In flow: " + name + ", the free input: " + step.getinputToFinalName().get(data.getName()) + " cannot get from user");
-
+                        if(freeInputFinalNameToDD.containsKey(step.getinputToFinalName().get(data.getName())))
+                            if(freeInputFinalNameToDD.get(step.getinputToFinalName().get(data.getName())).dataDefinition().getType() != data.dataDefinition().getType())//It's mean that there are two free inputs with other DD
+                                 throw new SameFreeInputNamesButNoDD("In flow: " + name + ", the are duplicate free input called:" + step.getinputToFinalName().get(data.getName()) + " but with other definition");
                         freeInputFinalNameToDD.put(step.getinputToFinalName().get(data.getName()), data);
                         freeInputStepDD.add(data);
                     }
