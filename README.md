@@ -1,12 +1,12 @@
-Stepper - Workflow/Pipeline System
+Stepper - Workflow/Pipeline System-
 Stepper is a workflow/pipeline system that enables the assembly of different scenarios (called flows) from common components (called steps). This includes executing them and producing the required results. The project includes different UI clients (simple CLI, Desktop, Client-server), components that manage users and permissions, serving multiple clients concurrently, and collecting information and statistics on their progress.
 
-Technologies Used
+Technologies Used:
 Java
 JSON serialization
 Getting Started
 
-Technologies in progressing
+Technologies in progressing:
 Multithreading
 Client-server architecture
 
