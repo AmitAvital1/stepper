@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: main.Main
+MainJavaFx-Class: main.MainJavaFx
 Class-Path: stepper-engine.jar
 
