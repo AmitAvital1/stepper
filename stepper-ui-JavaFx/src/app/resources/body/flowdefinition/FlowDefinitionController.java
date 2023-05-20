@@ -27,7 +27,7 @@ public class FlowDefinitionController implements BodyControllerDefinition {
     @FXML private TreeView<String> flowDetailsTreeView;
     @FXML private Button executeFlowDFButton;
 
-    List<FlowDefinition> flows;
+    private List<FlowDefinition> flows;
 
     @Override
     public void show() {

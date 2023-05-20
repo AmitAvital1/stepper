@@ -68,4 +68,5 @@ public class BodyController {
         }
     }
     public void addFlowExecutor(FlowExecution flowExecution){mainController.addExecutorFlow(flowExecution);}
+    public List<FlowExecution> getFlowExecutions(){return mainController.getFlowExecutions();}
 }

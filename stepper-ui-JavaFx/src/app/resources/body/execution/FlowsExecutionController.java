@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.PopOver;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
@@ -22,6 +23,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.util.Duration;
 import javafx.geometry.Insets;
+import org.controlsfx.control.PopOver;
+import javafx.geometry.Pos;
+import javafx.animation.PauseTransition;
 
 import javafx.scene.text.Text;
 import java.util.List;
@@ -50,6 +54,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
     private Button executeFlowButtonFinish;
 
     List<FlowDefinition> flows;
+    private PopOver errorPopOver;
 
     @Override
     public void setFlowsDetails(List<FlowDefinition> flow) {
@@ -110,7 +115,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         String text = textField.getText().trim();
        // Text messageText = new Text();
         if (text.isEmpty()) {
-            showErrorMessage("Please enter data.",step);
+            showErrorMessage(button,"Please enter data.",step);
             return;
         }
         try{
@@ -120,19 +125,35 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         }catch (MissMandatoryInput e) {
             //Pass
         }catch (StepperExeption e){
-            showErrorMessage(e.getMessage(),step);
+            showErrorMessage(button,e.getMessage(),step);
             return;
         }
         textField.setDisable(true);
         button.setText("Edit");
     }
 
-    private void showErrorMessage(String message,StepUsageDeclaration step) {
-        Notifications.create()
+    private void showErrorMessage(Button button,String message,StepUsageDeclaration step) {
+        /*Notifications.create()
                 .title("Error " + step.getFinalStepName())
                 .text(message)
                 .hideAfter(Duration.seconds(2))
-                .showError();
+                .showError();*/
+        if (errorPopOver != null && errorPopOver.isShowing()) {
+            errorPopOver.hide();
+        }
+
+        Label errorLabel = new Label(message);
+        errorLabel.setStyle("-fx-text-fill: red;");
+        errorPopOver = new PopOver();
+        errorPopOver.setContentNode(new HBox(errorLabel));
+        errorPopOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+        errorPopOver.setDetached(true);
+        errorPopOver.show(button);
+
+        // Hide the popover after 2 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(2));
+        pause.setOnFinished(event -> errorPopOver.hide());
+        pause.play();
     }
     @Override
     public void setBodyController(BodyController bodyCTRL) {
