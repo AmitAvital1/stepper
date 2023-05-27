@@ -5,10 +5,7 @@ import app.resources.main.AppMainConroller;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
 
@@ -31,9 +28,15 @@ public class BodyController {
         fxmlLoader.setLocation(url);
         loadScreen(fxmlLoader, url);
     }
-    public void showFlowExectuion() {
+    public void showFlowExecution() {
         FXMLLoader fxmlLoader = new FXMLLoader();
         URL url = getClass().getResource("/app/resources/body/execution/flowExecution.fxml");
+        fxmlLoader.setLocation(url);
+        loadScreen(fxmlLoader, url);
+    }
+    public void showFlowHistory() {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        URL url = getClass().getResource("/app/resources/body/history/history.fxml");
         fxmlLoader.setLocation(url);
         loadScreen(fxmlLoader, url);
     }
@@ -42,8 +45,8 @@ public class BodyController {
             Parent screen = fxmlLoader.load(url.openStream());
             BodyControllerDefinition bController = fxmlLoader.getController();
             bController.setFlowsDetails(mainController.getFlows());
-            bController.show();
             bController.setBodyController(this);
+            bController.show();
             bodyPane.getChildren().setAll(screen);
         }
         catch (IOException e) {
@@ -59,6 +62,7 @@ public class BodyController {
             Parent screen = fxmlLoader.load(url.openStream());
             FlowsExecutionController bController = fxmlLoader.getController();
             bController.setFlowsDetails(mainController.getFlows());
+            bController.setBodyController(this);
             bController.show();
             bController.handleFlowButtonAction(flow);
             bodyPane.getChildren().setAll(screen);
@@ -69,4 +73,5 @@ public class BodyController {
     }
     public void addFlowExecutor(FlowExecution flowExecution){mainController.addExecutorFlow(flowExecution);}
     public List<FlowExecution> getFlowExecutions(){return mainController.getFlowExecutions();}
+
 }

@@ -1,0 +1,78 @@
+.root {
+    -fx-font-family: "Arial", sans-serif;
+}
+#stepperTitle {
+    -fx-font-size: 40px; /* Updated size to 40px */
+    -fx-font-weight: bold;
+    -fx-text-fill: #45a049; /* Vibrant orange */
+    -fx-padding: 20px 0;
+}
+/* Buttons */
+.button {
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-background-color: #4CAF50; /* Green */
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #45a049; /* Darker green */
+}
+
+/* Labels */
+.label {
+    -fx-font-size: 16px;
+    -fx-padding: 4px;
+}
+
+/* Hyperlinks */
+.hyperlink {
+    -fx-font-size: 14px;
+    -fx-text-fill: #0645AD; /* Blue */
+    -fx-cursor: hand;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #0B0080; /* Darker blue */
+}
+
+/* Text Fields */
+.text-field {
+    -fx-font-size: 14px;
+    -fx-pref-height: 30px;
+}
+
+/* List Views */
+.list-view {
+    -fx-font-size: 14px;
+}
+
+.list-cell {
+    -fx-padding: 6px;
+}
+
+.list-cell:hover {
+    -fx-background-color: #f1f1f1; /* Light gray */
+}
+
+.list-cell:odd {
+    -fx-background-color: #fafafa; /* Off-white */
+}
+
+.list-cell:selected {
+    -fx-background-color: #c5e1a5; /* Light green */
+}
+
+/* Table Views */
+.table-view {
+    -fx-font-size: 14px;
+}
+
+.table-cell {
+    -fx-padding: 6px;
+}
+
+.table-cell:selected {
+    -fx-background-color: #c5e1a5; /* Light green */
+}

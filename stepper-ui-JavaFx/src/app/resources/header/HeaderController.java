@@ -27,6 +27,8 @@ public class HeaderController {
     private Button flowDefinitionButtom;
     @FXML
     private Button flowExecutionButton;
+    @FXML
+    private Button executionHistoryButton;
 
     @FXML
     void loadXmlButton(ActionEvent event) {
@@ -70,5 +72,13 @@ public class HeaderController {
     @FXML
     void flowExecutionListener(ActionEvent event) {
         mainController.showFlowExectuion();
+    }
+    @FXML
+    void executionHistoryButtonListen(ActionEvent event) {
+        mainController.showFlowsHistory();
+    }
+
+    public void setFlowHistory() {
+        executionHistoryButton.setDisable(false);
     }
 }

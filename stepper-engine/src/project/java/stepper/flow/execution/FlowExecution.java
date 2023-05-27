@@ -27,10 +27,10 @@ public class FlowExecution {
 
 
     public static class flowOutputsData{
-        private String finalName;
+        private final String finalName;
         private StepUsageDeclaration outputStep;
-        private DataDefinitionDeclaration outputDD;
-        private Object data;
+        private final DataDefinitionDeclaration outputDD;
+        private final Object data;
         public flowOutputsData(String finalName, StepUsageDeclaration outputStep, DataDefinitionDeclaration outputDD,Object data){
             this.finalName = finalName;
             this.outputStep = outputStep;
@@ -42,6 +42,22 @@ public class FlowExecution {
                    return true;
                else return false;
         }
+
+        public String getFinalName() {
+            return finalName;
+        }
+
+        public StepUsageDeclaration getOutputStep() {
+            return outputStep;
+        }
+
+        public DataDefinitionDeclaration getOutputDD() {
+            return outputDD;
+        }
+
+        public Object getData() {
+            return data;
+        }
     }
     public FlowExecution(String uniqueId, FlowDefinition flowDefinition) {
         this.uniqueId = uniqueId;
@@ -50,6 +66,7 @@ public class FlowExecution {
 
     }
     public void setFlowContexts(StepExecutionContext context){flowContexts = context;}
+    public StepExecutionContext getFlowContexts(){return  flowContexts;}
     public void setAllDataValues(Map<String, Object> allDataValues) {this.allDataValues = allDataValues;}
     public String getUniqueId() {
         return uniqueId;
@@ -153,6 +170,15 @@ public class FlowExecution {
             i++;
         }
         return outputsString;
+    }
+    public List<flowOutputsData> getOutputsStepData(){return outputsStepData; }
+        public List<StepExecutionContextImpl.stepData> getStepsData(){
+        List<StepExecutionContextImpl.stepData> lst = new ArrayList<>();
+        for(StepUsageDeclaration step : flowDefinition.getFlowSteps()) {
+            StepExecutionContextImpl.stepData data = flowContexts.getStepData(step);
+            lst.add(data);
+        }
+        return lst;
     }
     public List<String> getAllStepsWithDataToPrintList() {
         int i = 1;
