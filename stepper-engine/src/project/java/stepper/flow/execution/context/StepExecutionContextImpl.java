@@ -1,5 +1,10 @@
 package project.java.stepper.flow.execution.context;
 
+import javafx.application.Platform;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
@@ -19,6 +24,7 @@ public class StepExecutionContextImpl implements StepExecutionContext {
     private List<String> stepSummaryLine;
     private final List<FlowExecution.flowOutputsData> outputsData;
     private List<stepData> flowStepsData;
+    private ListProperty<stepData> flowStepsDataProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     public StepExecutionContextImpl() {
         dataValues = new HashMap<>();
@@ -124,8 +130,13 @@ public class StepExecutionContextImpl implements StepExecutionContext {
         return stepSummaryLine.get(stepSummaryLine.size()-1);
     }
     public void addStepData(StepUsageDeclaration step,String stepSummaryLine,StepLogs logs, Duration time, StepResult result){
-        flowStepsData.add(new stepData(step,stepSummaryLine,logs,time,result));
+        stepData data = new stepData(step,stepSummaryLine,logs,time,result);
+        flowStepsData.add(data);
+        Platform.runLater(() -> {
+            flowStepsDataProperty.add(data);
+        });
     }
+    public ListProperty<stepData> getFlowStepsDataProperty(){return flowStepsDataProperty;}
     public stepData getStepData(StepUsageDeclaration step){
         for(stepData data : flowStepsData){
             if(data.step == step)

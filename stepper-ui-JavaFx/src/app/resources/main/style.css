@@ -76,3 +76,6 @@
 .table-cell:selected {
     -fx-background-color: #c5e1a5; /* Light green */
 }
+.tree-view {
+    -fx-font-size: 14px;
+}

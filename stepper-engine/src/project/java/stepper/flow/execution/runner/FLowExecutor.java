@@ -16,9 +16,12 @@ import java.time.LocalTime;
 public class FLowExecutor implements Runnable {
 
     private FlowExecution flowExecution;
+    private StepExecutionContext context;
 
     public FLowExecutor(FlowExecution flowExecution){
         this.flowExecution = flowExecution;
+        context = new StepExecutionContextImpl(); // actual object goes here...
+        flowExecution.setFlowContexts(context);
     }
 
     public void executeFlow(FlowExecution flowExecution) {
@@ -29,9 +32,6 @@ public class FLowExecutor implements Runnable {
         String formattedTime = time.getHour() + ":" + time.getMinute() + ":" + time.getSecond();
         flowExecution.setStartedTime(formattedTime);
 
-        //System.out.println("Starting execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]");
-
-        StepExecutionContext context = new StepExecutionContextImpl(); // actual object goes here...
         flowExecution.setFlowContexts(context);
         context.updateCurrentWorkingStep(null);
         flowExecution.getStartersFreeInputForContext().forEach((key,val) -> context.storeDataValue(key,val));
@@ -67,6 +67,8 @@ public class FLowExecutor implements Runnable {
                 flowExecution.setFlowExecutionResult(FlowExecutionResult.FAILURE);
                 theStepFinishWithFailure = true;
                 stopTheFlow = true;
+                flowExecution.addStepFinished(flowExecution.getFlowDefinition().getFlowSteps().size());
+
             }
             else if(stepResult == StepResult.FAILURE){
                 flowExecution.setFlowExecutionResult(FlowExecutionResult.WARNING);
@@ -74,6 +76,7 @@ public class FLowExecutor implements Runnable {
             }
             context.addStepData(stepUsageDeclaration,context.getLastStepSummaryLine(),context.getLastStepLogs(),duration,stepResult);//Add all step datas
             flowExecution.getFlowDefinition().addFlowRunStepStats(stepUsageDeclaration,duration);
+            flowExecution.addStepFinished(1);
         }
         if(!theStepFinishWithFailure)
             flowExecution.setFlowExecutionResult(FlowExecutionResult.SUCCESS);

@@ -2,24 +2,29 @@ package app.resources.body.execution;
 
 import app.resources.body.BodyController;
 import app.resources.body.BodyControllerDefinition;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import org.controlsfx.control.PopOver;
+import project.java.stepper.dd.impl.DataDefinitionRegistry;
+import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
+import project.java.stepper.flow.execution.FlowExecutionResult;
+import project.java.stepper.flow.execution.context.StepExecutionContextImpl;
 import project.java.stepper.flow.execution.runner.FLowExecutor;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.util.Duration;
 import javafx.geometry.Insets;
@@ -53,6 +58,23 @@ public class FlowsExecutionController implements BodyControllerDefinition {
     @FXML
     private Button executeFlowButtonFinish;
 
+    @FXML
+    private StackPane flowExecutionInfo;
+
+    @FXML
+    private ProgressBar flowProgressBar;
+
+    @FXML
+    private Label stepResLabel;
+    @FXML
+    private TreeView<String> stepsProgressTreeView;
+    @FXML
+    private ListView<String> listOfLogs;
+    @FXML
+    private VBox theVboxParent;
+    @FXML
+    private VBox formalOutPutsVbox;
+
     List<FlowDefinition> flows;
     private PopOver errorPopOver;
 
@@ -64,6 +86,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
     @Override
     public void show() {
         flowDetailsExecutionBox.setVisible(false);
+        flowExecutionInfo.setVisible(false);
         for (FlowDefinition flow : flows) {
             Button button = new Button(flow.getName());
             button.setOnAction(e -> handleFlowButtonAction(flow));
@@ -71,9 +94,13 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         }
     }
     public void handleFlowButtonAction(FlowDefinition flowButton) {
+        theVboxParent.getChildren().clear();
+        theVboxParent.getChildren().addAll(flowDetailsExecutionBox,flowExecutionInfo);
         UUID uuid = UUID.randomUUID();
         FlowExecution flowExecution = new FlowExecution(uuid.toString(), flowButton);
         executeFlowButtonFinish.setDisable(false);
+        flowDetailsExecutionBox.setDisable(false);
+        flowExecutionInfo.setVisible(false);
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
         Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs = flowExecution.getFlowDefinition().getFlowFreeInputs();
@@ -163,16 +190,85 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         /*
         This function execute flow the user chose and validate all the free inputs has entered. then execute the flow.
          */
-
+        Accordion accordion = new Accordion();
+        TitledPane titledPane = new TitledPane("Execution Details", flowDetailsExecutionBox);
+        titledPane.setStyle("-fx-font-size: 16px;");
+        VBox currentParent = (VBox) flowDetailsExecutionBox.getParent();
+        ((Pane) currentParent).getChildren().clear();
+        titledPane.setContent(flowDetailsExecutionBox);
+        accordion.getPanes().add(titledPane);
+        currentParent.getChildren().addAll(accordion,flowExecutionInfo);
+        flowDetailsExecutionBox.setDisable(true);
+        flowExecutionInfo.setVisible(true);
+        stepResLabel.setText("");
+        stepsProgressTreeView.setRoot(new TreeItem<>());
         System.out.println("Starting execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]");
-        //FLowExecutor fLowExecutor = new FLowExecutor();
-        //fLowExecutor.executeFlow(flow);
         bodyForFlowExecutionController.getFlowManagerExecution().exeFlow(flow);
+        flow.getStepFinishedProperty().addListener((observable, oldValue, newValue) -> {
+            flowProgressBar.setProgress(newValue.doubleValue() / (double)flow.getFlowDefinition().getFlowSteps().size());
+        });
+        flow.getFlowExecutionResultProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != FlowExecutionResult.PROCESSING) {
+                stepResLabel.setText(newValue.name() + " [" + flow.getDuration() + ".ms" + "]");
+            }
+        });
+        flow.getFlowContexts().getFlowStepsDataProperty().addListener((observable, oldValue, newValue) -> {
+            stepsProgressTreeView.getRoot().getChildren().clear();
+            listOfLogs.getItems().clear();
+            for(StepUsageDeclaration step : flow.getFlowDefinition().getFlowSteps()){
+                StepExecutionContextImpl.stepData data = flow.getFlowContexts().getStepData(step);
+                TreeItem<String> stepNameItem = new TreeItem<>(step.getFinalStepName());
+                TreeItem<String> stepDetails;
+                if(data != null) {
+
+                    if (!data.step.getFinalStepName().equals(data.step.getStepDefinition().name()))
+                        stepNameItem.setValue(step.getFinalStepName() + "(" + step.getStepDefinition().name() + ")");
+
+                    stepDetails = new TreeItem<>( "Total Time:[" + data.time.toMillis() + ".ms]" + ", Result:" + data.result);
+                    TreeItem<String> stepSummaryLine = new TreeItem<>(data.stepSummaryLine);
+                    TreeItem<String> totalLogs = new TreeItem<>("Total logs(" + data.logs.getStepLogs().size() + ")");
+                    for (String log : data.logs.getStepLogs()) {
+                        totalLogs.getChildren().add(new TreeItem<>(log));
+                        listOfLogs.getItems().add(step.getFinalStepName() + ":" + log);
+                    }
+                    stepNameItem.getChildren().addAll(stepDetails,stepSummaryLine,totalLogs);
+                    stepsProgressTreeView.getRoot().getChildren().addAll(stepNameItem);
+                }
+            }
+//            Map<String,Object> formalOutputToData = flow.getFormalOutPutsData();
+//            for (Map.Entry<String, Object> entry : formalOutputToData.entrySet()) {
+//                Label outText;
+//                if(entry.getValue() == null)
+//                    break;
+//                if (entry.getValue().getClass() == ListData.class) {
+//                    outText = new Label(entry.getKey());
+//                    HBox hbox = new HBox();
+//                    hbox.setSpacing(5);
+//                    hbox.getChildren().add(outText);
+//                    Hyperlink hyperlink = new Hyperlink("Show list");
+//                    hyperlink.setOnAction(event -> showListPopup(entry.getValue()));
+//                    hbox.getChildren().add(hyperlink);
+//                    formalOutPutsVbox.getChildren().add(hbox);
+//                }
+//
+//
+//            }
+        });
         //System.out.println("End execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]. Status: " + flow.getFlowExecutionResult());
       //  System.out.println("Outputs:");
        // for (Map.Entry<String, Object> entry : flow.getFormalOutPutsData().entrySet()) {
         //    System.out.println(entry.getKey() + ":\n" + entry.getValue());
         //}
         bodyForFlowExecutionController.addFlowExecutor(flow);
+    }
+    private void showListPopup(Object flowData) {
+        Stage popupStage = new Stage();
+        ListView<String> tableView = new ListView<>();
+        List<Object> list = ListData.class.cast(flowData).getList();
+        list.forEach(item -> tableView.getItems().add(item.toString()));
+
+        Scene popupScene = new Scene(tableView);
+        popupStage.setScene(popupScene);
+        popupStage.show();
     }
 }

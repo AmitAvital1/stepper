@@ -1,5 +1,6 @@
 package project.java.stepper.flow.execution.context;
 
+import javafx.beans.property.ListProperty;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
@@ -23,6 +24,7 @@ public interface StepExecutionContext {
     List<FlowExecution.flowOutputsData> getFlowOutputsData();
     void addStepData(StepUsageDeclaration step, String stepSummaryLine, StepLogs logs, Duration time, StepResult result);
     StepExecutionContextImpl.stepData getStepData(StepUsageDeclaration step);
+    ListProperty<StepExecutionContextImpl.stepData> getFlowStepsDataProperty();
 
     // some more utility methods:
     // allow step to store log lines

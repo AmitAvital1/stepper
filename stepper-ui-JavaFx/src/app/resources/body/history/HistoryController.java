@@ -61,6 +61,7 @@ public class HistoryController implements BodyControllerDefinition {
     @FXML
     private TreeView<String> stepDetailsTree;
 
+
     private List<FlowExecution> flowExecutions;
     private List<FlowDefinition> flows;
 

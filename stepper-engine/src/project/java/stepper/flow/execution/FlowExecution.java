@@ -1,7 +1,10 @@
 package project.java.stepper.flow.execution;
 
 
+import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.exceptions.StepperExeption;
@@ -25,7 +28,15 @@ public class FlowExecution {
     private ObjectProperty<FlowExecutionResult> flowExecutionResult = new SimpleObjectProperty<>();
     private final Map<String, Object> startersFreeInputForContext;
     private Map<String, Object> allDataValues;
-    private List<flowOutputsData> outputsStepData;
+    private List<flowOutputsData> outputsStepData = new ArrayList<>();
+    private IntegerProperty stepFinished = new SimpleIntegerProperty(0);
+
+    public IntegerProperty getStepFinishedProperty() {
+        return stepFinished;
+    }
+    public void addStepFinished(int adder) {
+        stepFinished.setValue(stepFinished.get() + adder);
+    }
 
 
     public static class flowOutputsData{
@@ -83,7 +94,9 @@ public class FlowExecution {
         return flowDefinition;
     }
     public void setFlowExecutionResult(FlowExecutionResult result) {
-        flowExecutionResult.set(result);
+        Platform.runLater(() -> {
+            flowExecutionResult.setValue(result);
+        });
     }
     public ObjectProperty<FlowExecutionResult> getFlowExecutionResultProperty(){return flowExecutionResult;}
     public FlowExecutionResult getFlowExecutionResult() {
