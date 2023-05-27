@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
+import project.java.stepper.flow.execution.runner.FlowsExecutionManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -73,5 +74,5 @@ public class BodyController {
     }
     public void addFlowExecutor(FlowExecution flowExecution){mainController.addExecutorFlow(flowExecution);}
     public List<FlowExecution> getFlowExecutions(){return mainController.getFlowExecutions();}
-
+    public FlowsExecutionManager getFlowManagerExecution(){return mainController.getFlowsExecutionManager();}
 }

@@ -165,13 +165,14 @@ public class FlowsExecutionController implements BodyControllerDefinition {
          */
 
         System.out.println("Starting execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]");
-        FLowExecutor fLowExecutor = new FLowExecutor();
-        fLowExecutor.executeFlow(flow);
-        System.out.println("End execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]. Status: " + flow.getFlowExecutionResult());
-        System.out.println("Outputs:");
-        for (Map.Entry<String, Object> entry : flow.getFormalOutPutsData().entrySet()) {
-            System.out.println(entry.getKey() + ":\n" + entry.getValue());
-        }
+        //FLowExecutor fLowExecutor = new FLowExecutor();
+        //fLowExecutor.executeFlow(flow);
+        bodyForFlowExecutionController.getFlowManagerExecution().exeFlow(flow);
+        //System.out.println("End execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]. Status: " + flow.getFlowExecutionResult());
+      //  System.out.println("Outputs:");
+       // for (Map.Entry<String, Object> entry : flow.getFormalOutPutsData().entrySet()) {
+        //    System.out.println(entry.getKey() + ":\n" + entry.getValue());
+        //}
         bodyForFlowExecutionController.addFlowExecutor(flow);
     }
 }

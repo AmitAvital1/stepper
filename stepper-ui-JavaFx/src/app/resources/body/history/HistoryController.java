@@ -2,6 +2,8 @@ package app.resources.body.history;
 
 import app.resources.body.BodyController;
 import app.resources.body.BodyControllerDefinition;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -25,6 +27,7 @@ import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
+import project.java.stepper.flow.execution.FlowExecutionResult;
 import project.java.stepper.flow.execution.context.StepExecutionContextImpl;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 
@@ -65,14 +68,19 @@ public class HistoryController implements BodyControllerDefinition {
     public class tableRow{
         private String flowName;
         private String executionTime;
-        private String result;
+        private ObjectProperty<FlowExecutionResult> result = new SimpleObjectProperty<>();
         private FlowExecution theFlow;
 
         public tableRow(String n, String e, String r, FlowExecution f){
             flowName = n;
             executionTime = e;
-            result = r;
             theFlow = f;
+            result.set(theFlow.getFlowExecutionResult());
+            //result.bind(theFlow.getFlowExecutionResultProperty());
+            theFlow.getFlowExecutionResultProperty().addListener((observable, oldValue, newValue) -> {
+                // Update the table row when the result property changes
+                setResult(newValue);
+            });
         }
 
         public void setTheFlow(FlowExecution theFlow) {
@@ -88,7 +96,7 @@ public class HistoryController implements BodyControllerDefinition {
         }
 
         public String getResult() {
-            return result;
+            return result.get().toString();
         }
 
         public String getFlowName() {
@@ -103,8 +111,8 @@ public class HistoryController implements BodyControllerDefinition {
             this.flowName = flowName;
         }
 
-        public void setResult(String result) {
-            this.result = result;
+        public void setResult(FlowExecutionResult result) {
+            this.result.set(result);
         }
     }
 
@@ -119,7 +127,8 @@ public class HistoryController implements BodyControllerDefinition {
         flowExecutions = bodyForHistoryExecutionController.getFlowExecutions();
         nameColumn.setCellValueFactory(new PropertyValueFactory<tableRow, String>("flowName"));
         executionTimeColum.setCellValueFactory(new PropertyValueFactory<tableRow, String>("executionTime"));
-        resultColumn.setCellValueFactory(new PropertyValueFactory<tableRow, String>("result"));
+        //resultColumn.setCellValueFactory(new PropertyValueFactory<tableRow, String>("result"));
+        resultColumn.setCellValueFactory(cellData -> cellData.getValue().result.asString());
         List<tableRow> list = new ArrayList<>();
         for(FlowExecution flow : flowExecutions){
             list.add(new tableRow(flow.getFlowDefinition().getName(), flow.getStartedTime(), flow.getFlowExecutionResult().toString(),flow));
@@ -137,7 +146,8 @@ public class HistoryController implements BodyControllerDefinition {
             if (event.getClickCount() == 1) {
                 tableRow flowDetails = historyOfExecutionsFlowsTable.getSelectionModel().getSelectedItem();
                 if (flowDetails != null) {
-                    showFlowDetails(flowDetails.getTheFlow());
+                    if(flowDetails.getTheFlow().getFlowExecutionResult() != FlowExecutionResult.PROCESSING)
+                        showFlowDetails(flowDetails.getTheFlow());
                 }
             }
         });

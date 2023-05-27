@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
+import project.java.stepper.flow.execution.runner.FlowsExecutionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class AppMainConroller {
 
     private List<FlowDefinition> flows = new ArrayList<>();
     private final List<FlowExecution> flowExecutions = new ArrayList<>();
+    private final FlowsExecutionManager flowsExecutionManager = new FlowsExecutionManager();
 
     @FXML
     public void initialize() {
@@ -43,4 +45,8 @@ public class AppMainConroller {
         headerComponentController.setFlowHistory();//Set the button available
     }
     public List<FlowExecution> getFlowExecutions(){return flowExecutions;}
+
+    public FlowsExecutionManager getFlowsExecutionManager() {
+        return flowsExecutionManager;
+    }
 }

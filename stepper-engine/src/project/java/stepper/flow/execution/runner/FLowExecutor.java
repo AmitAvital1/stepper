@@ -13,7 +13,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
 
-public class FLowExecutor {
+public class FLowExecutor implements Runnable {
+
+    private FlowExecution flowExecution;
+
+    public FLowExecutor(FlowExecution flowExecution){
+        this.flowExecution = flowExecution;
+    }
 
     public void executeFlow(FlowExecution flowExecution) {
         boolean theStepFinishWithFailure = false;
@@ -81,5 +87,10 @@ public class FLowExecutor {
         flowExecution.setAllDataValues(context.getDataValuesMap());
         flowExecution.addFlowOutputsData(context.getFlowOutputsData());
         flowExecution.getFlowDefinition().addFlowRunStats(duration);
+    }
+
+    @Override
+    public void run() {
+        executeFlow(flowExecution);
     }
 }

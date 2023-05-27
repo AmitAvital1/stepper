@@ -31,7 +31,7 @@ public class CollectFilesInFolderStep extends AbstractStepDefinition {
 
 
     @Override
-    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         String filePath = context.getDataValue("FOLDER_NAME", String.class);
         Optional<String> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", String.class));

@@ -39,7 +39,7 @@ public class HeaderController {
         if (selectedFile != null) {
             boolean res = false;
             try{
-                mainController.addFlows(LoadStepperDataFromXml.load(selectedFile.getAbsolutePath()));
+                mainController.addFlows(LoadStepperDataFromXml.load(selectedFile.getAbsolutePath(),mainController.getFlowsExecutionManager()));
                 res = true;
             }catch(FileNotFoundException e) {
                 showErrorPopup("An error occurred","Error: XML path not found");

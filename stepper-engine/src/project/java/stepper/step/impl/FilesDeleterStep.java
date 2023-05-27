@@ -27,7 +27,7 @@ public class FilesDeleterStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("DELETION_STATS", DataNecessity.NA, "Deletion summary results", DataDefinitionRegistry.MAPPING));
     }
 
-    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         List<FileData> filesList = context.getDataValue("FILES_LIST", ListData.class).getList();
         ListData<FileData> listOfDeletedFiles = new ListData<>();

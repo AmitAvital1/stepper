@@ -19,7 +19,7 @@ public class CSVExporterStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "CSV export result", DataDefinitionRegistry.STRING));
     }
     @Override
-    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
         RelationData table = context.getDataValue("SOURCE", RelationData.class);
         String output = "";
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());

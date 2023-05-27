@@ -29,7 +29,7 @@ public class FilesRenamerStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("RENAME_RESULT", DataNecessity.NA, "Rename operation summary", DataDefinitionRegistry.RELATION));
     }
 
-    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         List<FileData> filesList = context.getDataValue("FILES_TO_RENAME", ListData.class).getList();
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());

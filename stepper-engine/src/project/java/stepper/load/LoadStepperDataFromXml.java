@@ -5,6 +5,7 @@ import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.FlowDefinitionImpl;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.definition.api.StepUsageDeclarationImpl;
+import project.java.stepper.flow.execution.runner.FlowsExecutionManager;
 import project.java.stepper.schema.generated.*;
 import project.java.stepper.step.StepDefinitionRegistry;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
@@ -25,7 +26,7 @@ public class LoadStepperDataFromXml {
      */
     private final static String JAXB_XML_PACKAGE_NAME = "project.java.stepper.schema.generated";
 
-    public static List<FlowDefinition> load(String xmlPath) throws FileNotFoundException, JAXBException, StepperExeption {
+    public static List<FlowDefinition> load(String xmlPath, FlowsExecutionManager flowsExecutionManager) throws FileNotFoundException, JAXBException, StepperExeption {
         List<FlowDefinition> flowList = new ArrayList<>();
         InputStream inputStream = new FileInputStream(new File(xmlPath));
         STStepper genStepper = deserializeFrom(inputStream);

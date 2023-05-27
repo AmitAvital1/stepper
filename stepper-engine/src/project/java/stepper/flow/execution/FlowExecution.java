@@ -1,6 +1,8 @@
 package project.java.stepper.flow.execution;
 
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
@@ -20,7 +22,7 @@ public class FlowExecution {
     private StepExecutionContext flowContexts;
     private Duration totalTime;
     private String startedTime;
-    private FlowExecutionResult flowExecutionResult;
+    private ObjectProperty<FlowExecutionResult> flowExecutionResult = new SimpleObjectProperty<>();
     private final Map<String, Object> startersFreeInputForContext;
     private Map<String, Object> allDataValues;
     private List<flowOutputsData> outputsStepData;
@@ -81,10 +83,11 @@ public class FlowExecution {
         return flowDefinition;
     }
     public void setFlowExecutionResult(FlowExecutionResult result) {
-        flowExecutionResult = result;
+        flowExecutionResult.set(result);
     }
+    public ObjectProperty<FlowExecutionResult> getFlowExecutionResultProperty(){return flowExecutionResult;}
     public FlowExecutionResult getFlowExecutionResult() {
-        return flowExecutionResult;
+        return flowExecutionResult.get();
     }
     public void setDuration(Duration time){
         totalTime = time;

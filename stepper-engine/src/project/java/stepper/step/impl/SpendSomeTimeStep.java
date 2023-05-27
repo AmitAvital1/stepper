@@ -15,7 +15,7 @@ public class SpendSomeTimeStep extends AbstractStepDefinition {
 
         addInput(new DataDefinitionDeclarationImpl("TIME_TO_SPEND", DataNecessity.MANDATORY, "Total sleeping time (sec)", DataDefinitionRegistry.INTEGER));
     }
-    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
         int seconds = context.getDataValue("TIME_TO_SPEND", Integer.class);
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
         if (seconds <= 0) {

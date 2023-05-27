@@ -23,7 +23,7 @@ public class FileDumperStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "File Creation Result", DataDefinitionRegistry.STRING));
     }
     @Override
-    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
         String content = context.getDataValue("CONTENT", String.class);
         String fileNameWithPath = context.getDataValue("FILE_NAME", String.class);
         String result = "SUCCESS";

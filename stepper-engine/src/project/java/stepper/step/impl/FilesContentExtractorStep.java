@@ -25,7 +25,7 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data extraction", DataDefinitionRegistry.RELATION));
     }
     @Override
-    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         List<FileData> filesList = context.getDataValue("FILES_LIST", ListData.class).getList();
         Integer lineNumber = context.getDataValue("LINE", Integer.class);
