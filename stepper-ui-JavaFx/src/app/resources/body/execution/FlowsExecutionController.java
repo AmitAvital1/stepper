@@ -194,6 +194,8 @@ public class FlowsExecutionController implements BodyControllerDefinition {
     public void setBodyController(BodyController bodyCTRL) {
         bodyForFlowExecutionController = bodyCTRL;
     }
+
+
     private void executeFlow(FlowExecution flow) {
         /*
         This function execute flow the user chose and validate all the free inputs has entered. then execute the flow.
@@ -239,11 +241,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 }
             }
         });
-        //System.out.println("End execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]. Status: " + flow.getFlowExecutionResult());
-      //  System.out.println("Outputs:");
-       // for (Map.Entry<String, Object> entry : flow.getFormalOutPutsData().entrySet()) {
-        //    System.out.println(entry.getKey() + ":\n" + entry.getValue());
-        //}
+
         bodyForFlowExecutionController.addFlowExecutor(flow);
     }
 
