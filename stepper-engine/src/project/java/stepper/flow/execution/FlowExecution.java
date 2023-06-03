@@ -132,9 +132,9 @@ public class FlowExecution {
         }
         return res;
     }
-    public boolean addFreeInputForStart(StepUsageDeclaration step,DataDefinitionDeclaration dataDefinitionDeclaration, String data) throws StepperExeption {
+    public boolean addFreeInputForStart(String inputName,DataDefinitionDeclaration dataDefinitionDeclaration, String data) throws StepperExeption {
         Object newData = dataDefinitionDeclaration.dataDefinition().convertUserInputToDataType(data,dataDefinitionDeclaration.dataDefinition().getType());
-        startersFreeInputForContext.put(step.getinputToFinalName().get(dataDefinitionDeclaration.getName()),newData);
+        startersFreeInputForContext.put(inputName,newData);
         return true;
     }
     public Map<String, Object> getStartersFreeInputForContext() {
@@ -144,33 +144,30 @@ public class FlowExecution {
         int i = 1;
         //First print all the mandatories input:
         List<String> data = new ArrayList<>();
-        for (Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : flowDefinition.getFlowFreeInputs().entrySet()) {
-            StepUsageDeclaration key = entry.getKey();
-            List<DataDefinitionDeclaration> value = entry.getValue();
-            for (DataDefinitionDeclaration dd : value) {
+        for (Map.Entry<String, DataDefinitionDeclaration> entry : flowDefinition.getFreeInputFinalNameToDD().entrySet()) {
+            String key = entry.getKey();
+            DataDefinitionDeclaration dd = entry.getValue();
                 if(dd.necessity() == DataNecessity.MANDATORY) {
-                    String inputFinalName = key.getinputToFinalName().get(dd.getName());
+                    String inputFinalName = key;
                     Object inputContext = startersFreeInputForContext.get(inputFinalName);
                     data.add(i + "." + inputFinalName + "[" + inputContext + "]" + "(" + dd.dataDefinition().getName() + ") - " +
                             dd.necessity());
                     i++;
-                }
             }
         }
         //Print optional free inputs
-        for (Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : flowDefinition.getFlowFreeInputs().entrySet()) {
-            StepUsageDeclaration key = entry.getKey();
-            List<DataDefinitionDeclaration> value = entry.getValue();
-            for (DataDefinitionDeclaration dd : value) {
+        for (Map.Entry<String, DataDefinitionDeclaration> entry : flowDefinition.getFreeInputFinalNameToDD().entrySet()) {
+            String key = entry.getKey();
+            DataDefinitionDeclaration dd = entry.getValue();
+
                 if(dd.necessity() == DataNecessity.OPTIONAL) {
-                    String inputFinalName = key.getinputToFinalName().get(dd.getName());
+                    String inputFinalName = key;
                     Optional<Object> inputContext = Optional.ofNullable(startersFreeInputForContext.get(inputFinalName));
                     if(inputContext.isPresent()) {
                         data.add(i + "." + inputFinalName + "[" + inputContext.get() + "]" + "(" + dd.dataDefinition().getName() + ") - " +
                                 dd.necessity());
                         i++;
                     }
-                }
             }
         }
         return data;

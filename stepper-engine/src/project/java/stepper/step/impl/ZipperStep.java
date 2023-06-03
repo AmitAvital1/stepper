@@ -47,10 +47,43 @@ public class ZipperStep extends AbstractStepDefinition {
                     context.addStepSummaryLine("Step failed cause error occurred during the zip");
                     res = StepResult.FAILURE;
                 }
-            } else {
-                logs.addLogLine("Invalid source for zip operation: " + source);
-                context.addStepSummaryLine("Step failed cause invalid source for zip operation");
-                res = StepResult.FAILURE;
+            }
+            else {
+                File file = new File(source);
+                if (file.exists()) {
+                    logs.addLogLine("About to perform operation ZIP" + " on source " + source);
+                    String fileName = file.getName();
+                    String baseName = getBaseName(fileName);
+                    String zipFilePath = file.getParent() + File.separator + baseName + ".zip";
+                    try (FileInputStream fis = new FileInputStream(file);
+                         FileOutputStream fos = new FileOutputStream(zipFilePath);
+                         ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+                        // Create a new ZIP entry using the file name without extension
+                        ZipEntry zipEntry = new ZipEntry(fileName);
+                        zos.putNextEntry(zipEntry);
+
+                        // Read and write the file's contents to the ZIP file
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = fis.read(buffer)) != -1) {
+                            zos.write(buffer, 0, bytesRead);
+                        }
+                        zos.closeEntry();
+
+                        logs.addLogLine("File zipped successfully: " + zipFilePath);
+                        context.addStepSummaryLine("File zipped successfully: " + zipFilePath);
+                        res = StepResult.SUCCESS;
+                    } catch (IOException e) {
+                        logs.addLogLine("Error occurred during the zip");
+                        context.addStepSummaryLine("Step failed cause error occurred during the zip");
+                        res = StepResult.FAILURE;
+                    }
+                } else {
+                    logs.addLogLine("Invalid source for zip operation: " + source);
+                    context.addStepSummaryLine("Step failed cause invalid source for zip operation");
+                    res = StepResult.FAILURE;
+                }
             }
         }else if (operation == ZipEnum.UNZIP) {
             if (isZipFile(source)) {
@@ -152,5 +185,12 @@ public class ZipperStep extends AbstractStepDefinition {
         File zipFile = new File(source);
         String parentFolder = zipFile.getParent();
         return parentFolder != null ? parentFolder : "";
+    }
+    private static String getBaseName(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex != -1) {
+            return fileName.substring(0, lastDotIndex);
+        }
+        return fileName;
     }
 }

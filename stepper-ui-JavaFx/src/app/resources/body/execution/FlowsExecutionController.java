@@ -111,15 +111,14 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flowExecutionInfo.setVisible(false);
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
-        Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs = flowExecution.getFlowDefinition().getFlowFreeInputs();
-        for (Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : freeInputs.entrySet()) {
-            StepUsageDeclaration key = entry.getKey();
-            List<DataDefinitionDeclaration> value = entry.getValue();
-            for (DataDefinitionDeclaration dd : value) {
+        Map<String, DataDefinitionDeclaration> freeInputs = flowExecution.getFlowDefinition().getFreeInputFinalNameToDD();
+        for (Map.Entry<String, DataDefinitionDeclaration> entry : freeInputs.entrySet()) {
+            String key = entry.getKey();
+            DataDefinitionDeclaration dd = entry.getValue();
                 HBox hbox = new HBox();
                 hbox.setPadding(new Insets(10));
                 if(!flowButton.getInitialValues().containsKey(dd.getName())) {
-                    Label stepName = new Label(key.getFinalStepName());
+                    Label stepName = new Label(key);
                     TextField textField = new TextField();
                     textField.setPromptText(dd.userString() + "[" + dd.dataDefinition().getName() + "]");
                     Button button = new Button("Add");
@@ -132,7 +131,6 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     hbox.setHgrow(textField, Priority.ALWAYS);
                     hbox.getChildren().addAll(stepName, textField, button, isMandatory);
                     freeInputsList.getChildren().addAll(hbox);
-                }
             }
         }
        executeFlowButtonFinish.setOnAction(e -> executeFlow(flowExecution));
@@ -149,19 +147,18 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flowExecutionInfo.setVisible(false);
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
-        Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs = flowExe.getFlowDefinition().getFlowFreeInputs();
-        for (Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : freeInputs.entrySet()) {
-            StepUsageDeclaration key = entry.getKey();
-            List<DataDefinitionDeclaration> value = entry.getValue();
-            for (DataDefinitionDeclaration dd : value) {
+        Map<String, DataDefinitionDeclaration> freeInputs = flowExe.getFlowDefinition().getFreeInputFinalNameToDD();
+        for (Map.Entry<String, DataDefinitionDeclaration> entry : freeInputs.entrySet()) {
+            String key = entry.getKey();
+            DataDefinitionDeclaration dd = entry.getValue();
                 HBox hbox = new HBox();
                 hbox.setPadding(new Insets(10));
 
-                Label stepName = new Label(key.getFinalStepName());
+                Label stepName = new Label(key);
                 TextField textField = new TextField();
                 Button button;
-                if(flowExe.getStartersFreeInputForContext().containsKey(key.getinputToFinalName().get(dd.getName()))){
-                    textField.setPromptText(flowExe.getStartersFreeInputForContext().get(key.getinputToFinalName().get(dd.getName())).toString());
+                if(flowExe.getStartersFreeInputForContext().containsKey(key)){
+                    textField.setPromptText(flowExe.getStartersFreeInputForContext().get(key).toString());
                     button = new Button("Edit");
                     textField.setDisable(true);
                 }
@@ -178,14 +175,13 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 hbox.setHgrow(textField, Priority.ALWAYS);
                 hbox.getChildren().addAll(stepName, textField, button,isMandatory);
                 freeInputsList.getChildren().addAll(hbox);
-            }
         }
         executeFlowButtonFinish.setOnAction(e -> executeFlow(flowExe));
 
         flowDetailsExecutionBox.setVisible(true);
     }
 
-    private void handleFreeInputButtonAction(Button button, FlowExecution flowExecution, StepUsageDeclaration step, DataDefinitionDeclaration dd, TextField textField) {
+    private void handleFreeInputButtonAction(Button button, FlowExecution flowExecution, String inputFinalName, DataDefinitionDeclaration dd, TextField textField) {
         if(textField.isDisable()) {
             button.setText("Add");
             textField.setDisable(false);
@@ -194,26 +190,26 @@ public class FlowsExecutionController implements BodyControllerDefinition {
             return;
         }
         String text = textField.getText().trim();
-       // Text messageText = new Text();
+        // Text messageText = new Text();
         if (text.isEmpty()) {
-            showErrorMessage(button,"Please enter data.",step);
+            showErrorMessage(button,"Please enter data.");
             return;
         }
         try{
-            flowExecution.addFreeInputForStart(step, dd, text);
+            flowExecution.addFreeInputForStart(inputFinalName, dd, text);
             flowExecution.validateToExecute();
             executeFlowButtonFinish.setDisable(false);
         }catch (MissMandatoryInput e) {
             //Pass
         }catch (StepperExeption e){
-            showErrorMessage(button,e.getMessage(),step);
+            showErrorMessage(button,e.getMessage());
             return;
         }
         textField.setDisable(true);
         button.setText("Edit");
     }
 
-    private void showErrorMessage(Button button,String message,StepUsageDeclaration step) {
+    private void showErrorMessage(Button button,String message) {
         /*Notifications.create()
                 .title("Error " + step.getFinalStepName())
                 .text(message)
