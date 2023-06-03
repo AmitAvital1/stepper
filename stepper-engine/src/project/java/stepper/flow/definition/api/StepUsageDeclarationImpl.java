@@ -1,5 +1,7 @@
 package project.java.stepper.flow.definition.api;
 
+import project.java.stepper.dd.api.DataDefinition;
+import project.java.stepper.step.api.DataDefinitionDeclaration;
 import project.java.stepper.step.api.StepDefinition;
 
 import java.util.HashMap;
@@ -13,6 +15,8 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     private final Map<String,String> outputsToFinalNames;
     private final Map<String,String> finalNamesToInput;
     private final Map<String,String> finalNamesToOutput;
+
+    private final Map<String, DataDefinition> finalNamesOutputsToDD;
 
     private final Map<String,String> customeMapInput;
 
@@ -34,12 +38,15 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
         finalNamesToInput = new HashMap<>();
         finalNamesToOutput = new HashMap<>();
         customeMapInput = new HashMap<>();
+        finalNamesOutputsToDD = new HashMap<>();
 
         stepDefinition.inputs().stream().forEach(stepD -> inputsToFinalNames.put(stepD.getName(),stepD.getName()));
         stepDefinition.outputs().stream().forEach(stepD -> outputsToFinalNames.put(stepD.getName(),stepD.getName()));
 
         stepDefinition.inputs().stream().forEach(stepD -> finalNamesToInput.put(stepD.getName(),stepD.getName()));
         stepDefinition.outputs().stream().forEach(stepD -> finalNamesToOutput.put(stepD.getName(),stepD.getName()));
+
+        stepDefinition.outputs().stream().forEach(stepD -> finalNamesOutputsToDD.put(stepD.getName(),stepD.dataDefinition()));
 
     }
 
@@ -82,6 +89,11 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     }
 
     @Override
+    public Map<String, DataDefinition> getFinalNamesOutputsToDD() {
+        return finalNamesOutputsToDD;
+    }
+
+    @Override
     public boolean addLevelAlias(String name, String finalName) {
         if(inputsToFinalNames.containsKey(name)) {
             inputsToFinalNames.put(name, finalName);
@@ -93,6 +105,8 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
             outputsToFinalNames.put(name, finalName);
             finalNamesToOutput.remove(name);
             finalNamesToOutput.put(finalName,name);
+            DataDefinition dd = finalNamesOutputsToDD.remove(name);
+            finalNamesOutputsToDD.put(finalName,dd);
             return true;
         }
         else

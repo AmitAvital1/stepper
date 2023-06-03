@@ -72,6 +72,23 @@ public class BodyController {
             e.printStackTrace();
         }
     }
+    public void executeContinuationFlowScreen(FlowExecution flow) {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        URL url = getClass().getResource("/app/resources/body/execution/flowExecution.fxml");
+        fxmlLoader.setLocation(url);
+        try {
+            Parent screen = fxmlLoader.load(url.openStream());
+            FlowsExecutionController bController = fxmlLoader.getController();
+            bController.setFlowsDetails(mainController.getFlows());
+            bController.setBodyController(this);
+            bController.show();
+            bController.handleContinuationFlowButtonAction(flow);
+            bodyPane.getChildren().setAll(screen);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void addFlowExecutor(FlowExecution flowExecution){mainController.addExecutorFlow(flowExecution);}
     public List<FlowExecution> getFlowExecutions(){return mainController.getFlowExecutions();}
     public FlowsExecutionManager getFlowManagerExecution(){return mainController.getFlowsExecutionManager();}

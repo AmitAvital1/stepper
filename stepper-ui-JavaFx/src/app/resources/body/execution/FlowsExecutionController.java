@@ -139,6 +139,51 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flowDetailsExecutionBox.setVisible(true);
     }
 
+    public void handleContinuationFlowButtonAction(FlowExecution flowExe) {
+        theVboxParent.getChildren().clear();
+        theVboxParent.getChildren().addAll(flowDetailsExecutionBox,flowExecutionInfo);
+        FlowDefinition flowButton = flowExe.getFlowDefinition();
+        executeFlowButtonFinish.setDisable(false);
+        flowDetailsExecutionBox.setDisable(false);
+        flowExecutionInfo.setVisible(false);
+        flowExecuteNameLabel.setText(flowButton.getName());
+        freeInputsList.getChildren().clear();
+        Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> freeInputs = flowExe.getFlowDefinition().getFlowFreeInputs();
+        for (Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : freeInputs.entrySet()) {
+            StepUsageDeclaration key = entry.getKey();
+            List<DataDefinitionDeclaration> value = entry.getValue();
+            for (DataDefinitionDeclaration dd : value) {
+                HBox hbox = new HBox();
+                hbox.setPadding(new Insets(10));
+
+                Label stepName = new Label(key.getFinalStepName());
+                TextField textField = new TextField();
+                Button button;
+                if(flowExe.getStartersFreeInputForContext().containsKey(key.getinputToFinalName().get(dd.getName()))){
+                    textField.setPromptText(flowExe.getStartersFreeInputForContext().get(key.getinputToFinalName().get(dd.getName())).toString());
+                    button = new Button("Edit");
+                    textField.setDisable(true);
+                }
+                else {
+                    textField.setPromptText(dd.userString() + "[" + dd.dataDefinition().getName() + "]");
+                    button = new Button("Add");
+                }
+                button.setOnAction(e -> handleFreeInputButtonAction(button,flowExe,key,dd,textField));
+                Label isMandatory = new Label(dd.necessity().toString());
+                if(dd.necessity() == DataNecessity.MANDATORY)
+                    executeFlowButtonFinish.setDisable(true);
+                hbox.setSpacing(5);
+                textField.setMaxWidth(250);
+                hbox.setHgrow(textField, Priority.ALWAYS);
+                hbox.getChildren().addAll(stepName, textField, button,isMandatory);
+                freeInputsList.getChildren().addAll(hbox);
+            }
+        }
+        executeFlowButtonFinish.setOnAction(e -> executeFlow(flowExe));
+
+        flowDetailsExecutionBox.setVisible(true);
+    }
+
     private void handleFreeInputButtonAction(Button button, FlowExecution flowExecution, StepUsageDeclaration step, DataDefinitionDeclaration dd, TextField textField) {
         if(textField.isDisable()) {
             button.setText("Add");
@@ -213,7 +258,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         });
         flow.getFlowExecutionResultProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != FlowExecutionResult.PROCESSING) {
-                stepResLabel.setText(newValue.name() + " [" + flow.getDuration() + ".ms" + "]");
+                stepResLabel.setText(newValue.name() + " [" + flow.getDuration() + ".ms" + "]");//TODO
                 addFormalOutputs(flow);
             }
         });

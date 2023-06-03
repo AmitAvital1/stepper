@@ -18,6 +18,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -25,6 +26,7 @@ import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.flow.definition.api.FlowDefinition;
+import project.java.stepper.flow.definition.api.FlowDefinitionImpl;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
@@ -60,6 +62,14 @@ public class HistoryController implements BodyControllerDefinition {
     private VBox flowOutputsList;
     @FXML
     private TreeView<String> stepDetailsTree;
+    @FXML
+    private GridPane gredContinuations;
+
+    @FXML
+    private HBox hboxContinuations;
+
+    @FXML
+    private Button continueToFlowButton;
 
 
     private List<FlowExecution> flowExecutions;
@@ -152,8 +162,6 @@ public class HistoryController implements BodyControllerDefinition {
                 }
             }
         });
-
-
     }
 
     private void showFlowDetails(FlowExecution flow) {
@@ -178,14 +186,12 @@ public class HistoryController implements BodyControllerDefinition {
             boolean noOutput = false;
             for(FlowExecution.flowOutputsData output : outPuts){
                 String outputLine = i + "." + output.getFinalName() + "," + output.getOutputDD().userString() + "(" + output.getOutputDD().dataDefinition().getName() + ")";
-                if(output.getData().getClass() == String.class) {
-                    if (output.getData().equals("Not created due to failure in flow")) {
-                        outputLine += "-NOTE:Not created due to failure in flow";
-                        noOutput = true;
-                    }
+                if(!output.getCreatedFromFlow()) {
+                    outputLine += "-NOTE:Not created due to failure in flow";
+                    noOutput = true;
                 }
+                Label outText;
                 if(!noOutput) {
-                    Label outText;
                     if (output.getOutputDD().dataDefinition() == DataDefinitionRegistry.LIST) {
                         outText = new Label(outputLine);
                         HBox hbox = new HBox();
@@ -209,8 +215,11 @@ public class HistoryController implements BodyControllerDefinition {
                         outText = new Label(outputLine);
                         flowOutputsList.getChildren().add(outText);
                     }
-                    i++;
+                }else{
+                    outText = new Label(outputLine);
+                    flowOutputsList.getChildren().add(outText);
                 }
+                i++;
             }
         }
 
@@ -236,6 +245,25 @@ public class HistoryController implements BodyControllerDefinition {
                 stepDetails = new TreeItem<>("Don't have data during failure of the step");
                 stepNameItem.getChildren().addAll(stepDetails);
                 stepDetailsTree.getRoot().getChildren().addAll(stepNameItem);
+            }
+        }
+        if(flow.getFlowDefinition().getFlowsContinuations().size() <= 0)
+            gredContinuations.setVisible(false);
+        else{
+            gredContinuations.setVisible(true);
+            continueToFlowButton.setDisable(true);
+            hboxContinuations.getChildren().clear();
+            ToggleGroup toggleGroup = new ToggleGroup();
+            for(FlowDefinitionImpl.continuationFlowDetails cDetails : flow.getFlowDefinition().getFlowsContinuations()) {
+                RadioButton radioButton = new RadioButton(cDetails.getTargetFlow().getName());
+                radioButton.setToggleGroup(toggleGroup);
+                radioButton.setOnAction(event -> {
+                    if (radioButton.isSelected()) {
+                        continueToFlowButton.setDisable(false);
+                        continueToFlowButton.setOnAction(event1 -> {bodyForHistoryExecutionController.executeContinuationFlowScreen(flow.runContinuationFlow(cDetails));});
+                    }
+                });
+                hboxContinuations.getChildren().add(radioButton);
             }
         }
         flowChooseVBOX.setVisible(true);

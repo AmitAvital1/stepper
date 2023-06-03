@@ -5,10 +5,7 @@ import project.java.stepper.flow.statistics.FlowStats;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FlowDefinitionImpl implements FlowDefinition {
 
@@ -20,6 +17,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
     private Map<StepUsageDeclaration,List<DataDefinitionDeclaration>> stepToFreeInputFinalNameToDD;
     private Map<String,DataDefinitionDeclaration> freeInputFinalNameToDD;
     private Map<String,DataDefinitionDeclaration> formalFinalOutPutNameToDD;
+    private List<continuationFlowDetails> flowsContinuations;
 
     public FlowDefinitionImpl(String name, String description) {
         this.name = name;
@@ -28,8 +26,35 @@ public class FlowDefinitionImpl implements FlowDefinition {
         steps = new ArrayList<>();
         formalFinalOutPutNameToDD = new HashMap<>();
         flowStatistics = new FlowStats();
+        flowsContinuations = new ArrayList<>();
     }
+    public class continuationFlowDetails{
+        private FlowDefinition targetFlow; //The target flow to continue
+        private Map<String,String> sourceToTargetInput;
 
+        continuationFlowDetails(FlowDefinition flow, Map<String,String> contDetails) throws InvalidContinuationsData{
+            targetFlow = flow;
+            for(Map.Entry<String,String> val : contDetails.entrySet()){
+                boolean found = false;
+                for(StepUsageDeclaration step : steps){
+                    if(step.getFinalNameToOutput().containsKey(val.getKey())){
+                        found = true;
+                    }
+                }
+                if(!found)
+                    throw new InvalidContinuationsData("In flow " + name + " the source data in the continuation:" + val.getKey() + " does not output of the flow.");
+            }
+            sourceToTargetInput = contDetails;
+        }
+
+        public FlowDefinition getTargetFlow() {
+            return targetFlow;
+        }
+
+        public Map<String, String> getSourceToTargetInput() {
+            return sourceToTargetInput;
+        }
+    }
     @Override
     public void addFormalOutput(String name, DataDefinitionDeclaration data) {
         formalFinalOutPutNameToDD.put(name,data);
@@ -57,7 +82,12 @@ public class FlowDefinitionImpl implements FlowDefinition {
     public void addFlowRunStats(Duration time) {
         flowStatistics.addFlowRunStats(time);
     }
-
+    @Override
+    public void addContinuation(FlowDefinition name, Map<String,String> data) throws StepperExeption{
+        flowsContinuations.add(new continuationFlowDetails(name,data));
+    }
+    @Override
+    public List<continuationFlowDetails> getFlowsContinuations(){ return flowsContinuations;}
     public FlowStats getFlowStatistics() {
         return flowStatistics;
     }
@@ -141,4 +171,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
     public List<StepUsageDeclaration> getFlowSteps() {
         return steps;
     }
+
+    @Override
+    public Map<String,DataDefinitionDeclaration> getFreeInputFinalNameToDD(){return freeInputFinalNameToDD;}
 }

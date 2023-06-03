@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
+import project.java.stepper.flow.definition.api.FlowDefinitionImpl;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.StepExecutionContextImpl;
@@ -44,17 +45,26 @@ public class FlowExecution {
         private StepUsageDeclaration outputStep;
         private final DataDefinitionDeclaration outputDD;
         private final Object data;
+        boolean createdFromFlow = true;
         public flowOutputsData(String finalName, StepUsageDeclaration outputStep, DataDefinitionDeclaration outputDD,Object data){
             this.finalName = finalName;
             this.outputStep = outputStep;
             this.outputDD = outputDD;
             this.data = data;
         }
+        public flowOutputsData(String finalName, StepUsageDeclaration outputStep, DataDefinitionDeclaration outputDD,Object data,boolean created){
+            this.finalName = finalName;
+            this.outputStep = outputStep;
+            this.outputDD = outputDD;
+            this.data = data;
+            createdFromFlow = created;
+        }
         public boolean isOutputExist(String finalName,DataDefinitionDeclaration dd){
                if(this.finalName.equals(finalName) && this.outputDD.dataDefinition().getName().equals(dd.dataDefinition().getName()))
                    return true;
                else return false;
         }
+        public boolean getCreatedFromFlow(){return createdFromFlow;}
 
         public String getFinalName() {
             return finalName;
@@ -188,7 +198,8 @@ public class FlowExecution {
         return outputsString;
     }
     public List<flowOutputsData> getOutputsStepData(){return outputsStepData; }
-        public List<StepExecutionContextImpl.stepData> getStepsData(){
+
+    public List<StepExecutionContextImpl.stepData> getStepsData(){
         List<StepExecutionContextImpl.stepData> lst = new ArrayList<>();
         for(StepUsageDeclaration step : flowDefinition.getFlowSteps()) {
             StepExecutionContextImpl.stepData data = flowContexts.getStepData(step);
@@ -227,7 +238,7 @@ public class FlowExecution {
             for (DataDefinitionDeclaration dd : value) {
                 String outputFinalName = key.getoutputToFinalName().get(dd.getName());
                 if(outputsStepData.stream().noneMatch(outputData -> outputData.isOutputExist(outputFinalName,dd))) {
-                    outputsStepData.add(new flowOutputsData(outputFinalName,key,dd,"Not created due to failure in flow"));
+                    outputsStepData.add(new flowOutputsData(outputFinalName,key,dd,"Not created due to failure in flow",false));
                 }
             }
         }
@@ -240,5 +251,19 @@ public class FlowExecution {
             formalOutputToData.put(newVal,key);
         }
         return formalOutputToData;
+    }
+    public FlowExecution runContinuationFlow(FlowDefinitionImpl.continuationFlowDetails targetFlowDetails){
+        UUID uuid = UUID.randomUUID();
+        FlowExecution flowExecution = new FlowExecution(uuid.toString(), targetFlowDetails.getTargetFlow());
+        for(Map.Entry<String,String> sourceToTarget : targetFlowDetails.getSourceToTargetInput().entrySet()){
+            Optional<flowOutputsData> flowOutput = outputsStepData.stream().
+                    filter(outputData -> outputData.getFinalName().equals(sourceToTarget.getKey()))
+                    .findFirst();
+            if(flowOutput.isPresent()){
+                if(flowOutput.get().createdFromFlow)
+                    flowExecution.startersFreeInputForContext.put(sourceToTarget.getValue(),flowOutput.get().data);
+            }
+        }
+        return flowExecution;
     }
 }

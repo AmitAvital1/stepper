@@ -46,7 +46,7 @@ public class HeaderController {
             }catch (JAXBException e) {
                 showErrorPopup("An error occurred","Error while trying get your data from XML");
             }catch (StepperExeption e){
-                showErrorPopup("An error occurred","Load Failed:" + e.getMessage());
+                showErrorPopup("Load Failed",e.getMessage());
             }
             if(res) {
                 fileXmlPathTextField.setPromptText(selectedFile.getAbsolutePath());

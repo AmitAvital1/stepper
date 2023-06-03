@@ -1,6 +1,7 @@
 
 package main;
 
+import app.resources.main.AppMainConroller;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,6 +28,13 @@ public class MainJavaFx extends Application {
         scene.getStylesheets().add(getClass().getResource("/app/resources/main/style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setTitle("Stepper");
+
+        // Shutdown the thread pool when the JavaFX application is closed
+        AppMainConroller controller = fxmlLoader.getController();
+        primaryStage.setOnCloseRequest(event -> {
+            controller.getFlowsExecutionManager().shutDown();
+        });
     }
 
     public static void main(String[] args) {

@@ -21,4 +21,7 @@ public interface FlowDefinition {
     void addFlowRunStepStats(StepUsageDeclaration step, Duration time);
     void addFlowRunStats(Duration time);
     FlowStats getFlowStatistics();
+    void addContinuation(FlowDefinition name, Map<String,String> data) throws StepperExeption;
+    List<FlowDefinitionImpl.continuationFlowDetails> getFlowsContinuations();
+    Map<String,DataDefinitionDeclaration> getFreeInputFinalNameToDD();
 }

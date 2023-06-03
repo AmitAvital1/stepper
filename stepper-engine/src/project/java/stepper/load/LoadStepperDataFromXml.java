@@ -1,5 +1,6 @@
 package project.java.stepper.load;
 
+import project.java.stepper.dd.api.DataDefinition;
 import project.java.stepper.exceptions.*;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.FlowDefinitionImpl;
@@ -37,7 +38,53 @@ public class LoadStepperDataFromXml {
                 flowList.add(systemFlow);//Add the flow to the list
             }
         }
+        FlowsExecutionManager.setThreadExecutor(genStepper.getSTThreadPool());
+        addContinuations(flowList, genStepper);
         return flowList;
+    }
+
+    private static void addContinuations(List<FlowDefinition> flowList, STStepper genStepper) throws StepperExeption {
+        int i = 0;
+        for(STFlow stFlow : genStepper.getSTFlows().getSTFlow() ){
+            if(Optional.ofNullable(stFlow.getSTContinuations()).isPresent()){
+                List<STContinuation> continuationsFlow = stFlow.getSTContinuations().getSTContinuation();
+                for(STContinuation flowContinuation : continuationsFlow){
+                    Map<String,String> sourceToTarget= new HashMap<>();
+                    for(FlowDefinition targetFlow : flowList) {
+                        if (targetFlow.getName().equals(flowContinuation.getTargetFlow())) {
+                            for (STContinuationMapping data : flowContinuation.getSTContinuationMapping()) {
+                                if(targetFlow.getFreeInputFinalNameToDD().containsKey(data.getTargetData())) {
+                                    checkTheSameDD(flowList.get(i), targetFlow.getFreeInputFinalNameToDD().get(data.getTargetData()), data.getSourceData(), data.getTargetData());
+                                    sourceToTarget.put(data.getSourceData(), data.getTargetData());//Else throw the exception
+                                }
+                                else
+                                    throw new InvalidContinuationsData("In flow: " + flowList.get(i).getName() + " the target data in the continuation:"
+                                        + data.getTargetData() + " does not input of the flow " + targetFlow.getName());
+                            }
+                                flowList.get(i).addContinuation(targetFlow, sourceToTarget);
+                                break;
+                            }
+                        }
+                    }
+                }
+            i++;
+        }
+
+        }
+
+    private static boolean checkTheSameDD(FlowDefinition existFlow, DataDefinitionDeclaration targetDD, String sourceName,String targetName) throws InvalidContinuationsData {
+        for(StepUsageDeclaration step : existFlow.getFlowSteps()){
+            DataDefinition existFlowDD = step.getFinalNamesOutputsToDD().get(sourceName);
+            if(existFlowDD != null){
+                if(targetDD.dataDefinition().getType() == existFlowDD.getType())
+                    return true;
+                else
+                    throw new InvalidContinuationsData("In flow: " + existFlow.getName() + " the target data in the continuation:"
+                            + targetName + "[" + targetDD.dataDefinition().getType().getSimpleName() + "] is not the same type as the source " + sourceName + "["
+                    + existFlowDD.getType().getSimpleName() + "]");
+            }
+        }
+        return false;
     }
 
     private static FlowDefinition cloneFlowDetails(STFlow flow) throws StepperExeption{

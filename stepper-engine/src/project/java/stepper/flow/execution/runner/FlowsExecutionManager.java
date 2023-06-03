@@ -7,17 +7,20 @@ import java.util.concurrent.Executors;
 import static project.java.stepper.flow.execution.FlowExecutionResult.PROCESSING;
 
 public class FlowsExecutionManager {
-    ExecutorService threadExecutor;
-
+    private ExecutorService threadExecutor;
+    private static int threadsNum = 1;
     public FlowsExecutionManager(){
-        threadExecutor = Executors.newFixedThreadPool(3);
-    }
-    public void setThreadExecutor(int threadsNum){
         threadExecutor = Executors.newFixedThreadPool(threadsNum);
+    }
+    public static void setThreadExecutor(int threadN){
+        threadsNum = threadN;
     }
     public void exeFlow(FlowExecution flow){
         flow.setFlowExecutionResult(PROCESSING);
         FLowExecutor fLowExecutor = new FLowExecutor(flow);
         threadExecutor.execute(fLowExecutor);
+    }
+    public void shutDown(){
+        threadExecutor.shutdown();
     }
 }
