@@ -35,6 +35,7 @@ public class LoadStepperDataFromXml {
             for (STFlow flow : genStepper.getSTFlows().getSTFlow()) {
                 FlowDefinition systemFlow = cloneFlowDetails(flow);//Doing the deep copy
                 systemFlow.validateFlowStructure();
+                addInitialsInputs(flow,systemFlow);
                 flowList.add(systemFlow);//Add the flow to the list
             }
         }
@@ -42,7 +43,6 @@ public class LoadStepperDataFromXml {
         addContinuations(flowList, genStepper);
         return flowList;
     }
-
     private static void addContinuations(List<FlowDefinition> flowList, STStepper genStepper) throws StepperExeption {
         int i = 0;
         for(STFlow stFlow : genStepper.getSTFlows().getSTFlow() ){
@@ -201,6 +201,23 @@ public class LoadStepperDataFromXml {
                 throw new CustomeMappingInvalid("Error in custom mapping: The source output " + custom.getSourceData() + " does not exist");
 
        return true;
+    }
+    private static void addInitialsInputs(STFlow flow, FlowDefinition systemFlow) throws InvalidInitialFlowValues {
+        if(Optional.ofNullable(flow.getSTInitialInputValues()).isPresent()){
+            for(STInitialInputValue initData: flow.getSTInitialInputValues().getSTInitialInputValue()){
+                if(systemFlow.getFreeInputFinalNameToDD().containsKey(initData.getInputName())){
+                    DataDefinitionDeclaration dd = systemFlow.getFreeInputFinalNameToDD().get(initData.getInputName());
+                    try {
+                        Object initValue = dd.dataDefinition().convertUserInputToDataType(initData.getInitialValue(), dd.dataDefinition().getType());
+                        systemFlow.addInitialValue(initData.getInputName(),initValue);
+                    }catch (Exception e){
+                        throw new InvalidInitialFlowValues("Wrong initial value data to " + initData.getInputName() + ", the data have to be a " + dd.dataDefinition().getType().getSimpleName());
+                    }
+                }else {
+                    throw new InvalidInitialFlowValues("In Initials Values:The initial value" + initData.getInputName() + ", is invalid. There are no input at this name.");
+                }
+            }
+        }
     }
 
     private static STStepper deserializeFrom(InputStream in) throws JAXBException {

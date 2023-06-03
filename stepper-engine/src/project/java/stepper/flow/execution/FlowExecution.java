@@ -85,8 +85,7 @@ public class FlowExecution {
     public FlowExecution(String uniqueId, FlowDefinition flowDefinition) {
         this.uniqueId = uniqueId;
         this.flowDefinition = flowDefinition;
-        startersFreeInputForContext = new HashMap<>();
-
+        startersFreeInputForContext = new HashMap<>(this.flowDefinition.getInitialValues());
     }
     public void setFlowContexts(StepExecutionContext context){flowContexts = context;}
     public StepExecutionContext getFlowContexts(){return  flowContexts;}
@@ -260,7 +259,7 @@ public class FlowExecution {
                     filter(outputData -> outputData.getFinalName().equals(sourceToTarget.getKey()))
                     .findFirst();
             if(flowOutput.isPresent()){
-                if(flowOutput.get().createdFromFlow)
+                if(flowOutput.get().createdFromFlow && !flowExecution.getFlowDefinition().getInitialValues().containsKey(flowOutput.get().finalName))
                     flowExecution.startersFreeInputForContext.put(sourceToTarget.getValue(),flowOutput.get().data);
             }
         }

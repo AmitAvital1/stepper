@@ -18,6 +18,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
     private Map<String,DataDefinitionDeclaration> freeInputFinalNameToDD;
     private Map<String,DataDefinitionDeclaration> formalFinalOutPutNameToDD;
     private List<continuationFlowDetails> flowsContinuations;
+    private Map<String, Object> initialValues;
 
     public FlowDefinitionImpl(String name, String description) {
         this.name = name;
@@ -27,7 +28,9 @@ public class FlowDefinitionImpl implements FlowDefinition {
         formalFinalOutPutNameToDD = new HashMap<>();
         flowStatistics = new FlowStats();
         flowsContinuations = new ArrayList<>();
+        initialValues = new HashMap<>();
     }
+
     public class continuationFlowDetails{
         private FlowDefinition targetFlow; //The target flow to continue
         private Map<String,String> sourceToTargetInput;
@@ -128,10 +131,12 @@ public class FlowDefinitionImpl implements FlowDefinition {
                         //There is no output to take for the input - so its free input
                         if(!data.dataDefinition().isUserFriendly())//If the free input does not user-friendly
                             throw new FreeInputNotUserFriendly("In flow: " + name + ", the free input: " + step.getinputToFinalName().get(data.getName()) + " cannot get from user");
-                        if(freeInputFinalNameToDD.containsKey(step.getinputToFinalName().get(data.getName())))
-                            if(freeInputFinalNameToDD.get(step.getinputToFinalName().get(data.getName())).dataDefinition().getType() != data.dataDefinition().getType())//It's mean that there are two free inputs with other DD
-                                 throw new SameFreeInputNamesButNoDD("In flow: " + name + ", the are duplicate free input called:" + step.getinputToFinalName().get(data.getName()) + " but with other definition");
-                        freeInputFinalNameToDD.put(step.getinputToFinalName().get(data.getName()), data);
+                        if(freeInputFinalNameToDD.containsKey(step.getinputToFinalName().get(data.getName()))) {
+                            if (freeInputFinalNameToDD.get(step.getinputToFinalName().get(data.getName())).dataDefinition().getType() != data.dataDefinition().getType())//It's mean that there are two free inputs with other DD
+                                throw new SameFreeInputNamesButNoDD("In flow: " + name + ", the are duplicate free input called:" + step.getinputToFinalName().get(data.getName()) + " but with other definition");
+                        }
+                        else
+                            freeInputFinalNameToDD.put(step.getinputToFinalName().get(data.getName()), data);
                         freeInputStepDD.add(data);
                     }
                 }
@@ -174,4 +179,13 @@ public class FlowDefinitionImpl implements FlowDefinition {
 
     @Override
     public Map<String,DataDefinitionDeclaration> getFreeInputFinalNameToDD(){return freeInputFinalNameToDD;}
+
+    @Override
+    public Map<String, Object> getInitialValues() {
+        return initialValues;
+    }
+    @Override
+    public void addInitialValue(String finalNameInput, Object dataInput){
+        initialValues.put(finalNameInput,dataInput);
+    }
 }

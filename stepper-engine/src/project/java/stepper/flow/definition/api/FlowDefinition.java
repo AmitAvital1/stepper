@@ -24,4 +24,6 @@ public interface FlowDefinition {
     void addContinuation(FlowDefinition name, Map<String,String> data) throws StepperExeption;
     List<FlowDefinitionImpl.continuationFlowDetails> getFlowsContinuations();
     Map<String,DataDefinitionDeclaration> getFreeInputFinalNameToDD();
+    Map<String, Object> getInitialValues();
+    void addInitialValue(String finalNameInput, Object dataInput);
 }

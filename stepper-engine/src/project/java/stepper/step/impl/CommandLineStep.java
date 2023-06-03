@@ -57,6 +57,7 @@ public class CommandLineStep extends AbstractStepDefinition{
             cmdResult = output;
         } catch (IOException | InterruptedException e) {
             logs.addLogLine("Error occurred with running the command");
+            context.addStepSummaryLine("Error occurred with running the command");
             cmdResult = "Error occurred with running the command";
         }
         context.storeDataValue("RESULT", cmdResult);
