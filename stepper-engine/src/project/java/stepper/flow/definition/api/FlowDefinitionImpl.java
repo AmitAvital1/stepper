@@ -40,7 +40,7 @@ public class FlowDefinitionImpl implements FlowDefinition {
             for(Map.Entry<String,String> val : contDetails.entrySet()){
                 boolean found = false;
                 for(StepUsageDeclaration step : steps){
-                    if(step.getFinalNameToOutput().containsKey(val.getKey())){
+                    if(step.getFinalNameToOutput().containsKey(val.getKey()) || step.getFinalNameToInput().containsKey(val.getKey())){
                         found = true;
                     }
                 }

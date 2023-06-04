@@ -151,7 +151,7 @@ public class FlowExecution {
                     String inputFinalName = key;
                     Object inputContext = startersFreeInputForContext.get(inputFinalName);
                     data.add(i + "." + inputFinalName + "[" + inputContext + "]" + "(" + dd.dataDefinition().getName() + ") - " +
-                            dd.necessity());
+                            (!getFlowDefinition().getInitialValues().containsKey(inputFinalName) ? dd.necessity() : "Initial Value"));
                     i++;
             }
         }
@@ -165,7 +165,7 @@ public class FlowExecution {
                     Optional<Object> inputContext = Optional.ofNullable(startersFreeInputForContext.get(inputFinalName));
                     if(inputContext.isPresent()) {
                         data.add(i + "." + inputFinalName + "[" + inputContext.get() + "]" + "(" + dd.dataDefinition().getName() + ") - " +
-                                dd.necessity());
+                                (!getFlowDefinition().getInitialValues().containsKey(inputFinalName) ? dd.necessity() : "Initial Value"));
                         i++;
                     }
             }
@@ -255,11 +255,16 @@ public class FlowExecution {
             Optional<flowOutputsData> flowOutput = outputsStepData.stream().
                     filter(outputData -> outputData.getFinalName().equals(sourceToTarget.getKey()))
                     .findFirst();
+            boolean freeInput = startersFreeInputForContext.containsKey(sourceToTarget.getKey());
             if(flowOutput.isPresent()){
                 if(flowOutput.get().createdFromFlow && !flowExecution.getFlowDefinition().getInitialValues().containsKey(flowOutput.get().finalName))
                     flowExecution.startersFreeInputForContext.put(sourceToTarget.getValue(),flowOutput.get().data);
             }
-        }
+            else if(freeInput){
+                if(!flowExecution.getFlowDefinition().getInitialValues().containsKey(sourceToTarget.getKey()))
+                    flowExecution.startersFreeInputForContext.put(sourceToTarget.getValue(), startersFreeInputForContext.get(sourceToTarget.getKey()));
+            }
+        }//TODO AUTOMATIC CONTINUATION
         return flowExecution;
     }
 }

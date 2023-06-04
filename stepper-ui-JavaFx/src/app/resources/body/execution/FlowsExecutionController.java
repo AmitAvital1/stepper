@@ -151,30 +151,30 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         for (Map.Entry<String, DataDefinitionDeclaration> entry : freeInputs.entrySet()) {
             String key = entry.getKey();
             DataDefinitionDeclaration dd = entry.getValue();
-                HBox hbox = new HBox();
-                hbox.setPadding(new Insets(10));
-
+            HBox hbox = new HBox();
+            hbox.setPadding(new Insets(10));
+            if (!flowButton.getInitialValues().containsKey(dd.getName())) {
                 Label stepName = new Label(key);
                 TextField textField = new TextField();
                 Button button;
-                if(flowExe.getStartersFreeInputForContext().containsKey(key)){
+                if (flowExe.getStartersFreeInputForContext().containsKey(key)) {
                     textField.setPromptText(flowExe.getStartersFreeInputForContext().get(key).toString());
                     button = new Button("Edit");
                     textField.setDisable(true);
-                }
-                else {
+                } else {
                     textField.setPromptText(dd.userString() + "[" + dd.dataDefinition().getName() + "]");
                     button = new Button("Add");
                 }
-                button.setOnAction(e -> handleFreeInputButtonAction(button,flowExe,key,dd,textField));
+                button.setOnAction(e -> handleFreeInputButtonAction(button, flowExe, key, dd, textField));
                 Label isMandatory = new Label(dd.necessity().toString());
-                if(dd.necessity() == DataNecessity.MANDATORY)
+                if (dd.necessity() == DataNecessity.MANDATORY)
                     executeFlowButtonFinish.setDisable(true);
                 hbox.setSpacing(5);
                 textField.setMaxWidth(250);
                 hbox.setHgrow(textField, Priority.ALWAYS);
-                hbox.getChildren().addAll(stepName, textField, button,isMandatory);
+                hbox.getChildren().addAll(stepName, textField, button, isMandatory);
                 freeInputsList.getChildren().addAll(hbox);
+            }
         }
         executeFlowButtonFinish.setOnAction(e -> executeFlow(flowExe));
 

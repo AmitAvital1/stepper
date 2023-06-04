@@ -17,6 +17,7 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     private final Map<String,String> finalNamesToOutput;
 
     private final Map<String, DataDefinition> finalNamesOutputsToDD;
+    private final Map<String, DataDefinition> finalNamesInputsToDD;
 
     private final Map<String,String> customeMapInput;
 
@@ -39,6 +40,7 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
         finalNamesToOutput = new HashMap<>();
         customeMapInput = new HashMap<>();
         finalNamesOutputsToDD = new HashMap<>();
+        finalNamesInputsToDD = new HashMap<>();
 
         stepDefinition.inputs().stream().forEach(stepD -> inputsToFinalNames.put(stepD.getName(),stepD.getName()));
         stepDefinition.outputs().stream().forEach(stepD -> outputsToFinalNames.put(stepD.getName(),stepD.getName()));
@@ -46,6 +48,7 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
         stepDefinition.inputs().stream().forEach(stepD -> finalNamesToInput.put(stepD.getName(),stepD.getName()));
         stepDefinition.outputs().stream().forEach(stepD -> finalNamesToOutput.put(stepD.getName(),stepD.getName()));
 
+        stepDefinition.inputs().stream().forEach(stepD -> finalNamesInputsToDD.put(stepD.getName(),stepD.dataDefinition()));
         stepDefinition.outputs().stream().forEach(stepD -> finalNamesOutputsToDD.put(stepD.getName(),stepD.dataDefinition()));
 
     }
@@ -92,6 +95,10 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
     public Map<String, DataDefinition> getFinalNamesOutputsToDD() {
         return finalNamesOutputsToDD;
     }
+    @Override
+    public Map<String, DataDefinition> getFinalNamesInputsToDD() {
+        return finalNamesInputsToDD;
+    }
 
     @Override
     public boolean addLevelAlias(String name, String finalName) {
@@ -99,6 +106,8 @@ public class StepUsageDeclarationImpl implements StepUsageDeclaration {
             inputsToFinalNames.put(name, finalName);
             finalNamesToInput.remove(name);
             finalNamesToInput.put(finalName,name);
+            DataDefinition dd = finalNamesInputsToDD.remove(name);
+            finalNamesInputsToDD.put(finalName,dd);
             return true;
         }
         else if(outputsToFinalNames.containsKey(name)) {

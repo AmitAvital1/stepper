@@ -74,14 +74,23 @@ public class LoadStepperDataFromXml {
 
     private static boolean checkTheSameDD(FlowDefinition existFlow, DataDefinitionDeclaration targetDD, String sourceName,String targetName) throws InvalidContinuationsData {
         for(StepUsageDeclaration step : existFlow.getFlowSteps()){
-            DataDefinition existFlowDD = step.getFinalNamesOutputsToDD().get(sourceName);
-            if(existFlowDD != null){
-                if(targetDD.dataDefinition().getType() == existFlowDD.getType())
+            DataDefinition existOutPutDD = step.getFinalNamesOutputsToDD().get(sourceName);
+            DataDefinition existInputDD = step.getFinalNamesInputsToDD().get(sourceName);
+            if(existOutPutDD != null){
+                if(targetDD.dataDefinition().getType() == existOutPutDD.getType())
                     return true;
                 else
                     throw new InvalidContinuationsData("In flow: " + existFlow.getName() + " the target data in the continuation:"
                             + targetName + "[" + targetDD.dataDefinition().getType().getSimpleName() + "] is not the same type as the source " + sourceName + "["
-                    + existFlowDD.getType().getSimpleName() + "]");
+                    + existOutPutDD.getType().getSimpleName() + "]");
+            }
+            else if(existInputDD != null){
+                if(targetDD.dataDefinition().getType() == existInputDD.getType())
+                    return true;
+                else
+                    throw new InvalidContinuationsData("In flow: " + existFlow.getName() + " the target data in the continuation:"
+                            + targetName + "[" + targetDD.dataDefinition().getType().getSimpleName() + "] is not the same type as the source " + sourceName + "["
+                            + existInputDD.getType().getSimpleName() + "]");
             }
         }
         return false;
@@ -214,7 +223,7 @@ public class LoadStepperDataFromXml {
                         throw new InvalidInitialFlowValues("Wrong initial value data to " + initData.getInputName() + ", the data have to be a " + dd.dataDefinition().getType().getSimpleName());
                     }
                 }else {
-                    throw new InvalidInitialFlowValues("In Initials Values:The initial value" + initData.getInputName() + ", is invalid. There are no input at this name.");
+                    throw new InvalidInitialFlowValues("In Initials Values:The initial value " + initData.getInputName() + ", is invalid. There are no input at this name.");
                 }
             }
         }

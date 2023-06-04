@@ -14,6 +14,7 @@ public interface StepUsageDeclaration {
     Map<String,String> getFinalNameToInput();
     Map<String,String> getFinalNameToOutput();
     Map<String, DataDefinition> getFinalNamesOutputsToDD();
+    Map<String, DataDefinition> getFinalNamesInputsToDD();
     boolean addLevelAlias(String name,String finalName);
     void addCustomeMapInput(String inputName,String inputTarget);
     String thisInputHaveCustomeMapping(String data);

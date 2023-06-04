@@ -68,7 +68,8 @@ public class FlowDefinitionController implements BodyControllerDefinition {
             StepUsageDeclaration key = entry.getKey();
             List<DataDefinitionDeclaration> value = entry.getValue();
             for(DataDefinitionDeclaration data : value) {
-                freeInputsItem.getChildren().add(new TreeItem<>(key.getinputToFinalName().get(data.getName()) + ":" + data.userString() + "(" + data.necessity() + ")"));
+                freeInputsItem.getChildren().add(new TreeItem<>(key.getinputToFinalName().get(data.getName()) + ":" + data.userString() +
+                        "(" + (!flowButton.getInitialValues().containsKey(key.getinputToFinalName().get(data.getName())) ? data.necessity() : "INITIANAL") + ")"));
                 freeInputsItem.getChildren().add(new TreeItem<>("Data type:" + data.dataDefinition().getName()));
                 freeInputsItem.getChildren().add(new TreeItem<>(""));
             }
