@@ -4,6 +4,7 @@ import app.resources.body.BodyController;
 import app.resources.header.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.stage.Stage;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.runner.FlowsExecutionManager;
@@ -18,6 +19,8 @@ public class AppMainConroller {
     @FXML private HeaderController headerComponentController;
     @FXML private Parent bodyComponent;
     @FXML private BodyController bodyComponentController;
+
+    private Stage primaryStage;
 
     private List<FlowDefinition> flows = new ArrayList<>();
     private final List<FlowExecution> flowExecutions = new ArrayList<>();
@@ -52,4 +55,10 @@ public class AppMainConroller {
     }
 
 
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
 }

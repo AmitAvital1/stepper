@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -70,6 +71,8 @@ public class HistoryController implements BodyControllerDefinition {
 
     @FXML
     private Button continueToFlowButton;
+    @FXML
+    private ImageView rerunButtonImg;
 
 
     private List<FlowExecution> flowExecutions;
@@ -266,6 +269,15 @@ public class HistoryController implements BodyControllerDefinition {
                 hboxContinuations.getChildren().add(radioButton);
             }
         }
+        rerunButtonImg.setOnMouseClicked(e -> bodyForHistoryExecutionController.executeContinuationFlowScreen(flow.reRunFlow()));
+        Tooltip tooltip = new Tooltip();
+        rerunButtonImg.setOnMouseEntered(event -> {
+            tooltip.setText("Rerun flow");
+            tooltip.show(rerunButtonImg, event.getScreenX() + 5, event.getScreenY() + 5);
+        });
+        rerunButtonImg.setOnMouseExited(event -> {
+            tooltip.hide();
+        });
         flowChooseVBOX.setVisible(true);
     }
 
@@ -330,4 +342,6 @@ public class HistoryController implements BodyControllerDefinition {
             return valueProperty;
         }
     }
+
+
 }

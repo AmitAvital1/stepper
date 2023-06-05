@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.List;
 
 public class BodyController {
+
     private AppMainConroller mainController;
     @FXML
     private StackPane bodyPane;
@@ -98,4 +99,5 @@ public class BodyController {
     public void addFlowExecutor(FlowExecution flowExecution){mainController.addExecutorFlow(flowExecution);}
     public List<FlowExecution> getFlowExecutions(){return mainController.getFlowExecutions();}
     public FlowsExecutionManager getFlowManagerExecution(){return mainController.getFlowsExecutionManager();}
+    public AppMainConroller getMainController() {return mainController;}
 }

@@ -4,10 +4,7 @@ import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
-import project.java.stepper.step.api.AbstractStepDefinition;
-import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
-import project.java.stepper.step.api.DataNecessity;
-import project.java.stepper.step.api.StepResult;
+import project.java.stepper.step.api.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -17,10 +14,10 @@ public class FileDumperStep extends AbstractStepDefinition {
     public FileDumperStep() {
         super("File Dumper", true);
 
-        addInput(new DataDefinitionDeclarationImpl("CONTENT", DataNecessity.MANDATORY, "Content", DataDefinitionRegistry.STRING));
-        addInput(new DataDefinitionDeclarationImpl("FILE_NAME", DataNecessity.MANDATORY, "Target file path", DataDefinitionRegistry.STRING));
+        addInput(new DataDefinitionDeclarationImpl("CONTENT", DataNecessity.MANDATORY, "Content", DataDefinitionRegistry.STRING, UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("FILE_NAME", DataNecessity.MANDATORY, "Target file path", DataDefinitionRegistry.STRING,UIDDPresent.NA));
 
-        addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "File Creation Result", DataDefinitionRegistry.STRING));
+        addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "File Creation Result", DataDefinitionRegistry.STRING, UIDDPresent.NA));
     }
     @Override
     public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {

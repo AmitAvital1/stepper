@@ -7,10 +7,7 @@ import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
-import project.java.stepper.step.api.AbstractStepDefinition;
-import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
-import project.java.stepper.step.api.DataNecessity;
-import project.java.stepper.step.api.StepResult;
+import project.java.stepper.step.api.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,11 +19,11 @@ public class FilesRenamerStep extends AbstractStepDefinition {
     public FilesRenamerStep() {
         super("Files Renamer", false);
 
-        addInput(new DataDefinitionDeclarationImpl("FILES_TO_RENAME", DataNecessity.MANDATORY, "Files to rename", DataDefinitionRegistry.LIST));
-        addInput(new DataDefinitionDeclarationImpl("PREFIX", DataNecessity.OPTIONAL, "Add this prefix", DataDefinitionRegistry.STRING));
-        addInput(new DataDefinitionDeclarationImpl("SUFFIX", DataNecessity.OPTIONAL, "Append this suffix", DataDefinitionRegistry.STRING));
+        addInput(new DataDefinitionDeclarationImpl("FILES_TO_RENAME", DataNecessity.MANDATORY, "Files to rename", DataDefinitionRegistry.LIST, UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("PREFIX", DataNecessity.OPTIONAL, "Add this prefix", DataDefinitionRegistry.STRING, UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("SUFFIX", DataNecessity.OPTIONAL, "Append this suffix", DataDefinitionRegistry.STRING, UIDDPresent.NA));
 
-        addOutput(new DataDefinitionDeclarationImpl("RENAME_RESULT", DataNecessity.NA, "Rename operation summary", DataDefinitionRegistry.RELATION));
+        addOutput(new DataDefinitionDeclarationImpl("RENAME_RESULT", DataNecessity.NA, "Rename operation summary", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
     }
 
     public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {

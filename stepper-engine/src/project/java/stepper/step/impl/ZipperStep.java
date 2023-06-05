@@ -5,10 +5,7 @@ import project.java.stepper.dd.impl.enumerator.ZipEnum;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
-import project.java.stepper.step.api.AbstractStepDefinition;
-import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
-import project.java.stepper.step.api.DataNecessity;
-import project.java.stepper.step.api.StepResult;
+import project.java.stepper.step.api.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,10 +19,10 @@ public class ZipperStep extends AbstractStepDefinition {
     public ZipperStep() {
         super("Zipper", false);
 
-        addInput(new DataDefinitionDeclarationImpl("SOURCE", DataNecessity.MANDATORY, "Source", DataDefinitionRegistry.STRING));
-        addInput(new DataDefinitionDeclarationImpl("OPERATION", DataNecessity.MANDATORY, "Operation type", DataDefinitionRegistry.ZIPENUMERATOR));
+        addInput(new DataDefinitionDeclarationImpl("SOURCE", DataNecessity.MANDATORY, "Source", DataDefinitionRegistry.STRING, UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("OPERATION", DataNecessity.MANDATORY, "Operation type", DataDefinitionRegistry.ZIPENUMERATOR, UIDDPresent.ENUM));
 
-        addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "Zip operation result", DataDefinitionRegistry.STRING));
+        addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "Zip operation result", DataDefinitionRegistry.STRING, UIDDPresent.NA));
     }
     public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
         String source = context.getDataValue("SOURCE", String.class);

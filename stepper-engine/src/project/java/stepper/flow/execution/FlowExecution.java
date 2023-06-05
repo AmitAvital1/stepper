@@ -27,7 +27,7 @@ public class FlowExecution {
     private Duration totalTime;
     private String startedTime;
     private ObjectProperty<FlowExecutionResult> flowExecutionResult = new SimpleObjectProperty<>();
-    private final Map<String, Object> startersFreeInputForContext;
+    private Map<String, Object> startersFreeInputForContext;
     private Map<String, Object> allDataValues;
     private List<flowOutputsData> outputsStepData = new ArrayList<>();
     private IntegerProperty stepFinished = new SimpleIntegerProperty(0);
@@ -281,5 +281,15 @@ public class FlowExecution {
                         flowExecution.startersFreeInputForContext.put(set.getKey(),set.getValue());
         });
         return flowExecution;
+    }
+    public FlowExecution reRunFlow(){
+        UUID uuid = UUID.randomUUID();
+        FlowExecution flowExecution = new FlowExecution(uuid.toString(), flowDefinition);
+        Map<String,Object> copyFreeInputs = new HashMap<>(startersFreeInputForContext);
+        flowExecution.setStartersFreeInputForContext(copyFreeInputs);
+        return flowExecution;
+    }
+    public void setStartersFreeInputForContext(Map<String,Object> newContext){
+        startersFreeInputForContext = newContext;
     }
 }

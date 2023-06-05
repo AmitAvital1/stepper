@@ -5,10 +5,7 @@ import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
-import project.java.stepper.step.api.AbstractStepDefinition;
-import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
-import project.java.stepper.step.api.DataNecessity;
-import project.java.stepper.step.api.StepResult;
+import project.java.stepper.step.api.*;
 
 import java.util.List;
 
@@ -16,9 +13,9 @@ public class PropertiesExporterStep extends AbstractStepDefinition {
     public PropertiesExporterStep() {
         super("Properties Exporter", true);
 
-        addInput(new DataDefinitionDeclarationImpl("SOURCE", DataNecessity.MANDATORY, "Source data", DataDefinitionRegistry.RELATION));
+        addInput(new DataDefinitionDeclarationImpl("SOURCE", DataNecessity.MANDATORY, "Source data", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
 
-        addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "Properties export result", DataDefinitionRegistry.STRING));
+        addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "Properties export result", DataDefinitionRegistry.STRING, UIDDPresent.NA));
     }
     @Override
     public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {

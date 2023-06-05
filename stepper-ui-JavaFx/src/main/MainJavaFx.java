@@ -32,6 +32,7 @@ public class MainJavaFx extends Application {
 
         // Shutdown the thread pool when the JavaFX application is closed
         AppMainConroller controller = fxmlLoader.getController();
+        controller.setPrimaryStage(primaryStage);
         primaryStage.setOnCloseRequest(event -> {
             controller.getFlowsExecutionManager().shutDown();
         });

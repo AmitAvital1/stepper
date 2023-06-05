@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum StepDefinitionRegistry {
-    HELLO_WORLD(new HelloWorldStep()),
-    PERSON_DETAILS(new PersonDetailsStep()),
     COLLECT_FILES_FOLDER_STEP(new CollectFilesInFolderStep()),
     SPEND_SOME_TIME_STEP(new SpendSomeTimeStep()),
     FILES_DELETER_STEP(new FilesDeleterStep()),

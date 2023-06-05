@@ -7,10 +7,7 @@ import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
-import project.java.stepper.step.api.AbstractStepDefinition;
-import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
-import project.java.stepper.step.api.DataNecessity;
-import project.java.stepper.step.api.StepResult;
+import project.java.stepper.step.api.*;
 
 import java.io.*;
 import java.util.List;
@@ -19,10 +16,10 @@ public class FilesContentExtractorStep extends AbstractStepDefinition {
     public FilesContentExtractorStep() {
         super("Files Content Extractor", true);
 
-        addInput(new DataDefinitionDeclarationImpl("FILES_LIST", DataNecessity.MANDATORY, "Files to extract", DataDefinitionRegistry.LIST));
-        addInput(new DataDefinitionDeclarationImpl("LINE", DataNecessity.MANDATORY, "Line number to extract", DataDefinitionRegistry.INTEGER));
+        addInput(new DataDefinitionDeclarationImpl("FILES_LIST", DataNecessity.MANDATORY, "Files to extract", DataDefinitionRegistry.LIST, UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("LINE", DataNecessity.MANDATORY, "Line number to extract", DataDefinitionRegistry.INTEGER, UIDDPresent.NA));
 
-        addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data extraction", DataDefinitionRegistry.RELATION));
+        addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data extraction", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
     }
     @Override
     public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {

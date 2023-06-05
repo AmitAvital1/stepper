@@ -7,10 +7,7 @@ import project.java.stepper.dd.impl.mapping.MappingData;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
-import project.java.stepper.step.api.AbstractStepDefinition;
-import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
-import project.java.stepper.step.api.DataNecessity;
-import project.java.stepper.step.api.StepResult;
+import project.java.stepper.step.api.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,10 +18,10 @@ public class FilesDeleterStep extends AbstractStepDefinition {
     public FilesDeleterStep() {
         super("Files Deleter", false);
 
-        addInput(new DataDefinitionDeclarationImpl("FILES_LIST", DataNecessity.MANDATORY, "Files to delete", DataDefinitionRegistry.LIST));
+        addInput(new DataDefinitionDeclarationImpl("FILES_LIST", DataNecessity.MANDATORY, "Files to delete", DataDefinitionRegistry.LIST, UIDDPresent.NA));
 
-        addOutput(new DataDefinitionDeclarationImpl("DELETED_LIST", DataNecessity.NA, "Files list", DataDefinitionRegistry.LIST));
-        addOutput(new DataDefinitionDeclarationImpl("DELETION_STATS", DataNecessity.NA, "Deletion summary results", DataDefinitionRegistry.MAPPING));
+        addOutput(new DataDefinitionDeclarationImpl("DELETED_LIST", DataNecessity.NA, "Files list", DataDefinitionRegistry.LIST, UIDDPresent.NA));
+        addOutput(new DataDefinitionDeclarationImpl("DELETION_STATS", DataNecessity.NA, "Deletion summary results", DataDefinitionRegistry.MAPPING, UIDDPresent.NA));
     }
 
     public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {

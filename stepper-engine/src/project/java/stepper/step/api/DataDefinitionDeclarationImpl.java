@@ -11,12 +11,14 @@ public class DataDefinitionDeclarationImpl implements DataDefinitionDeclaration 
     private final DataNecessity necessity;
     private final String userString;
     private final DataDefinition dataDefinition;
+    private final UIDDPresent UIPresent;
 
-    public DataDefinitionDeclarationImpl(String name, DataNecessity necessity, String userString, DataDefinition dataDefinition) {
+    public DataDefinitionDeclarationImpl(String name, DataNecessity necessity, String userString, DataDefinition dataDefinition, UIDDPresent UIpresent) {
         this.name = name;
         this.necessity = necessity;
         this.userString = userString;
         this.dataDefinition = dataDefinition;
+        this.UIPresent = UIpresent;
     }
 
     @Override
@@ -37,5 +39,10 @@ public class DataDefinitionDeclarationImpl implements DataDefinitionDeclaration 
     @Override
     public DataDefinition dataDefinition() {
         return dataDefinition;
+    }
+
+    @Override
+    public UIDDPresent UIPresent() {
+        return this.UIPresent;
     }
 }

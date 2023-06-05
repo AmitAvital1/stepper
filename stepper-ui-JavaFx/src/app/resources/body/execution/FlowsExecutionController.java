@@ -17,7 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import org.controlsfx.control.PopOver;
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.list.ListData;
@@ -25,6 +25,7 @@ import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.MissMandatoryInput;
 import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.flow.definition.api.FlowDefinition;
+import project.java.stepper.flow.definition.api.FlowDefinitionImpl;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
@@ -40,13 +41,16 @@ import javafx.animation.PauseTransition;
 
 import javafx.scene.text.Text;
 
+
 import java.awt.*;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.controlsfx.control.Notifications;
 import project.java.stepper.step.api.DataNecessity;
+import project.java.stepper.step.api.UIDDPresent;
 
 public class FlowsExecutionController implements BodyControllerDefinition {
 
@@ -82,6 +86,10 @@ public class FlowsExecutionController implements BodyControllerDefinition {
     private VBox theVboxParent;
     @FXML
     private VBox formalOutPutsVbox;
+    @FXML
+    private VBox continuationVBOX;
+    @FXML
+    private Label supllyFreeInput;
 
     List<FlowDefinition> flows;
     private PopOver errorPopOver;
@@ -106,8 +114,9 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         theVboxParent.getChildren().addAll(flowDetailsExecutionBox,flowExecutionInfo);
         UUID uuid = UUID.randomUUID();
         FlowExecution flowExecution = new FlowExecution(uuid.toString(), flowButton);
-        executeFlowButtonFinish.setDisable(false);
-        flowDetailsExecutionBox.setDisable(false);
+        supllyFreeInput.setDisable(false);
+        flowExecuteNameLabel.setDisable(false);
+        freeInputsList.setDisable(false);
         flowExecutionInfo.setVisible(false);
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
@@ -123,6 +132,9 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     textField.setPromptText(dd.userString() + "[" + dd.dataDefinition().getName() + "]");
                     Button button = new Button("Add");
                     button.setOnAction(e -> handleFreeInputButtonAction(button, flowExecution, key, dd, textField));
+                    if(dd.UIPresent() == UIDDPresent.FOLDER_DIALOG){
+                        textField.setOnMouseClicked(e -> freeInputDialog(textField));
+                    }
                     Label isMandatory = new Label(dd.necessity().toString());
                     if (dd.necessity() == DataNecessity.MANDATORY)
                         executeFlowButtonFinish.setDisable(true);
@@ -133,17 +145,32 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     freeInputsList.getChildren().addAll(hbox);
             }
         }
+        try {
+            flowExecution.validateToExecute();
+            executeFlowButtonFinish.setDisable(false);
+        } catch (MissMandatoryInput e) {
+            executeFlowButtonFinish.setDisable(true);
+        }
        executeFlowButtonFinish.setOnAction(e -> executeFlow(flowExecution));
 
         flowDetailsExecutionBox.setVisible(true);
+    }
+
+    private void freeInputDialog(TextField textField) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Choose Directory");
+        File selectedDir = directoryChooser.showDialog(bodyForFlowExecutionController.getMainController().getPrimaryStage());
+        if(selectedDir != null)
+            textField.setText(selectedDir.getAbsolutePath());
     }
 
     public void handleContinuationFlowButtonAction(FlowExecution flowExe) {
         theVboxParent.getChildren().clear();
         theVboxParent.getChildren().addAll(flowDetailsExecutionBox,flowExecutionInfo);
         FlowDefinition flowButton = flowExe.getFlowDefinition();
-        executeFlowButtonFinish.setDisable(false);
-        flowDetailsExecutionBox.setDisable(false);
+        supllyFreeInput.setDisable(false);
+        flowExecuteNameLabel.setDisable(false);
+        freeInputsList.setDisable(false);
         flowExecutionInfo.setVisible(false);
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
@@ -166,6 +193,9 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     button = new Button("Add");
                 }
                 button.setOnAction(e -> handleFreeInputButtonAction(button, flowExe, key, dd, textField));
+                if(dd.UIPresent() == UIDDPresent.FOLDER_DIALOG){
+                    textField.setOnMouseClicked(e -> freeInputDialog(textField));
+                }
                 Label isMandatory = new Label(dd.necessity().toString());
                 if (dd.necessity() == DataNecessity.MANDATORY)
                     executeFlowButtonFinish.setDisable(true);
@@ -177,7 +207,12 @@ public class FlowsExecutionController implements BodyControllerDefinition {
             }
         }
         executeFlowButtonFinish.setOnAction(e -> executeFlow(flowExe));
-
+        try {
+            flowExe.validateToExecute();
+            executeFlowButtonFinish.setDisable(false);
+        } catch (MissMandatoryInput e) {
+            executeFlowButtonFinish.setDisable(true);
+        }
         flowDetailsExecutionBox.setVisible(true);
     }
 
@@ -190,7 +225,6 @@ public class FlowsExecutionController implements BodyControllerDefinition {
             return;
         }
         String text = textField.getText().trim();
-        // Text messageText = new Text();
         if (text.isEmpty()) {
             showErrorMessage(button,"Please enter data.");
             return;
@@ -210,11 +244,6 @@ public class FlowsExecutionController implements BodyControllerDefinition {
     }
 
     private void showErrorMessage(Button button,String message) {
-        /*Notifications.create()
-                .title("Error " + step.getFinalStepName())
-                .text(message)
-                .hideAfter(Duration.seconds(2))
-                .showError();*/
         if (errorPopOver != null && errorPopOver.isShowing()) {
             errorPopOver.hide();
         }
@@ -243,7 +272,10 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         This function execute flow the user chose and validate all the free inputs has entered. then execute the flow.
          */
         putInAccordionTheExecuteDetails();
-        flowDetailsExecutionBox.setDisable(true);
+        //flowDetailsExecutionBox.setDisable(true);
+        supllyFreeInput.setDisable(true);
+        flowExecuteNameLabel.setDisable(true);
+        freeInputsList.setDisable(true);
         flowExecutionInfo.setVisible(true);
         stepResLabel.setText("");
         formalOutPutsVbox.getChildren().clear();
@@ -256,7 +288,35 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flow.getFlowExecutionResultProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != FlowExecutionResult.PROCESSING) {
                 stepResLabel.setText(newValue.name() + " [" + flow.getDuration() + ".ms" + "]");//TODO
+                if(newValue == FlowExecutionResult.SUCCESS)
+                    stepResLabel.setStyle("-fx-text-fill: green;");
+                else
+                    stepResLabel.setStyle("-fx-text-fill: red;");
                 addFormalOutputs(flow);
+                if(flow.getFlowDefinition().getFlowsContinuations().size() > 0) {
+                    Label Title = new Label("Step continuation:");
+                    formalOutPutsVbox.getChildren().add(Title);
+                    Title.setFont(javafx.scene.text.Font.font(Font.BOLD));
+                    Title.setStyle("-fx-font-size: 16px;");
+                    HBox continuationHbox = new HBox();
+                    continuationHbox.setSpacing(5);
+                    ToggleGroup toggleGroup = new ToggleGroup();
+                    Button continuationButton = new Button("Continue to flow");
+                    continuationButton.setAlignment(Pos.CENTER);
+                    for (FlowDefinitionImpl.continuationFlowDetails cDetails : flow.getFlowDefinition().getFlowsContinuations()) {
+                        RadioButton radioButton = new RadioButton(cDetails.getTargetFlow().getName());
+                        radioButton.setToggleGroup(toggleGroup);
+                        radioButton.setOnAction(event -> {
+                            if (radioButton.isSelected()) {
+                                continuationButton.setOnAction(event1 -> {
+                                    bodyForFlowExecutionController.executeContinuationFlowScreen(flow.runContinuationFlow(cDetails));
+                                });
+                            }
+                        });
+                        continuationHbox.getChildren().add(radioButton);
+                    }
+                    continuationVBOX.getChildren().addAll(Title,continuationHbox,continuationButton);
+                }
             }
         });
         flow.getFlowContexts().getFlowStepsDataProperty().addListener((observable, oldValue, newValue) -> {
@@ -285,13 +345,21 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         });
 
         bodyForFlowExecutionController.addFlowExecutor(flow);
+        executeFlowButtonFinish.setText("Rerun flow");
+        executeFlowButtonFinish.setOnAction(e -> rerunFlow(flow));
+    }
+
+    private void rerunFlow(FlowExecution flow) {
+        FlowExecution newFlow = flow.reRunFlow();
+        bodyForFlowExecutionController.executeContinuationFlowScreen(newFlow);
     }
 
     private void addFormalOutputs(FlowExecution flow) {
         Map<String, Object> formalOutputToData = flow.getFormalOutPutsData();
-        Label Title = new Label("Formal outputs");
+        Label Title = new Label("Formal outputs:");
+        formalOutPutsVbox.getChildren().add(Title);
         Title.setFont(javafx.scene.text.Font.font(Font.BOLD));
-        Title.setStyle("-fx-font-size: 14px;");
+        Title.setStyle("-fx-font-size: 16px;");
         for (Map.Entry<String, Object> entry : formalOutputToData.entrySet()) {
             Label outText;
             if (entry.getValue() == null)
