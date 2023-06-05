@@ -41,6 +41,12 @@ public class BodyController {
         fxmlLoader.setLocation(url);
         loadScreen(fxmlLoader, url);
     }
+    public void showFlowStats() {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        URL url = getClass().getResource("/app/resources/body/statistics/statistics.fxml");
+        fxmlLoader.setLocation(url);
+        loadScreen(fxmlLoader, url);
+    }
     private void loadScreen(FXMLLoader fxmlLoader,URL url){
         try {
             Parent screen = fxmlLoader.load(url.openStream());

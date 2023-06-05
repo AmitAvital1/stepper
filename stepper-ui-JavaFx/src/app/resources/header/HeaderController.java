@@ -29,6 +29,8 @@ public class HeaderController {
     private Button flowExecutionButton;
     @FXML
     private Button executionHistoryButton;
+    @FXML
+    private Button statisticsFlowsButton;
 
     @FXML
     void loadXmlButton(ActionEvent event) {
@@ -52,6 +54,7 @@ public class HeaderController {
                 fileXmlPathTextField.setPromptText(selectedFile.getAbsolutePath());
                 flowDefinitionButtom.setDisable(false);
                 flowExecutionButton.setDisable(false);
+                statisticsFlowsButton.setDisable(false);
             }
         }
     }
@@ -76,6 +79,10 @@ public class HeaderController {
     @FXML
     void executionHistoryButtonListen(ActionEvent event) {
         mainController.showFlowsHistory();
+    }
+    @FXML
+    void statisticsFlowsButtonListen(ActionEvent event) {
+        mainController.showFlowsStats();
     }
 
     public void setFlowHistory() {

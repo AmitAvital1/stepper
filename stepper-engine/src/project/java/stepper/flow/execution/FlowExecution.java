@@ -264,7 +264,22 @@ public class FlowExecution {
                 if(!flowExecution.getFlowDefinition().getInitialValues().containsKey(sourceToTarget.getKey()))
                     flowExecution.startersFreeInputForContext.put(sourceToTarget.getValue(), startersFreeInputForContext.get(sourceToTarget.getKey()));
             }
-        }//TODO AUTOMATIC CONTINUATION
+        }
+        //Do automatic mapping for continuation (outputs values ---> free inputs) with the same name and same dd
+        outputsStepData.stream().forEach(out -> {
+                if(out.createdFromFlow && flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().containsKey(out.finalName)){
+                    if(flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().get(out.finalName).dataDefinition().getType() == out.getOutputDD().dataDefinition().getType())
+                        if(!flowExecution.getFlowDefinition().getInitialValues().containsKey(out.finalName))
+                            flowExecution.startersFreeInputForContext.put(out.finalName,out.data);
+                }
+        });
+        //Do automatic mapping for continuation (free inputs values ---> free inputs (in the next flow) with the same name and same dd
+        startersFreeInputForContext.entrySet().stream().forEach(set -> {
+            if(flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().containsKey(set.getKey()))
+                if(flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().get(set.getKey()).dataDefinition().getType() == getFlowDefinition().getFreeInputFinalNameToDD().get(set.getKey()).dataDefinition().getType())
+                    if(!flowExecution.getFlowDefinition().getInitialValues().containsKey(set.getKey()))
+                        flowExecution.startersFreeInputForContext.put(set.getKey(),set.getValue());
+        });
         return flowExecution;
     }
 }

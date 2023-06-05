@@ -36,6 +36,7 @@ public class AppMainConroller {
     public void showFlowsHistory(){
         bodyComponentController.showFlowHistory();
     }
+    public void showFlowsStats() {bodyComponentController.showFlowStats();}
 
     public void showFlowExectuion(){ bodyComponentController.showFlowExecution(); }
     public void addFlows(List<FlowDefinition> newFlows){flows = newFlows;}
@@ -49,4 +50,6 @@ public class AppMainConroller {
     public FlowsExecutionManager getFlowsExecutionManager() {
         return flowsExecutionManager;
     }
+
+
 }
