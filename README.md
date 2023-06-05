@@ -5,16 +5,10 @@ Technologies Used:
 Java
 JSON serialization
 Getting Started
+Multithreading
 
 Technologies in progressing:
-Multithreading
 Client-server architecture
-
-To use Stepper in your project, follow these steps:
-
-Clone the repository to your local machine.
-Import the project into your preferred IDE (e.g. IntelliJ, Eclipse).
-Build and run the project.
 
 Usage
 Stepper is designed to be highly customizable, allowing you to create workflows and pipelines that fit your specific needs. To get started, follow these steps:
