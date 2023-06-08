@@ -2,14 +2,13 @@ package app.resources.body.execution;
 
 import app.resources.body.BodyController;
 import app.resources.body.BodyControllerDefinition;
-import app.resources.body.history.HistoryController;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -19,7 +18,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import org.controlsfx.control.PopOver;
-import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.MissMandatoryInput;
@@ -30,31 +28,27 @@ import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
 import project.java.stepper.flow.execution.context.StepExecutionContextImpl;
-import project.java.stepper.flow.execution.runner.FLowExecutor;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
-import javafx.scene.control.Alert.AlertType;
 import javafx.util.Duration;
-import javafx.geometry.Insets;
-import org.controlsfx.control.PopOver;
 import javafx.geometry.Pos;
 import javafx.animation.PauseTransition;
 
-import javafx.scene.text.Text;
 
-
-import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.controlsfx.control.Notifications;
 import project.java.stepper.step.api.DataNecessity;
 import project.java.stepper.step.api.UIDDPresent;
 
 public class FlowsExecutionController implements BodyControllerDefinition {
 
     private BodyController bodyForFlowExecutionController;
+
+    @FXML
+    private BorderPane theAllBorderOfExecute;
 
     @FXML
     private VBox flowDetailsExecutionBox;
@@ -73,45 +67,59 @@ public class FlowsExecutionController implements BodyControllerDefinition {
     @FXML
     private StackPane flowExecutionInfo;
 
-    @FXML
-    private ProgressBar flowProgressBar;
 
     @FXML
-    private Label stepResLabel;
+    private VBox thevboxforContandFormal;
+
     @FXML
     private TreeView<String> stepsProgressTreeView;
     @FXML
-    private ListView<String> listOfLogs;
+    private StackPane listOfLogsStackPane;
+
     @FXML
     private VBox theVboxParent;
     @FXML
-    private VBox formalOutPutsVbox;
-    @FXML
-    private VBox continuationVBOX;
-    @FXML
     private Label supllyFreeInput;
+    @FXML
+    private HBox HBOXProccesing;
+    @FXML
+    private StackPane contAndFormalStack;
 
     List<FlowDefinition> flows;
     private PopOver errorPopOver;
+    private List<Button> allFlowsButtons = new ArrayList<>();
 
     @Override
     public void setFlowsDetails(List<FlowDefinition> flow) {
         flows = flow;
     }
 
+    public BorderPane getTheAllBorderOfExecute() {
+        return theAllBorderOfExecute;
+    }
+
     @Override
     public void show() {
         flowDetailsExecutionBox.setVisible(false);
         flowExecutionInfo.setVisible(false);
+        if(bodyForFlowExecutionController.getFlowExecutions().size() > 0){
+            if(bodyForFlowExecutionController.getFlowExecutions().get(bodyForFlowExecutionController.getFlowExecutions().size() - 1).getFlowExecutionResult() == FlowExecutionResult.PROCESSING) {
+                flowDetailsExecutionBox.setVisible(true);
+                flowExecutionInfo.setVisible(true);
+            }
+        }
         for (FlowDefinition flow : flows) {
             Button button = new Button(flow.getName());
-            button.setOnAction(e -> handleFlowButtonAction(flow));
+            allFlowsButtons.add(button);
+            button.setOnAction(e -> {handleFlowButtonAction(flow); allFlowsButtons.stream().forEach(b -> b.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);"));
+                button.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");});
             flowListToExecute.getChildren().add(button);
         }
     }
     public void handleFlowButtonAction(FlowDefinition flowButton) {
         theVboxParent.getChildren().clear();
         theVboxParent.getChildren().addAll(flowDetailsExecutionBox,flowExecutionInfo);
+
         UUID uuid = UUID.randomUUID();
         FlowExecution flowExecution = new FlowExecution(uuid.toString(), flowButton);
         supllyFreeInput.setDisable(false);
@@ -277,37 +285,60 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flowExecuteNameLabel.setDisable(true);
         freeInputsList.setDisable(true);
         flowExecutionInfo.setVisible(true);
-        stepResLabel.setText("");
-        formalOutPutsVbox.getChildren().clear();
+
+
+        Node n = HBOXProccesing.getChildren().get(0);
+        HBOXProccesing.getChildren().clear();
+        ProgressBar flowProgressBar = new ProgressBar(0);
+       // HBOXProccesing.getChildren().add(flowProgressBar);
+        Label stepResLabel = new Label("");
+        //HBOXProccesing.getChildren().add(stepResLabel);
+        HBOXProccesing.getChildren().addAll(n,flowProgressBar,stepResLabel);
+        contAndFormalStack.getChildren().clear();
+        VBox formalOutPutsVbox = new VBox();
+        formalOutPutsVbox.setPrefHeight(200);
+        formalOutPutsVbox.setPrefWidth(100);
+        VBox continuationVBOX = new VBox();
+        continuationVBOX.setSpacing(20);
+        VBox formalAndCont = new VBox(formalOutPutsVbox,continuationVBOX);
+        formalAndCont.setSpacing(10);
+        contAndFormalStack.getChildren().addAll(formalAndCont);
         stepsProgressTreeView.setRoot(new TreeItem<>());
         System.out.println("Starting execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]");
         bodyForFlowExecutionController.getFlowManagerExecution().exeFlow(flow);
+        bodyForFlowExecutionController.addFlowExecutor(flow);
+        bodyForFlowExecutionController.enableExecutionButton();
         flow.getStepFinishedProperty().addListener((observable, oldValue, newValue) -> {
             flowProgressBar.setProgress(newValue.doubleValue() / (double)flow.getFlowDefinition().getFlowSteps().size());
         });
         flow.getFlowExecutionResultProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != FlowExecutionResult.PROCESSING) {
+                if(flow.getUniqueId().equals(bodyForFlowExecutionController.getFlowExecutions().get(bodyForFlowExecutionController.getFlowExecutions().size()-1).getUniqueId())){
+                    bodyForFlowExecutionController.disableExecutionButton();
+                }
                 stepResLabel.setText(newValue.name() + " [" + flow.getDuration() + ".ms" + "]");//TODO
                 if(newValue == FlowExecutionResult.SUCCESS)
                     stepResLabel.setStyle("-fx-text-fill: green;");
+                else if(newValue == FlowExecutionResult.WARNING)
+                    stepResLabel.setStyle("-fx-text-fill: yellow;");
                 else
                     stepResLabel.setStyle("-fx-text-fill: red;");
-                addFormalOutputs(flow);
+                addFormalOutputs(flow,formalOutPutsVbox);
                 if(flow.getFlowDefinition().getFlowsContinuations().size() > 0) {
                     Label Title = new Label("Step continuation:");
                     formalOutPutsVbox.getChildren().add(Title);
-                    Title.setFont(javafx.scene.text.Font.font(Font.BOLD));
-                    Title.setStyle("-fx-font-size: 16px;");
                     HBox continuationHbox = new HBox();
                     continuationHbox.setSpacing(5);
                     ToggleGroup toggleGroup = new ToggleGroup();
                     Button continuationButton = new Button("Continue to flow");
+                    continuationButton.setDisable(true);
                     continuationButton.setAlignment(Pos.CENTER);
                     for (FlowDefinitionImpl.continuationFlowDetails cDetails : flow.getFlowDefinition().getFlowsContinuations()) {
                         RadioButton radioButton = new RadioButton(cDetails.getTargetFlow().getName());
                         radioButton.setToggleGroup(toggleGroup);
                         radioButton.setOnAction(event -> {
                             if (radioButton.isSelected()) {
+                                continuationButton.setDisable(false);
                                 continuationButton.setOnAction(event1 -> {
                                     bodyForFlowExecutionController.executeContinuationFlowScreen(flow.runContinuationFlow(cDetails));
                                 });
@@ -319,6 +350,10 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 }
             }
         });
+        listOfLogsStackPane.getChildren().clear();
+        ListView<String> listOfLogs = new ListView<>();
+        listOfLogs.prefHeight(150);
+        listOfLogsStackPane.getChildren().add(listOfLogs);
         flow.getFlowContexts().getFlowStepsDataProperty().addListener((observable, oldValue, newValue) -> {
             stepsProgressTreeView.getRoot().getChildren().clear();
             listOfLogs.getItems().clear();
@@ -343,8 +378,6 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 }
             }
         });
-
-        bodyForFlowExecutionController.addFlowExecutor(flow);
         executeFlowButtonFinish.setText("Rerun flow");
         executeFlowButtonFinish.setOnAction(e -> rerunFlow(flow));
     }
@@ -352,14 +385,13 @@ public class FlowsExecutionController implements BodyControllerDefinition {
     private void rerunFlow(FlowExecution flow) {
         FlowExecution newFlow = flow.reRunFlow();
         bodyForFlowExecutionController.executeContinuationFlowScreen(newFlow);
+        //Continuation behaving as rerun so using this function
     }
 
-    private void addFormalOutputs(FlowExecution flow) {
+    private void addFormalOutputs(FlowExecution flow, VBox formalOutPutsVbox) {
         Map<String, Object> formalOutputToData = flow.getFormalOutPutsData();
         Label Title = new Label("Formal outputs:");
         formalOutPutsVbox.getChildren().add(Title);
-        Title.setFont(javafx.scene.text.Font.font(Font.BOLD));
-        Title.setStyle("-fx-font-size: 16px;");
         for (Map.Entry<String, Object> entry : formalOutputToData.entrySet()) {
             Label outText;
             if (entry.getValue() == null)

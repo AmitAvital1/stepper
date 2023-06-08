@@ -9,6 +9,7 @@ import project.java.stepper.step.api.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class CommandLineStep extends AbstractStepDefinition{
@@ -21,7 +22,7 @@ public class CommandLineStep extends AbstractStepDefinition{
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "Command output", DataDefinitionRegistry.STRING,UIDDPresent.NA));
     }
     @Override
-    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
 
         String cmd = context.getDataValue("COMMAND", String.class);
         Optional<String> maybeArg = Optional.ofNullable(context.getDataValue("ARGUMENTS", String.class));
@@ -32,11 +33,17 @@ public class CommandLineStep extends AbstractStepDefinition{
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
             logs.addLogLine("About to invoke " + cmd + " " + (maybeArg.isPresent() ? maybeArg.get() : ""));
+            cmd = "cmd /c " + cmd;
             // Set the command
-            processBuilder.command(cmd);
+            processBuilder.command(cmd.split(" "));
 
             // Add optional argument if present
-            maybeArg.ifPresent(processBuilder::command);
+            if (maybeArg.isPresent()) {
+                if (!maybeArg.get().isEmpty()) {
+                    processBuilder.command().addAll(Arrays.asList(maybeArg.get().split(" ")));
+                }
+            }
+            //maybeArg.ifPresent(processBuilder::command);
 
             // Redirect standard output and error
             processBuilder.redirectErrorStream(true);

@@ -24,7 +24,7 @@ public class MainJavaFx extends Application {
         fxmlLoader.setLocation(url);
         Parent root = fxmlLoader.load(url.openStream());
 
-        Scene scene = new Scene(root, 700, 550);
+        Scene scene = new Scene(root, 900, 600);
         scene.getStylesheets().add(getClass().getResource("/app/resources/main/style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();

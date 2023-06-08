@@ -18,7 +18,7 @@ public class PropertiesExporterStep extends AbstractStepDefinition {
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "Properties export result", DataDefinitionRegistry.STRING, UIDDPresent.NA));
     }
     @Override
-    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         RelationData table = context.getDataValue("SOURCE", RelationData.class);
         String output = "";
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());

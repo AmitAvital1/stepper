@@ -24,7 +24,9 @@ public class AppMainConroller {
 
     private List<FlowDefinition> flows = new ArrayList<>();
     private final List<FlowExecution> flowExecutions = new ArrayList<>();
-    private final FlowsExecutionManager flowsExecutionManager = new FlowsExecutionManager();
+
+
+    private FlowsExecutionManager flowsExecutionManager = new FlowsExecutionManager();
 
     @FXML
     public void initialize() {
@@ -60,5 +62,13 @@ public class AppMainConroller {
     }
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    public HeaderController getHeaderComponentController() {
+        return headerComponentController;
+    }
+
+    public void clearBodyScreen() {
+        bodyComponentController.clearScreen();
     }
 }

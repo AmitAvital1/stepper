@@ -39,8 +39,8 @@ public class LoadStepperDataFromXml {
                 flowList.add(systemFlow);//Add the flow to the list
             }
         }
-        FlowsExecutionManager.setThreadExecutor(genStepper.getSTThreadPool());
         addContinuations(flowList, genStepper);
+        flowsExecutionManager.setThreadExecutor(genStepper.getSTThreadPool());
         return flowList;
     }
     private static void addContinuations(List<FlowDefinition> flowList, STStepper genStepper) throws StepperExeption {

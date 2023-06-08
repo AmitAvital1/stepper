@@ -13,6 +13,7 @@ import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,20 +29,25 @@ public class FlowDefinitionController implements BodyControllerDefinition {
     @FXML private Button executeFlowDFButton;
 
     private List<FlowDefinition> flows;
+    private List<Button> allFlowsButtons = new ArrayList<>();
 
     @Override
     public void show() {
         flowDetailsBox.setVisible(false);
-
         for (FlowDefinition flow : flows) {
             Button button = new Button(flow.getName());
-            button.setOnAction(e -> handleButtonAction(flow));
+            allFlowsButtons.add(button);
+            button.setOnAction(e -> handleButtonAction(flow,button));
             flowListOfButtons.getChildren().add(button);
         }
     }
 
-    private void handleButtonAction(FlowDefinition flowButton) {
+    private void handleButtonAction(FlowDefinition flowButton, Button button) {
         //DONT FORGET PUT SOMEWHERE THE READ ONLY!!!!!!!!!!!!!!!
+
+        allFlowsButtons.stream().forEach(b -> b.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);"));
+        button.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
+
         flowDetailsBox.setVisible(true);
         FlowNameTL.setText(flowButton.getName());
         flowDescribtionTL.setText(flowButton.getDescription());

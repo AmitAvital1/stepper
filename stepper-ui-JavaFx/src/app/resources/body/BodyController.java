@@ -1,6 +1,7 @@
 package app.resources.body;
 
 import app.resources.body.execution.FlowsExecutionController;
+import app.resources.header.HeaderController;
 import app.resources.main.AppMainConroller;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -8,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
+import project.java.stepper.flow.execution.FlowExecutionResult;
 import project.java.stepper.flow.execution.runner.FlowsExecutionManager;
 
 import java.io.IOException;
@@ -17,13 +19,22 @@ import java.util.List;
 public class BodyController {
 
     private AppMainConroller mainController;
+    private HeaderController headerController;
     @FXML
     private StackPane bodyPane;
+
+    private URL lastLoadedExecution;
+    private Parent lastScreen;
+    FXMLLoader lastfxmlLoader;
+    private BodyControllerDefinition saveLastControllerExecution;
 
     public void setMainController(AppMainConroller mainController) {
         this.mainController = mainController;
     }
 
+    public void clearScreen(){
+        bodyPane.getChildren().clear();
+    }
     public void showFlowDefinition() {
         FXMLLoader fxmlLoader = new FXMLLoader();
         URL url = getClass().getResource("/app/resources/body/flowdefinition/flowDefinition.fxml");
@@ -32,9 +43,21 @@ public class BodyController {
     }
     public void showFlowExecution() {
         FXMLLoader fxmlLoader = new FXMLLoader();
+        if(getFlowExecutions().size() > 0) {
+            if (getFlowExecutions().get(getFlowExecutions().size() - 1).getFlowExecutionResult() == FlowExecutionResult.PROCESSING)
+                if (lastLoadedExecution != null) {
+                    bodyPane.getChildren().setAll(((FlowsExecutionController)saveLastControllerExecution).getTheAllBorderOfExecute());
+                    return;
+                }
+        }
+
         URL url = getClass().getResource("/app/resources/body/execution/flowExecution.fxml");
         fxmlLoader.setLocation(url);
         loadScreen(fxmlLoader, url);
+        lastLoadedExecution = url;
+        saveLastControllerExecution = fxmlLoader.getController();//To return to execute
+
+
     }
     public void showFlowHistory() {
         FXMLLoader fxmlLoader = new FXMLLoader();
@@ -74,6 +97,8 @@ public class BodyController {
             bController.show();
             bController.handleFlowButtonAction(flow);
             bodyPane.getChildren().setAll(screen);
+            lastLoadedExecution = url;
+            saveLastControllerExecution = fxmlLoader.getController();//To return to execute
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -91,6 +116,8 @@ public class BodyController {
             bController.show();
             bController.handleContinuationFlowButtonAction(flow);
             bodyPane.getChildren().setAll(screen);
+            lastLoadedExecution = url;
+            saveLastControllerExecution = fxmlLoader.getController();//To return to execute
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -100,4 +127,12 @@ public class BodyController {
     public List<FlowExecution> getFlowExecutions(){return mainController.getFlowExecutions();}
     public FlowsExecutionManager getFlowManagerExecution(){return mainController.getFlowsExecutionManager();}
     public AppMainConroller getMainController() {return mainController;}
+
+    public void disableExecutionButton() {
+        mainController.getHeaderComponentController().disableExecutionButton();
+    }
+
+    public void enableExecutionButton() {
+        mainController.getHeaderComponentController().enableExecutionButton();
+    }
 }

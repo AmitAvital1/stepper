@@ -24,7 +24,8 @@ public class ZipperStep extends AbstractStepDefinition {
 
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "Zip operation result", DataDefinitionRegistry.STRING, UIDDPresent.NA));
     }
-    public synchronized StepResult invoke(StepExecutionContext context) throws NoStepInput {
+    @Override
+    public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         String source = context.getDataValue("SOURCE", String.class);
         ZipEnum operation = context.getDataValue("OPERATION", ZipEnum.class);
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());

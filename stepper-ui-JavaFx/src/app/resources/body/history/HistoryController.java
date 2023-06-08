@@ -5,20 +5,16 @@ import app.resources.body.BodyControllerDefinition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventType;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -32,10 +28,10 @@ import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
 import project.java.stepper.flow.execution.context.StepExecutionContextImpl;
-import project.java.stepper.step.api.DataDefinitionDeclaration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class HistoryController implements BodyControllerDefinition {
     private BodyController bodyForHistoryExecutionController;
@@ -73,6 +69,8 @@ public class HistoryController implements BodyControllerDefinition {
     private Button continueToFlowButton;
     @FXML
     private ImageView rerunButtonImg;
+    @FXML
+    private ChoiceBox<String> sortTableChoice;
 
 
     private List<FlowExecution> flowExecutions;
@@ -165,6 +163,22 @@ public class HistoryController implements BodyControllerDefinition {
                 }
             }
         });
+        sortTableChoice.getItems().addAll("ALL","SUCCESS", "FAILURE", "WARNING");
+        sortTableChoice.setValue("ALL");
+        sortTableChoice.setOnAction(event -> sortTable(historyOfExecutionsFlowsTable,sortTableChoice.getValue(),rowList));
+    }
+
+    private void sortTable(TableView<tableRow> historyOfExecutionsFlowsTable, String value, ObservableList<tableRow> rowList) {
+        historyOfExecutionsFlowsTable.setItems(rowList);
+        FilteredList<tableRow> filteredData = new FilteredList<>(historyOfExecutionsFlowsTable.getItems());
+        String sort = value;
+        Predicate<tableRow> filterPredicate;
+        if(value.equals("ALL"))
+            filterPredicate = row -> true;
+        else
+            filterPredicate = row -> row.getResult().contains(value);
+        filteredData.setPredicate(filterPredicate);
+        historyOfExecutionsFlowsTable.setItems(filteredData);
     }
 
     private void showFlowDetails(FlowExecution flow) {

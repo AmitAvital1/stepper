@@ -42,6 +42,7 @@ public class HeaderController {
             boolean res = false;
             try{
                 mainController.addFlows(LoadStepperDataFromXml.load(selectedFile.getAbsolutePath(),mainController.getFlowsExecutionManager()));
+                mainController.clearBodyScreen();
                 res = true;
             }catch(FileNotFoundException e) {
                 showErrorPopup("An error occurred","Error: XML path not found");
@@ -53,7 +54,7 @@ public class HeaderController {
             if(res) {
                 fileXmlPathTextField.setPromptText(selectedFile.getAbsolutePath());
                 flowDefinitionButtom.setDisable(false);
-                flowExecutionButton.setDisable(false);
+                flowExecutionButton.setDisable(true);
                 statisticsFlowsButton.setDisable(false);
             }
         }
@@ -70,22 +71,44 @@ public class HeaderController {
     }
     @FXML
     void flowDefinitionButtonListen(ActionEvent event) {
+        resetButtonsColor();
+        flowDefinitionButtom.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
         mainController.showFlowDefinition();
     }
     @FXML
     void flowExecutionListener(ActionEvent event) {
+        resetButtonsColor();
+        flowExecutionButton.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
         mainController.showFlowExectuion();
     }
     @FXML
     void executionHistoryButtonListen(ActionEvent event) {
+        resetButtonsColor();
+        executionHistoryButton.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
         mainController.showFlowsHistory();
     }
     @FXML
     void statisticsFlowsButtonListen(ActionEvent event) {
+        resetButtonsColor();
+        statisticsFlowsButton.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
         mainController.showFlowsStats();
     }
 
     public void setFlowHistory() {
         executionHistoryButton.setDisable(false);
+    }
+
+    public void resetButtonsColor(){
+        flowDefinitionButtom.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);");
+        flowExecutionButton.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);");
+        statisticsFlowsButton.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);");
+        executionHistoryButton.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);");
+    }
+
+    public void disableExecutionButton() {
+        flowExecutionButton.setDisable(true);
+    }
+    public void enableExecutionButton() {
+        flowExecutionButton.setDisable(false);
     }
 }
