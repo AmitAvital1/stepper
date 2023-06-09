@@ -40,6 +40,10 @@ public class LoadStepperDataFromXml {
             }
         }
         addContinuations(flowList, genStepper);
+
+        if(genStepper.getSTThreadPool() <= 0)
+            throw new InvalidThreadPoolNumber("Invalid thread-pool number - must be non negative number.");
+
         flowsExecutionManager.setThreadExecutor(genStepper.getSTThreadPool());
         return flowList;
     }

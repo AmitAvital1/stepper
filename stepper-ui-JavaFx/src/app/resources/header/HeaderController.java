@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
+import org.controlsfx.control.ToggleSwitch;
 import project.java.stepper.exceptions.StepperExeption;
 import project.java.stepper.load.LoadStepperDataFromXml;
 
@@ -31,6 +32,8 @@ public class HeaderController {
     private Button executionHistoryButton;
     @FXML
     private Button statisticsFlowsButton;
+    @FXML
+    private ToggleSwitch darkModeToggle;
 
     @FXML
     void loadXmlButton(ActionEvent event) {
@@ -61,6 +64,17 @@ public class HeaderController {
     }
     public void setMainController(AppMainConroller mainController) {
         this.mainController = mainController;
+        darkModeToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                // Switch to dark mode
+                mainController.getPrimaryStage().getScene().getStylesheets().clear();
+                mainController.getPrimaryStage().getScene().getStylesheets().add(getClass().getResource("/app/resources/main/dark.css").toExternalForm());
+            } else {
+                // Switch to light mode
+                mainController.getPrimaryStage().getScene().getStylesheets().clear();
+                mainController.getPrimaryStage().getScene().getStylesheets().add(getClass().getResource("/app/resources/main/style.css").toExternalForm());
+            }
+        });
     }
     private static void showErrorPopup(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import org.controlsfx.control.PopOver;
@@ -35,10 +36,7 @@ import javafx.animation.PauseTransition;
 
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import project.java.stepper.step.api.DataNecessity;
 import project.java.stepper.step.api.UIDDPresent;
@@ -113,13 +111,14 @@ public class FlowsExecutionController implements BodyControllerDefinition {
             allFlowsButtons.add(button);
             button.setOnAction(e -> {handleFlowButtonAction(flow); allFlowsButtons.stream().forEach(b -> b.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);"));
                 button.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");});
-            flowListToExecute.getChildren().add(button);
+            //flowListToExecute.getChildren().add(button);#Not using more
         }
     }
     public void handleFlowButtonAction(FlowDefinition flowButton) {
+        addFlowDetails(flowButton);
         theVboxParent.getChildren().clear();
         theVboxParent.getChildren().addAll(flowDetailsExecutionBox,flowExecutionInfo);
-
+        Map<HBox,Boolean> freeInputToMandatory = new HashMap<>();
         UUID uuid = UUID.randomUUID();
         FlowExecution flowExecution = new FlowExecution(uuid.toString(), flowButton);
         supllyFreeInput.setDisable(false);
@@ -134,7 +133,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
             DataDefinitionDeclaration dd = entry.getValue();
                 HBox hbox = new HBox();
                 hbox.setPadding(new Insets(10));
-                if(!flowButton.getInitialValues().containsKey(dd.getName())) {
+                if(!flowButton.getInitialValues().containsKey(key)) {
                     Label stepName = new Label(key);
                     TextField textField = new TextField();
                     textField.setPromptText(dd.userString() + "[" + dd.dataDefinition().getName() + "]");
@@ -146,13 +145,21 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     Label isMandatory = new Label(dd.necessity().toString());
                     if (dd.necessity() == DataNecessity.MANDATORY)
                         executeFlowButtonFinish.setDisable(true);
+                    else{
+                        isMandatory.setStyle("-fx-text-fill: rgba(168,3,119,0.75)");
+                    }
                     hbox.setSpacing(5);
                     textField.setMaxWidth(250);
                     hbox.setHgrow(textField, Priority.ALWAYS);
                     hbox.getChildren().addAll(stepName, textField, button, isMandatory);
-                    freeInputsList.getChildren().addAll(hbox);
+                    freeInputToMandatory.put(hbox,dd.necessity() == DataNecessity.MANDATORY ? true : false);
             }
         }
+        freeInputToMandatory.entrySet().stream().forEach(set -> {if(set.getValue() == true) freeInputsList.getChildren().add(set.getKey());});
+        Label dummy = new Label("Dummy");
+        dummy.setVisible(false);
+        freeInputsList.getChildren().add(dummy);
+        freeInputToMandatory.entrySet().stream().forEach(set -> {if(set.getValue() == false) freeInputsList.getChildren().add(set.getKey());});
         try {
             flowExecution.validateToExecute();
             executeFlowButtonFinish.setDisable(false);
@@ -161,18 +168,11 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         }
        executeFlowButtonFinish.setOnAction(e -> executeFlow(flowExecution));
 
-        flowDetailsExecutionBox.setVisible(true);
-    }
-
-    private void freeInputDialog(TextField textField) {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Choose Directory");
-        File selectedDir = directoryChooser.showDialog(bodyForFlowExecutionController.getMainController().getPrimaryStage());
-        if(selectedDir != null)
-            textField.setText(selectedDir.getAbsolutePath());
+       flowDetailsExecutionBox.setVisible(true);
     }
 
     public void handleContinuationFlowButtonAction(FlowExecution flowExe) {
+        addFlowDetails(flowExe.getFlowDefinition());
         theVboxParent.getChildren().clear();
         theVboxParent.getChildren().addAll(flowDetailsExecutionBox,flowExecutionInfo);
         FlowDefinition flowButton = flowExe.getFlowDefinition();
@@ -182,18 +182,19 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flowExecutionInfo.setVisible(false);
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
+        Map<HBox,Boolean> freeInputToMandatory = new HashMap<>();
         Map<String, DataDefinitionDeclaration> freeInputs = flowExe.getFlowDefinition().getFreeInputFinalNameToDD();
         for (Map.Entry<String, DataDefinitionDeclaration> entry : freeInputs.entrySet()) {
             String key = entry.getKey();
             DataDefinitionDeclaration dd = entry.getValue();
             HBox hbox = new HBox();
             hbox.setPadding(new Insets(10));
-            if (!flowButton.getInitialValues().containsKey(dd.getName())) {
+            if (!flowButton.getInitialValues().containsKey(key)) {
                 Label stepName = new Label(key);
                 TextField textField = new TextField();
                 Button button;
                 if (flowExe.getStartersFreeInputForContext().containsKey(key)) {
-                    textField.setPromptText(flowExe.getStartersFreeInputForContext().get(key).toString());
+                    textField.setText(flowExe.getStartersFreeInputForContext().get(key).toString());
                     button = new Button("Edit");
                     textField.setDisable(true);
                 } else {
@@ -207,13 +208,21 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 Label isMandatory = new Label(dd.necessity().toString());
                 if (dd.necessity() == DataNecessity.MANDATORY)
                     executeFlowButtonFinish.setDisable(true);
+                else{
+                    isMandatory.setStyle("-fx-text-fill: rgba(168,3,119,0.75)");
+                }
                 hbox.setSpacing(5);
                 textField.setMaxWidth(250);
                 hbox.setHgrow(textField, Priority.ALWAYS);
                 hbox.getChildren().addAll(stepName, textField, button, isMandatory);
-                freeInputsList.getChildren().addAll(hbox);
+                freeInputToMandatory.put(hbox,dd.necessity() == DataNecessity.MANDATORY ? true : false);
             }
         }
+        freeInputToMandatory.entrySet().stream().forEach(set -> {if(set.getValue() == true) freeInputsList.getChildren().add(set.getKey());});
+        Label dummy = new Label("Dummy");
+        dummy.setVisible(false);
+        freeInputsList.getChildren().add(dummy);
+        freeInputToMandatory.entrySet().stream().forEach(set -> {if(set.getValue() == false) freeInputsList.getChildren().add(set.getKey());});
         executeFlowButtonFinish.setOnAction(e -> executeFlow(flowExe));
         try {
             flowExe.validateToExecute();
@@ -296,8 +305,6 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         HBOXProccesing.getChildren().addAll(n,flowProgressBar,stepResLabel);
         contAndFormalStack.getChildren().clear();
         VBox formalOutPutsVbox = new VBox();
-        formalOutPutsVbox.setPrefHeight(200);
-        formalOutPutsVbox.setPrefWidth(100);
         VBox continuationVBOX = new VBox();
         continuationVBOX.setSpacing(20);
         VBox formalAndCont = new VBox(formalOutPutsVbox,continuationVBOX);
@@ -325,7 +332,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     stepResLabel.setStyle("-fx-text-fill: red;");
                 addFormalOutputs(flow,formalOutPutsVbox);
                 if(flow.getFlowDefinition().getFlowsContinuations().size() > 0) {
-                    Label Title = new Label("Step continuation:");
+                    Label Title = new Label("Flow continuation:");
                     formalOutPutsVbox.getChildren().add(Title);
                     HBox continuationHbox = new HBox();
                     continuationHbox.setSpacing(5);
@@ -352,7 +359,6 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         });
         listOfLogsStackPane.getChildren().clear();
         ListView<String> listOfLogs = new ListView<>();
-        listOfLogs.prefHeight(150);
         listOfLogsStackPane.getChildren().add(listOfLogs);
         flow.getFlowContexts().getFlowStepsDataProperty().addListener((observable, oldValue, newValue) -> {
             stepsProgressTreeView.getRoot().getChildren().clear();
@@ -381,7 +387,56 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         executeFlowButtonFinish.setText("Rerun flow");
         executeFlowButtonFinish.setOnAction(e -> rerunFlow(flow));
     }
+    private void addFlowDetails(FlowDefinition flowButton) {
+        Label FlowNameTL = new Label();
+        TreeView<String> flowDetailsTreeView = new TreeView<>();
+        FlowNameTL.setText(flowButton.getName());
+        FlowNameTL.getStyleClass().add("names");
 
+        flowDetailsTreeView.setRoot(new TreeItem<>());
+        TreeItem<String> formalOutputsItem = new TreeItem<>("Formal outputs");
+
+        for(Map.Entry<String, DataDefinitionDeclaration> entry : flowButton.getFormalOutput().entrySet()) {
+            String key = entry.getKey();
+            DataDefinitionDeclaration value = entry.getValue();
+            formalOutputsItem.getChildren().add(new TreeItem<>(key + ":" + value.userString()));
+        }
+
+        TreeItem<String> flowStepsItem = new TreeItem<>("Flow steps");
+        for(StepUsageDeclaration step : flowButton.getFlowSteps())
+        {
+            if(step.getFinalStepName().equals(step.getStepDefinition().name()))
+                flowStepsItem.getChildren().add(new TreeItem<>(step.getFinalStepName() + ", Read Only:" + step.getStepDefinition().isReadonly()));
+            else
+                flowStepsItem.getChildren().add(new TreeItem<>(step.getStepDefinition().name() + " Alias to:" + step.getFinalStepName() + ", Read Only:" + step.getStepDefinition().isReadonly()));
+        }
+        TreeItem<String> freeInputsItem = new TreeItem<>("Free inputs");
+        for(Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : flowButton.getFlowFreeInputs().entrySet()) {
+            StepUsageDeclaration key = entry.getKey();
+            List<DataDefinitionDeclaration> value = entry.getValue();
+            for(DataDefinitionDeclaration data : value) {
+                freeInputsItem.getChildren().add(new TreeItem<>(key.getinputToFinalName().get(data.getName()) + ":" + data.userString() +
+                        "(" + (!flowButton.getInitialValues().containsKey(key.getinputToFinalName().get(data.getName())) ? data.necessity() : "INITIANAL") + ")"));
+                freeInputsItem.getChildren().add(new TreeItem<>("Data type:" + data.dataDefinition().getName()));
+                freeInputsItem.getChildren().add(new TreeItem<>(""));
+            }
+        }
+        flowDetailsTreeView.getRoot().getChildren().addAll(formalOutputsItem,flowStepsItem,freeInputsItem);
+        flowDetailsTreeView.setShowRoot(false);
+        flowDetailsTreeView.getStyleClass().add("flowDetailsTree");
+        //flowDetailsTreeView.setMinWidth(500);
+        flowDetailsTreeView.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        flowDetailsTreeView.refresh();
+        flowListToExecute.getChildren().setAll(FlowNameTL,flowDetailsTreeView);
+    }
+
+    private void freeInputDialog(TextField textField) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Choose Directory");
+        File selectedDir = directoryChooser.showDialog(bodyForFlowExecutionController.getMainController().getPrimaryStage());
+        if(selectedDir != null)
+            textField.setText(selectedDir.getAbsolutePath());
+    }
     private void rerunFlow(FlowExecution flow) {
         FlowExecution newFlow = flow.reRunFlow();
         bodyForFlowExecutionController.executeContinuationFlowScreen(newFlow);
@@ -420,6 +475,9 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 formalOutPutsVbox.getChildren().add(outText);
             }
         }
+        Label dummyLabel = new Label("dummy");
+        dummyLabel.setVisible(false);
+        formalOutPutsVbox.getChildren().add(dummyLabel);
     }
 
     private void putInAccordionTheExecuteDetails() {

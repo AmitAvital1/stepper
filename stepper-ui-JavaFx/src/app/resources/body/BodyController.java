@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;

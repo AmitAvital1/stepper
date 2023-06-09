@@ -1,7 +1,8 @@
 
 .root {
     -fx-font-family: Trebuchet MS;
-    -fx-background: #EAF1F8;
+    -fx-text-fill: #6433E0;
+    -fx-background: #222225;
     -fx-font-size: 13px
 }
 #stepperTitle {
@@ -102,6 +103,7 @@
     -fx-font-family: "Consolas";
     -fx-font-size: 22px;
     -fx-padding: 7px;
+    -fx-text-fill: #6433E0;
 }
 .semiTitles {
     -fx-font-family: "Lucida Sans Unicode";
@@ -136,41 +138,37 @@
 
 .list-cell {
     -fx-padding: 6px;
-}
-
-.list-cell:hover {
-    -fx-background-color: #f1f1f1; /* Light gray */
-}
-
-.list-cell:odd {
-    -fx-background-color: #fafafa; /* Off-white */
+    -fx-text-fill: white;
+    -fx-background-color: #222225;
 }
 
 .list-cell:selected {
-    -fx-background-color: #c5e1a5; /* Light green */
-}
-.freeInputsList{
-    -fx-background-color: transparent;
-    -fx-blend-mode: darken;
+    -fx-background-color: white;
+    -fx-text-fill: #222225;
 }
 
 /* Table Views */
 .table-view {
+    -fx-background-color: #f1f1f1;
     -fx-font-size: 14px;
+    -fx-text-fill: #222225;
 }
 
 .table-cell {
     -fx-padding: 6px;
-}
-
-.table-cell:selected {
-    -fx-background-color: #c5e1a5; /* Light green */
+    -fx-text-fill: #222225;
 }
 .tree-view{
-    -fx-background-color: transparent;
-    -fx-blend-mode: darken;
+    -fx-background-color: #222225;
+    -fx-cell-size: 40;
+    -fx-text-fill: white;
+}
+.tree-view .cell {
+    -fx-background-color: #222225;
+    -fx-text-fill: white;
 }
 .flowDetailsTree {
     -fx-font-size: 15px;
     -fx-cell-size: 40;
+    -fx-text-fill: white;
 }
