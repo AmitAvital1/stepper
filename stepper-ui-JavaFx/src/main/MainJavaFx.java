@@ -30,7 +30,7 @@ public class MainJavaFx extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         primaryStage.setTitle("Stepper");
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/app/resources/img/stepper-logo.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/app/resources/img/stepper-logo2.png")));
 
         // Shutdown the thread pool when the JavaFX application is closed
         AppMainConroller controller = fxmlLoader.getController();

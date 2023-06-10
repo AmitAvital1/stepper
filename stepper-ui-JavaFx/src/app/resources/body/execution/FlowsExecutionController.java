@@ -16,6 +16,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import org.controlsfx.control.PopOver;
@@ -311,7 +313,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         formalAndCont.setSpacing(10);
         contAndFormalStack.getChildren().addAll(formalAndCont);
         stepsProgressTreeView.setRoot(new TreeItem<>());
-        System.out.println("Starting execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]");
+        //System.out.println("Starting execution of flow " + flow.getFlowDefinition().getName() + " [ID: " + flow.getUniqueId() + "]");
         bodyForFlowExecutionController.getFlowManagerExecution().exeFlow(flow);
         bodyForFlowExecutionController.addFlowExecutor(flow);
         bodyForFlowExecutionController.enableExecutionButton();
@@ -388,7 +390,12 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         executeFlowButtonFinish.setOnAction(e -> rerunFlow(flow));
     }
     private void addFlowDetails(FlowDefinition flowButton) {
+        HBox flowNameRead = new HBox();
+        flowNameRead.setSpacing(5);
+        ImageView readOnlyImage = new ImageView("app/resources/img/read-only.png");
+        addReadOnly(flowButton,readOnlyImage);
         Label FlowNameTL = new Label();
+        flowNameRead.getChildren().addAll(FlowNameTL,readOnlyImage);
         TreeView<String> flowDetailsTreeView = new TreeView<>();
         FlowNameTL.setText(flowButton.getName());
         FlowNameTL.getStyleClass().add("names");
@@ -427,7 +434,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         //flowDetailsTreeView.setMinWidth(500);
         flowDetailsTreeView.setPrefHeight(Region.USE_COMPUTED_SIZE);
         flowDetailsTreeView.refresh();
-        flowListToExecute.getChildren().setAll(FlowNameTL,flowDetailsTreeView);
+        flowListToExecute.getChildren().setAll(flowNameRead ,flowDetailsTreeView);
     }
 
     private void freeInputDialog(TextField textField) {
@@ -543,5 +550,24 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         public ObservableValue<String> getValueProperty() {
             return valueProperty;
         }
+    }
+    private void addReadOnly(FlowDefinition flowButton,ImageView readOnlyImage) {
+        readOnlyImage.setFitHeight(23);
+        readOnlyImage.setFitWidth(21);
+        if(flowButton.isReadOnly()) {
+            readOnlyImage.setVisible(true);
+            Tooltip tooltip = new Tooltip();
+            tooltip.setStyle("-fx-font-size: 12px;");
+            readOnlyImage.setOnMouseEntered(event -> showReadOnly(tooltip,readOnlyImage,event));
+            readOnlyImage.setOnMouseExited(event -> {
+                tooltip.hide();
+            });
+        }
+        else
+            readOnlyImage.setVisible(false);
+    }
+    private void showReadOnly(Tooltip tooltip, ImageView data, MouseEvent event) {
+        tooltip.setText("Read-Only");
+        tooltip.show(data, event.getScreenX() + 5, event.getScreenY() + 5);
     }
 }

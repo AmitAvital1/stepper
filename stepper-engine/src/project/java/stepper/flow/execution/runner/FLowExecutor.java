@@ -84,7 +84,7 @@ public class FLowExecutor implements Runnable {
         Instant flowEndTime = Instant.now();
         Duration duration = Duration.between(flowStartTime, flowEndTime);
         flowExecution.setDuration(duration);
-       System.out.println("End execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]. Status: " + flowExecution.getFlowExecutionResult());
+       //System.out.println("End execution of flow " + flowExecution.getFlowDefinition().getName() + " [ID: " + flowExecution.getUniqueId() + "]. Status: " + flowExecution.getFlowExecutionResult());
 
         //Inject all the data to the flow execution
         flowExecution.setAllDataValues(context.getDataValuesMap());

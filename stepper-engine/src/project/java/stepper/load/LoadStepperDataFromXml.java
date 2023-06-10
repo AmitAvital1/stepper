@@ -53,9 +53,11 @@ public class LoadStepperDataFromXml {
             if(Optional.ofNullable(stFlow.getSTContinuations()).isPresent()){
                 List<STContinuation> continuationsFlow = stFlow.getSTContinuations().getSTContinuation();
                 for(STContinuation flowContinuation : continuationsFlow){
+                    boolean found = false;
                     Map<String,String> sourceToTarget= new HashMap<>();
                     for(FlowDefinition targetFlow : flowList) {
                         if (targetFlow.getName().equals(flowContinuation.getTargetFlow())) {
+                            found = true;
                             for (STContinuationMapping data : flowContinuation.getSTContinuationMapping()) {
                                 if(targetFlow.getFreeInputFinalNameToDD().containsKey(data.getTargetData())) {
                                     checkTheSameDD(flowList.get(i), targetFlow.getFreeInputFinalNameToDD().get(data.getTargetData()), data.getSourceData(), data.getTargetData());
@@ -69,6 +71,8 @@ public class LoadStepperDataFromXml {
                                 break;
                             }
                         }
+                     if(!found)
+                         throw new InvalidContinuationsData("In flow: " + flowList.get(i).getName() + ", "+ flowContinuation.getTargetFlow() +" is not exist flow to do continuation.");
                     }
                 }
             i++;

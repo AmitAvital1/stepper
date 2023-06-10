@@ -4,10 +4,10 @@ import app.resources.body.BodyController;
 import app.resources.body.BodyControllerDefinition;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
@@ -27,6 +27,7 @@ public class FlowDefinitionController implements BodyControllerDefinition {
     @FXML private VBox flowDetailsBox;
     @FXML private TreeView<String> flowDetailsTreeView;
     @FXML private Button executeFlowDFButton;
+    @FXML private ImageView readOnlyImage;
 
     private List<FlowDefinition> flows;
     private List<Button> allFlowsButtons = new ArrayList<>();
@@ -43,14 +44,13 @@ public class FlowDefinitionController implements BodyControllerDefinition {
     }
 
     private void handleButtonAction(FlowDefinition flowButton, Button button) {
-        //DONT FORGET PUT SOMEWHERE THE READ ONLY!!!!!!!!!!!!!!!
-
         allFlowsButtons.stream().forEach(b -> b.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);"));
         button.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
 
         flowDetailsBox.setVisible(true);
         FlowNameTL.setText(flowButton.getName());
         flowDescribtionTL.setText(flowButton.getDescription());
+        addReadOnly(flowButton);
 
         flowDetailsTreeView.setRoot(new TreeItem<>());
         TreeItem<String> formalOutputsItem = new TreeItem<>("Formal outputs");
@@ -85,6 +85,7 @@ public class FlowDefinitionController implements BodyControllerDefinition {
         executeFlowDFButton.setOnAction(e -> executeFlowDFButton(flowButton));
 
     }
+
     @Override
     public void setFlowsDetails(List<FlowDefinition> flow) {
         flows = flow;
@@ -96,5 +97,22 @@ public class FlowDefinitionController implements BodyControllerDefinition {
     @Override
     public void setBodyController(BodyController bodyCTRL) {
         bodyForFlowDefinitionController = bodyCTRL;
+    }
+    private void addReadOnly(FlowDefinition flowButton) {
+        if(flowButton.isReadOnly()) {
+            readOnlyImage.setVisible(true);
+            Tooltip tooltip = new Tooltip();
+            tooltip.setStyle("-fx-font-size: 12px;");
+            readOnlyImage.setOnMouseEntered(event -> showReadOnly(tooltip,readOnlyImage,event));
+            readOnlyImage.setOnMouseExited(event -> {
+                tooltip.hide();
+            });
+        }
+        else
+            readOnlyImage.setVisible(false);
+    }
+    private void showReadOnly(Tooltip tooltip, ImageView data, MouseEvent event) {
+        tooltip.setText("Read-Only");
+        tooltip.show(data, event.getScreenX() + 5, event.getScreenY() + 5);
     }
 }
