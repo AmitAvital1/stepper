@@ -13,10 +13,10 @@ import java.time.Duration;
 
 public class FlowStats {
     private int executesRunTimes;
-    private IntegerProperty executesRunTimesProp;
+    private SimpleIntegerProperty executesRunTimesProp;
 
     private long averageExecutesTime;
-    private LongProperty averageExecutesTimeProp;
+    private SimpleLongProperty averageExecutesTimeProp;
 
     private List<stepStats> stepStatsList;
 
@@ -31,10 +31,10 @@ public class FlowStats {
         private final StepUsageDeclaration stepDeclaration;
 
         private int stepExecutesRunTimes;
-        private IntegerProperty stepExecutesRunTimesProp;
+        private SimpleIntegerProperty stepExecutesRunTimesProp;
 
         private long stepAverageExecutesTime;
-        private LongProperty stepAverageExecutesTimeProp;
+        private SimpleLongProperty stepAverageExecutesTimeProp;
 
         public stepStats(StepUsageDeclaration step, Duration time){
             stepDeclaration = step;

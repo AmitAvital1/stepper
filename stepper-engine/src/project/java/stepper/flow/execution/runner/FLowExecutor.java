@@ -31,6 +31,7 @@ public class FLowExecutor implements Runnable {
         LocalTime time = LocalTime.now();
         String formattedTime = time.getHour() + ":" + time.getMinute() + ":" + time.getSecond();
         flowExecution.setStartedTime(formattedTime);
+        flowExecution.setFlowExecutionResult(FlowExecutionResult.PROCESSING);
 
         flowExecution.setFlowContexts(context);
         context.updateCurrentWorkingStep(null);

@@ -8,12 +8,17 @@ import static project.java.stepper.flow.execution.FlowExecutionResult.PROCESSING
 
 public class FlowsExecutionManager {
     private ExecutorService threadExecutor = Executors.newFixedThreadPool(1);
-    private int threadsNum = 1;
+    private Integer threadsNum = null;
 
     public void setThreadExecutor(int threadN){
         threadsNum = threadN;
         threadExecutor = Executors.newFixedThreadPool(threadsNum);
     }
+
+    public Integer getThreadsNum() {
+        return threadsNum;
+    }
+
     public void exeFlow(FlowExecution flow){
         flow.setFlowExecutionResult(PROCESSING);
         FLowExecutor fLowExecutor = new FLowExecutor(flow);

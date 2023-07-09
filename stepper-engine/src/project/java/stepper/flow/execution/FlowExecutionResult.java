@@ -1,5 +1,5 @@
 package project.java.stepper.flow.execution;
 
 public enum FlowExecutionResult {
-    SUCCESS, FAILURE, WARNING,PROCESSING
+    SUCCESS, FAILURE, WARNING,PROCESSING,NA
 }

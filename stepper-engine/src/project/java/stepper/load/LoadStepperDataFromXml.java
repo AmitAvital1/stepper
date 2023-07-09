@@ -14,10 +14,7 @@ import project.java.stepper.step.api.DataDefinitionDeclaration;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +23,28 @@ public class LoadStepperDataFromXml {
     This function load data from xml path. Using JAXB to get data from xml, and make deep copy to Flows in our system
      */
     private final static String JAXB_XML_PACKAGE_NAME = "project.java.stepper.schema.generated";
+    public static List<FlowDefinition> load(byte[] xmlBytes, FlowsExecutionManager flowsExecutionManager) throws FileNotFoundException, JAXBException, StepperExeption {
+        List<FlowDefinition> flowList = new ArrayList<>();
+        InputStream inputStream = new ByteArrayInputStream(xmlBytes);
+        STStepper genStepper = deserializeFrom(inputStream);
+        if (firstCheckFlowValidate(genStepper.getSTFlows().getSTFlow())) {
+            for (STFlow flow : genStepper.getSTFlows().getSTFlow()) {
+                FlowDefinition systemFlow = cloneFlowDetails(flow);//Doing the deep copy
+                systemFlow.validateFlowStructure();
+                addInitialsInputs(flow,systemFlow);
+                flowList.add(systemFlow);//Add the flow to the list
+            }
+        }
+        addContinuations(flowList, genStepper);
+
+        if(genStepper.getSTThreadPool() <= 0)
+            throw new InvalidThreadPoolNumber("Invalid thread-pool number - must be non negative number.");
+
+        if(flowsExecutionManager.getThreadsNum() == null)
+            flowsExecutionManager.setThreadExecutor(genStepper.getSTThreadPool());
+
+        return flowList;
+    }
 
     public static List<FlowDefinition> load(String xmlPath, FlowsExecutionManager flowsExecutionManager) throws FileNotFoundException, JAXBException, StepperExeption {
         List<FlowDefinition> flowList = new ArrayList<>();
