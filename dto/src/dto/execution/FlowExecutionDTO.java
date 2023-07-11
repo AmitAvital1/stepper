@@ -12,11 +12,9 @@ import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
+import project.java.stepper.step.api.DataNecessity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FlowExecutionDTO {
@@ -33,6 +31,8 @@ public class FlowExecutionDTO {
 
     private List<String> flowsContinuation;
 
+    private final List<String> AllFreeInputsWithDataToPrintList;
+    private final List<String> AllOutPutsWithDataToPrintList;
 
     public FlowExecutionDTO(FlowExecution flowExecution){
         this.uniqueId = flowExecution.getUniqueId();
@@ -45,6 +45,9 @@ public class FlowExecutionDTO {
         this.outputsStepData = convertoutputsStepData(flowExecution.getOutputsStepData());
         this.stepFinished = flowExecution.getStepFinishedProperty().get();
         this.flowsContinuation = flowExecution.getFlowDefinition().getFlowsContinuations().stream().map(continuationFlowDetails -> continuationFlowDetails.getTargetFlow().getName()).collect(Collectors.toList());
+        this.AllFreeInputsWithDataToPrintList = flowExecution.getAllFreeInputsWithDataToPrintList();
+        this.AllOutPutsWithDataToPrintList = flowExecution.getAllOutPutsWithDataToPrintList();
+
     }
 
     private List<flowOutputsDataDTO> convertoutputsStepData(List<FlowExecution.flowOutputsData> outputsStepData) {
@@ -158,6 +161,14 @@ public class FlowExecutionDTO {
     public void setFlowsContinuation(List<String> flowsContinuation) {
         this.flowsContinuation = flowsContinuation;
     }
-
-
+    public String getStartedTime() {
+        return startedTime;
+    }
+    public List<String> getAllFreeInputsWithDataToPrintList(){
+        return AllFreeInputsWithDataToPrintList;
+    }
+    public List<FlowExecutionDTO.flowOutputsDataDTO> getOutputsStepData(){return outputsStepData; }
+    public List<String> getAllOutPutsWithDataToPrintList() {
+        return AllOutPutsWithDataToPrintList;
+    }
 }

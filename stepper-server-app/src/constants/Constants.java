@@ -22,6 +22,7 @@ public class Constants {
     public static final String EXECUTION_REFRESHER = "/execute-flow-refresh";
     public static final String EXECUTION_RERUN = "/execute-rerun";
     public static final String EXECUTION_CONTINUATION = "/execute-continuation";
+    public static final String EXECUTION_HISTORY = "/history";
 
     //roles
     public static final String ALL_FLOWS = "All flows";

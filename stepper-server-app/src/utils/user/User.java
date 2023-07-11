@@ -10,6 +10,7 @@ public class User {
     private List<Role> userRoles = new ArrayList<>();
     private final String name;
     private boolean isManager = false;
+
     private final List<FlowExecution> flowExecutions = new ArrayList<>();
 
     User(String name){this.name = name;}
@@ -32,5 +33,8 @@ public class User {
 
     public void addFlowExecution(FlowExecution flowExecution){
         flowExecutions.add(flowExecution);
+    }
+    public List<FlowExecution> getFlowExecutions() {
+        return flowExecutions;
     }
 }
