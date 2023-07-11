@@ -52,5 +52,9 @@ public class UserManager {
         nameToUser.get(username).addFlowExecution(flowExecution);
         return flowExecution;
     }
+    public void addFlowExecutionToRerun(String username,FlowExecution flow){
+        userToFlowsExecutions.computeIfAbsent(username, k -> new ArrayList<>()).add(flow);
+        nameToUser.get(username).addFlowExecution(flow);
+    }
 
 }

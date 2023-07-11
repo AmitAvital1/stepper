@@ -23,14 +23,14 @@ public class FlowExecution {
 
     private final String uniqueId;
     private final FlowDefinition flowDefinition;
-    private StepExecutionContext flowContexts;
+    private StepExecutionContext flowContexts = new StepExecutionContextImpl();
     private Duration totalTime;
     private String startedTime;
     private ObjectProperty<FlowExecutionResult> flowExecutionResult = new SimpleObjectProperty<>();
     private Map<String, Object> startersFreeInputForContext;
     private Map<String, Object> allDataValues;
     private List<flowOutputsData> outputsStepData = new ArrayList<>();
-    private IntegerProperty stepFinished = new SimpleIntegerProperty(0);
+    private SimpleIntegerProperty stepFinished = new SimpleIntegerProperty(0);
 
     public IntegerProperty getStepFinishedProperty() {
         return stepFinished;
@@ -103,9 +103,7 @@ public class FlowExecution {
         return flowDefinition;
     }
     public void setFlowExecutionResult(FlowExecutionResult result) {
-        Platform.runLater(() -> {
             flowExecutionResult.setValue(result);
-        });
     }
     public ObjectProperty<FlowExecutionResult> getFlowExecutionResultProperty(){return flowExecutionResult;}
     public FlowExecutionResult getFlowExecutionResult() {
@@ -115,7 +113,7 @@ public class FlowExecution {
         totalTime = time;
     }
     public long getDuration(){
-        return totalTime.toMillis();
+        return totalTime != null ? totalTime.toMillis() : 0;
     }
     public boolean validateToExecute() throws MissMandatoryInput {
         boolean res = true;

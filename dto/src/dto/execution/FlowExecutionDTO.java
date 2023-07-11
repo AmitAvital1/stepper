@@ -1,31 +1,153 @@
 package dto.execution;
 
+import dto.DataDefinitionDeclarationDTO;
 import dto.FlowDefinitionDTO;
+import dto.StepUsageDeclarationImplDTO;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import project.java.stepper.dd.impl.file.FileData;
+import project.java.stepper.dd.impl.list.ListData;
+import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
+import project.java.stepper.step.api.DataDefinitionDeclaration;
 
-import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class FlowExecutionDTO {
     private final String uniqueId;
     private final FlowDefinitionDTO flowDefinition;
-    private StepExecutionContext flowContexts;
-    private Duration totalTime;
-    private String startedTime;
-    private ObjectProperty<FlowExecutionResult> flowExecutionResult = new SimpleObjectProperty<>();
-    private Map<String, Object> startersFreeInputForContext;
-    private Map<String, Object> allDataValues;
-    private List<FlowExecution.flowOutputsData> outputsStepData = new ArrayList<>();
-    private IntegerProperty stepFinished = new SimpleIntegerProperty(0);
+    private final StepExecutionContextDTO flowContexts;
+    private final long totalTime;
+    private final String startedTime;
+    private final FlowExecutionResult flowExecutionResult;
+    private final Map<String, Object> startersFreeInputForContext;
+    private final List<flowOutputsDataDTO> outputsStepData;
+    private Integer stepFinished = new Integer(0);
+    private Map<String, String> formalOutputNameToClass = new HashMap<>();
+
+
+    public FlowExecutionDTO(FlowExecution flowExecution){
+        this.uniqueId = flowExecution.getUniqueId();
+        this.flowDefinition = new FlowDefinitionDTO(flowExecution.getFlowDefinition());
+        this.flowContexts = new StepExecutionContextDTO(flowExecution.getFlowContexts());
+        this.totalTime = flowExecution.getDuration();
+        this.startedTime = flowExecution.getStartedTime();
+        this.flowExecutionResult = flowExecution.getFlowExecutionResult();
+        this.startersFreeInputForContext = flowExecution.getStartersFreeInputForContext();
+        this.outputsStepData = convertoutputsStepData(flowExecution.getOutputsStepData());
+        this.stepFinished = flowExecution.getStepFinishedProperty().get();
+    }
+
+    private List<flowOutputsDataDTO> convertoutputsStepData(List<FlowExecution.flowOutputsData> outputsStepData) {
+        List<flowOutputsDataDTO> res = new ArrayList<>();
+        for(FlowExecution.flowOutputsData data : outputsStepData){
+            res.add(new flowOutputsDataDTO(data));
+        }
+        return res;
+    }
+
+
+    public static class flowOutputsDataDTO{
+        private final String finalName;
+        private StepUsageDeclarationImplDTO outputStep;
+        private final DataDefinitionDeclarationDTO outputDD;
+        private Object data;
+        boolean createdFromFlow = true;
+        private RelationData itsRelation;
+
+        public flowOutputsDataDTO(FlowExecution.flowOutputsData data){
+            this.finalName = data.getFinalName();
+            this.outputStep = new StepUsageDeclarationImplDTO(data.getOutputStep());
+            this.outputDD = new DataDefinitionDeclarationDTO(data.getOutputDD());
+            if(data.getOutputDD().dataDefinition().getType() == ListData.class) {
+                if (((ListData) data.getData()).getList().size() > 0) {
+                        if(((ListData) data.getData()).getList().get(0).getClass() == FileData.class) {
+                            List<String> arr = new ArrayList<>();
+                            for(Object var : ((ListData) data.getData()).getList())
+                                arr.add(var.toString());
+                            this.data = arr;
+                        }
+                        else
+                            this.data = ((ListData) data.getData()).getList().toString();
+                }
+                else
+                    this.data = ((ListData) data.getData()).getList().toString();
+            }
+            else if(data.getOutputDD().dataDefinition().getType() == RelationData.class) {
+                itsRelation = ((RelationData) data.getData());
+                this.data = data.getData().toString();
+            }
+            else
+                this.data = data.getData().toString();
+
+            createdFromFlow = data.getCreatedFromFlow();
+        }
+        public boolean isOutputExist(String finalName,DataDefinitionDeclarationDTO dd){
+            if(this.finalName.equals(finalName) && this.outputDD.dataDefinition().getName().equals(dd.dataDefinition().getName()))
+                return true;
+            else return false;
+        }
+        public boolean getCreatedFromFlow(){return createdFromFlow;}
+
+        public String getFinalName() {
+            return finalName;
+        }
+
+        public StepUsageDeclarationImplDTO getOutputStep() {
+            return outputStep;
+        }
+
+        public DataDefinitionDeclarationDTO getOutputDD() {
+            return outputDD;
+        }
+
+        public Object getData() {
+            return data;
+        }
+    }
+
+
+    public FlowExecutionResult getFlowExecutionResult() {
+        return flowExecutionResult;
+    }
+    public String getUniqueId() {
+        return uniqueId;
+    }
+    public long getDuration(){
+        return totalTime;
+    }
+    public FlowDefinitionDTO getFlowDefinition() {
+        return flowDefinition;
+    }
+    public Integer getStepFinishedProperty() {
+        return stepFinished;
+    }
+
+    public StepExecutionContextDTO getFlowContexts(){return  flowContexts;}
+
+    public Map<String,Object> getFormalOutPutsData(){
+        Map<String,Object> formalOutputToData = new HashMap<>();
+        for (Map.Entry<String, DataDefinitionDeclarationDTO> entry : flowDefinition.getFormalOutput().entrySet()) {
+            String newVal = entry.getKey() + "-" + entry.getValue().userString();
+            Object key = outputsStepData.stream().filter(output -> output.finalName.equals(entry.getKey())).findFirst().get().data;
+            formalOutputToData.put(newVal,key);
+            formalOutputNameToClass.put(newVal,entry.getValue().dataDefinition().getType());
+            if(formalOutputNameToClass.get(newVal).equals("RelationData"))
+                formalOutputToData.put(newVal,outputsStepData.stream().filter(output -> output.finalName.equals(entry.getKey())).findFirst().get().itsRelation);
+        }
+        return formalOutputToData;
+    }
+    public Map<String, Object> getStartersFreeInputForContext() {
+        return startersFreeInputForContext;
+    }
+    public String getTypeOfFormalOutPut(String output){
+        return formalOutputNameToClass.get(output);
+    }
 
 
 }

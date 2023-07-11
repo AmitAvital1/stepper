@@ -76,4 +76,19 @@ public class StepUsageDeclarationImplDTO {
     public Map<String, DataDefinitionDTO> getFinalNamesInputsToDD() {
         return finalNamesInputsToDD;
     }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if(o.getClass() != StepUsageDeclarationImplDTO.class )
+            return false;
+
+        StepUsageDeclarationImplDTO other = (StepUsageDeclarationImplDTO) o;
+
+        if(this.stepName.equals(other.getFinalStepName()) && this.stepDefinition.name().equals(other.getStepDefinition().name()))
+            return true;
+
+        return false;
+
+    }
 }

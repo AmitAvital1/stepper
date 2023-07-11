@@ -25,6 +25,9 @@ public interface StepExecutionContext {
     void addStepData(StepUsageDeclaration step, String stepSummaryLine, StepLogs logs, Duration time, StepResult result);
     StepExecutionContextImpl.stepData getStepData(StepUsageDeclaration step);
     ListProperty<StepExecutionContextImpl.stepData> getFlowStepsDataProperty();
+    List<StepLogs> getFlowLogs();
+    List<String> getStepSummaryLine();
+    List<StepExecutionContextImpl.stepData> getRegFlowStepsData();
 
     // some more utility methods:
     // allow step to store log lines

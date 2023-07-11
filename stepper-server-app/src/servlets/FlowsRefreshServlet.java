@@ -32,7 +32,7 @@ public class FlowsRefreshServlet extends HttpServlet {
         response.setContentType("application/json");
         UserManager userManager = ServerContextManager.getUserManager(getServletContext());
         DataManager dataManager = ServerContextManager.getStepperManager(getServletContext());
-        //String flowsNum = request.getParameter(FLOW_DEFINITION_NUM);
+
         String username = SessionUtils.getUsername(request);
         if (username == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -48,9 +48,7 @@ public class FlowsRefreshServlet extends HttpServlet {
             StepperDTO stepper = new StepperDTO(dto);
 
             Gson gson = new Gson();
-            Gson gson2 = new GsonBuilder().setPrettyPrinting().create();
             String jsonResponse = gson.toJson(stepper);
-            String formattedJson = gson2.toJson(stepper);
 
             try (PrintWriter out = response.getWriter()) {
                 out.print(jsonResponse);

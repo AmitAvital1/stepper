@@ -132,9 +132,7 @@ public class StepExecutionContextImpl implements StepExecutionContext {
     public void addStepData(StepUsageDeclaration step,String stepSummaryLine,StepLogs logs, Duration time, StepResult result){
         stepData data = new stepData(step,stepSummaryLine,logs,time,result);
         flowStepsData.add(data);
-        Platform.runLater(() -> {
-            flowStepsDataProperty.add(data);
-        });
+        flowStepsDataProperty.add(data);
     }
     public ListProperty<stepData> getFlowStepsDataProperty(){return flowStepsDataProperty;}
     public stepData getStepData(StepUsageDeclaration step){
@@ -143,5 +141,17 @@ public class StepExecutionContextImpl implements StepExecutionContext {
                 return data;
         }
         return null;
+    }
+    @Override
+    public List<StepLogs> getFlowLogs() {
+        return flowLogs;
+    }
+    @Override
+    public List<String> getStepSummaryLine() {
+        return stepSummaryLine;
+    }
+    @Override
+    public List<stepData> getRegFlowStepsData() {
+        return flowStepsData;
     }
 }

@@ -14,4 +14,6 @@ public class Constants {
     public static final String USER_HEAD_DETAILS = FULL_SERVER_PATH + "/header-details";
     public static final String FLOW_DEFINITION = FULL_SERVER_PATH + "/get-flows";
     public static final String FLOW_EXECUTION = FULL_SERVER_PATH + "/execute-flow";
+    public static final String FLOW_EXECUTION_REFRESH = FULL_SERVER_PATH + "/execute-flow-refresh";
+    public static final String EXECUTION_RERUN = FULL_SERVER_PATH + "/execute-rerun";
 }

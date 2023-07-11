@@ -5,6 +5,7 @@ public class Constants {
     public static final String USERNAME = "username";
     public static final String FLOW_NAME = "flowname";
     public static final String UUID = "uuid";
+    public static final String RERUN = "rerun";
 
     //Servlet Context
     public static final String STEPPER_DATA_MANAGER = "stepperManager";
@@ -18,6 +19,8 @@ public class Constants {
     public static final String ROLES = "/roles";
     public static final String FLOW_DEFINITION = "/get-flows";
     public static final String EXECUTION = "/execute-flow";
+    public static final String EXECUTION_REFRESHER = "/execute-flow-refresh";
+    public static final String EXECUTION_RERUN = "/execute-rerun";
 
     //roles
     public static final String ALL_FLOWS = "All flows";

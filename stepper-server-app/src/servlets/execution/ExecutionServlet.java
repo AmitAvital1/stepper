@@ -1,6 +1,8 @@
-package servlets;
+package servlets.execution;
 
 import com.google.gson.Gson;
+import dto.StepperDTO;
+import dto.execution.FlowExecutionDTO;
 import dto.execution.FlowExecutionUUIDDTO;
 import dto.execution.FreeInputDTO;
 import jakarta.servlet.ServletException;
@@ -73,13 +75,42 @@ public class ExecutionServlet extends HttpServlet {
         Gson gson = new Gson();
         FreeInputDTO freeInputDTO = gson.fromJson(requestBodyString, FreeInputDTO.class);
         FlowExecution flowExecution = dataManager.getFlowExecutionByUUID(freeInputDTO.getUUID());
+
         try{
-            flowExecution.addFreeInputForStart(freeInputDTO.getInputFinalName(), flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().get(freeInputDTO.getInputFinalName()), freeInputDTO.getInputData());
+            if(freeInputDTO.getInputFinalName() != null)
+                flowExecution.addFreeInputForStart(freeInputDTO.getInputFinalName(), flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().get(freeInputDTO.getInputFinalName()), freeInputDTO.getInputData());
             flowExecution.validateToExecute();
         }catch (MissMandatoryInput e) {
             response.setStatus(402);
         }catch (StepperExeption e){
             response.setStatus(403);
+            out.print(e.getMessage());
+        }
+    }
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse response) throws IOException, ServletException {
+        PrintWriter out = response.getWriter();
+
+        StringBuilder requestBody = new StringBuilder();
+        DataManager dataManager = ServerContextManager.getStepperManager(getServletContext());
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                requestBody.append(line);
+            }
+        }
+
+        String requestBodyString = requestBody.toString();
+
+        Gson gson = new Gson();
+        FlowExecutionUUIDDTO uuiddto = gson.fromJson(requestBodyString, FlowExecutionUUIDDTO.class);
+        FlowExecution flowExecution = dataManager.getFlowExecutionByUUID(uuiddto.getUuid());
+        try {
+            flowExecution.validateToExecute();
+            dataManager.getFlowsExecutionManager().exeFlow(flowExecution);
+        }catch (MissMandatoryInput e) {
+            response.setStatus(402);
             out.print(e.getMessage());
         }
     }

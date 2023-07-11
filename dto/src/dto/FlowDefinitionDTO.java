@@ -17,7 +17,6 @@ public class FlowDefinitionDTO {
     private final String description;
     private final boolean readOnly;
     private final List<StepUsageDeclarationImplDTO> steps;
-    private Map<StepUsageDeclarationImplDTO,List<DataDefinitionDeclarationDTO>> stepToFreeInputFinalNameToDD;
     private final Map<String, DataDefinitionDeclarationDTO> freeInputFinalNameToDD;
     private final Map<String, DataDefinitionDeclarationDTO> formalFinalOutPutNameToDD;
     private final Map<String, Object> initialValues;
@@ -85,9 +84,7 @@ public class FlowDefinitionDTO {
     public Map<String, DataDefinitionDeclarationDTO> getFormalOutput() {
         return formalFinalOutPutNameToDD;
     }
-    public Map<StepUsageDeclarationImplDTO,List<DataDefinitionDeclarationDTO>> getFlowFreeInputs(){
-        return stepToFreeInputFinalNameToDD;
-    }
+
 
     public Map<String, Object> getInitialValues() {
         return initialValues;
