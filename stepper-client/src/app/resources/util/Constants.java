@@ -16,4 +16,5 @@ public class Constants {
     public static final String FLOW_EXECUTION = FULL_SERVER_PATH + "/execute-flow";
     public static final String FLOW_EXECUTION_REFRESH = FULL_SERVER_PATH + "/execute-flow-refresh";
     public static final String EXECUTION_RERUN = FULL_SERVER_PATH + "/execute-rerun";
+    public static final String EXECUTION_CONTINUATION = FULL_SERVER_PATH + "/execute-continuation";
 }

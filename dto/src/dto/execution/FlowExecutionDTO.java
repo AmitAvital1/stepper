@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FlowExecutionDTO {
     private final String uniqueId;
@@ -30,6 +31,8 @@ public class FlowExecutionDTO {
     private Integer stepFinished = new Integer(0);
     private Map<String, String> formalOutputNameToClass = new HashMap<>();
 
+    private List<String> flowsContinuation;
+
 
     public FlowExecutionDTO(FlowExecution flowExecution){
         this.uniqueId = flowExecution.getUniqueId();
@@ -41,6 +44,7 @@ public class FlowExecutionDTO {
         this.startersFreeInputForContext = flowExecution.getStartersFreeInputForContext();
         this.outputsStepData = convertoutputsStepData(flowExecution.getOutputsStepData());
         this.stepFinished = flowExecution.getStepFinishedProperty().get();
+        this.flowsContinuation = flowExecution.getFlowDefinition().getFlowsContinuations().stream().map(continuationFlowDetails -> continuationFlowDetails.getTargetFlow().getName()).collect(Collectors.toList());
     }
 
     private List<flowOutputsDataDTO> convertoutputsStepData(List<FlowExecution.flowOutputsData> outputsStepData) {
@@ -76,7 +80,7 @@ public class FlowExecutionDTO {
                             this.data = ((ListData) data.getData()).getList().toString();
                 }
                 else
-                    this.data = ((ListData) data.getData()).getList().toString();
+                    this.data = ((ListData) data.getData()).getList();
             }
             else if(data.getOutputDD().dataDefinition().getType() == RelationData.class) {
                 itsRelation = ((RelationData) data.getData());
@@ -147,6 +151,12 @@ public class FlowExecutionDTO {
     }
     public String getTypeOfFormalOutPut(String output){
         return formalOutputNameToClass.get(output);
+    }
+    public List<String> getFlowsContinuation() {
+        return flowsContinuation;
+    }
+    public void setFlowsContinuation(List<String> flowsContinuation) {
+        this.flowsContinuation = flowsContinuation;
     }
 
 
