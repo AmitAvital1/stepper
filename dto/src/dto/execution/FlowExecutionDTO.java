@@ -71,26 +71,28 @@ public class FlowExecutionDTO {
             this.finalName = data.getFinalName();
             this.outputStep = new StepUsageDeclarationImplDTO(data.getOutputStep());
             this.outputDD = new DataDefinitionDeclarationDTO(data.getOutputDD());
-            if(data.getOutputDD().dataDefinition().getType() == ListData.class) {
-                if (((ListData) data.getData()).getList().size() > 0) {
-                        if(((ListData) data.getData()).getList().get(0).getClass() == FileData.class) {
+            if(data.getCreatedFromFlow()) {
+                if (data.getOutputDD().dataDefinition().getType() == ListData.class) {
+                    if (((ListData) data.getData()).getList().size() > 0) {
+                        if (((ListData) data.getData()).getList().get(0).getClass() == FileData.class) {
                             List<String> arr = new ArrayList<>();
-                            for(Object var : ((ListData) data.getData()).getList())
+                            for (Object var : ((ListData) data.getData()).getList())
                                 arr.add(var.toString());
                             this.data = arr;
-                        }
-                        else
+                        } else
                             this.data = ((ListData) data.getData()).getList().toString();
+                    } else
+                        this.data = ((ListData) data.getData()).getList();
+                } else if (data.getOutputDD().dataDefinition().getType() == RelationData.class) {
+                    itsRelation = ((RelationData) data.getData());
+                    this.data = data.getData().toString();
                 }
                 else
-                    this.data = ((ListData) data.getData()).getList();
+                    this.data = data.getData().toString();
             }
-            else if(data.getOutputDD().dataDefinition().getType() == RelationData.class) {
-                itsRelation = ((RelationData) data.getData());
+            else {
                 this.data = data.getData().toString();
             }
-            else
-                this.data = data.getData().toString();
 
             createdFromFlow = data.getCreatedFromFlow();
         }
@@ -143,7 +145,11 @@ public class FlowExecutionDTO {
             String newVal = entry.getKey() + "-" + entry.getValue().userString();
             Object key = outputsStepData.stream().filter(output -> output.finalName.equals(entry.getKey())).findFirst().get().data;
             formalOutputToData.put(newVal,key);
-            formalOutputNameToClass.put(newVal,entry.getValue().dataDefinition().getType());
+            if(outputsStepData.stream().filter(output -> output.finalName.equals(entry.getKey())).findFirst().get().createdFromFlow)
+                formalOutputNameToClass.put(newVal,entry.getValue().dataDefinition().getType());
+            else
+                formalOutputNameToClass.put(newVal,"String");
+
             if(formalOutputNameToClass.get(newVal).equals("RelationData"))
                 formalOutputToData.put(newVal,outputsStepData.stream().filter(output -> output.finalName.equals(entry.getKey())).findFirst().get().itsRelation);
         }
