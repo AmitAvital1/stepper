@@ -18,4 +18,5 @@ public class Constants {
     public static final String EXECUTION_RERUN = FULL_SERVER_PATH + "/execute-rerun";
     public static final String EXECUTION_CONTINUATION = FULL_SERVER_PATH + "/execute-continuation";
     public static final String EXECUTION_HISTORY = FULL_SERVER_PATH + "/history";
+    public static final String STATISTICS = FULL_SERVER_PATH + "/statistics";
 }

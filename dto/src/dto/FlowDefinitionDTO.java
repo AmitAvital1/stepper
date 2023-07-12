@@ -27,10 +27,10 @@ public class FlowDefinitionDTO {
         description = flow.getDescription();
         readOnly = flow.isReadOnly();
         steps = converStepsToDTO(flow.getFlowSteps());
-        //stepToFreeInputFinalNameToDD = convertStepToFreeInputFinalNameToDD(flow.getFlowFreeInputs());
         freeInputFinalNameToDD = castToDDDeclerationImpl(flow.getFreeInputFinalNameToDD());
         formalFinalOutPutNameToDD = castToDDDeclerationImpl(flow.getFormalOutput());
         initialValues = flow.getInitialValues();
+        
     }
 
     private Map<StepUsageDeclarationImplDTO, List<DataDefinitionDeclarationDTO>> convertStepToFreeInputFinalNameToDD(Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> flowFreeInputs) {

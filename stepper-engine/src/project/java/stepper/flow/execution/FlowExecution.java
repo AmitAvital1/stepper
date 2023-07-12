@@ -26,7 +26,7 @@ public class FlowExecution {
     private StepExecutionContext flowContexts = new StepExecutionContextImpl();
     private Duration totalTime;
     private String startedTime;
-    private ObjectProperty<FlowExecutionResult> flowExecutionResult = new SimpleObjectProperty<>();
+    private ObjectProperty<FlowExecutionResult> flowExecutionResult = new SimpleObjectProperty<>(FlowExecutionResult.NA);
     private Map<String, Object> startersFreeInputForContext;
     private Map<String, Object> allDataValues;
     private List<flowOutputsData> outputsStepData = new ArrayList<>();

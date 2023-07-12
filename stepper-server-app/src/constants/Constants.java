@@ -23,6 +23,7 @@ public class Constants {
     public static final String EXECUTION_RERUN = "/execute-rerun";
     public static final String EXECUTION_CONTINUATION = "/execute-continuation";
     public static final String EXECUTION_HISTORY = "/history";
+    public static final String STATISTICS = "/statistics";
 
     //roles
     public static final String ALL_FLOWS = "All flows";

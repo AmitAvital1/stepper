@@ -27,13 +27,14 @@ public class FlowStats {
         averageExecutesTimeProp = new SimpleLongProperty(0);
     }
 
-    private class stepStats{
+    public class stepStats{
         private final StepUsageDeclaration stepDeclaration;
 
         private int stepExecutesRunTimes;
         private SimpleIntegerProperty stepExecutesRunTimesProp;
 
         private long stepAverageExecutesTime;
+
         private SimpleLongProperty stepAverageExecutesTimeProp;
 
         public stepStats(StepUsageDeclaration step, Duration time){
@@ -43,6 +44,10 @@ public class FlowStats {
 
             stepExecutesRunTimesProp = new SimpleIntegerProperty(1);
             stepAverageExecutesTimeProp = new SimpleLongProperty(time.toMillis());
+        }
+
+        public StepUsageDeclaration getStepDeclaration() {
+            return stepDeclaration;
         }
 
         public IntegerProperty stepExecutesRunTimesPropProperty() {return stepExecutesRunTimesProp;}
@@ -124,5 +129,9 @@ public class FlowStats {
 
     public LongProperty averageExecutesTimePropProperty() {
         return averageExecutesTimeProp;
+    }
+
+    public List<stepStats> getStepStatsList() {
+        return stepStatsList;
     }
 }
