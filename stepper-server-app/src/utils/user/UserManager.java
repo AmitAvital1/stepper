@@ -1,7 +1,9 @@
 package utils.user;
 
+import exception.ServerException;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
+import project.java.stepper.flow.manager.DataManager;
 
 import java.util.*;
 
@@ -57,4 +59,26 @@ public class UserManager {
         nameToUser.get(username).addFlowExecution(flow);
     }
 
+    public List<Role> getRoles() {
+        return roles;
+    }
+    public synchronized void updateRoleFlows(String roleName,List<String> flowList, DataManager dataManager){
+        Role role = roles.stream().filter(r -> r.getRoleName().equals(roleName)).findFirst().get();
+        List<FlowDefinition> flowPerm = new ArrayList<>();
+        for(String flowName : flowList )
+            flowPerm.add(dataManager.getFlowDefinitionByName(flowName));
+
+        role.setFlowsPermissions(flowPerm);
+
+    }
+    public synchronized void addRole(String roleName,String roleDesc) throws ServerException {
+        if(roleName.isEmpty())
+            throw new ServerException("Please enter role name");
+        Optional<Role> optionalRole = roles.stream().filter(r -> r.getRoleName().equals(roleName)).findFirst();
+        if(optionalRole.isPresent())
+            throw new ServerException("This role already exist");
+
+        Role newRole = new Role(roleName,roleDesc);
+        roles.add(newRole);
+    }
 }

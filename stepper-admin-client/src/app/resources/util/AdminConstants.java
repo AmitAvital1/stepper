@@ -1,6 +1,6 @@
 package app.resources.util;
 
-public class Constants {
+public class AdminConstants {
     // Server resources locations
     public final static String BASE_DOMAIN = "localhost";
     private final static String BASE_URL = "http://" + BASE_DOMAIN + ":8080";
@@ -8,4 +8,5 @@ public class Constants {
     private final static String FULL_SERVER_PATH = BASE_URL + CONTEXT_PATH;
 
     public final static String LOAD_XML = FULL_SERVER_PATH + "/load-xml";
+    public static final String ROLES = FULL_SERVER_PATH + "/roles";
 }
