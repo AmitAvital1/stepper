@@ -9,4 +9,6 @@ public class AdminConstants {
 
     public final static String LOAD_XML = FULL_SERVER_PATH + "/load-xml";
     public static final String ROLES = FULL_SERVER_PATH + "/roles";
+    public static final String USERS = FULL_SERVER_PATH + "/users";
+    public static final String USER_HEAD_DETAILS = FULL_SERVER_PATH + "/header-details";
 }

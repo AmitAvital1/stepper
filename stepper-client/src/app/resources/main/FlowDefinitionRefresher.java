@@ -28,7 +28,6 @@ public class FlowDefinitionRefresher extends TimerTask {
 
     @Override
     public void run() {
-
         String finalUrl = HttpUrl
                 .parse(FLOW_DEFINITION)
                 .newBuilder()

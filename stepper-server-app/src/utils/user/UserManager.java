@@ -1,5 +1,6 @@
 package utils.user;
 
+import dto.users.UserDTO;
 import exception.ServerException;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
@@ -26,8 +27,10 @@ public class UserManager {
 
     public boolean addUser(String name){
 
-        if(nameToUser.containsKey(name))
+        if(nameToUser.containsKey(name)) {
+            nameToUser.get(name).setLogin(true);
             return false;
+        }
 
         User newUser = new User(name);
         users.add(newUser);
@@ -40,7 +43,10 @@ public class UserManager {
     }
 
     public boolean isUserExists(String username) {
-        return nameToUser.containsKey(username);
+        if(nameToUser.containsKey(username))
+            return nameToUser.get(username).isLogin();
+        else
+            return false;
     }
 
     public User getUser(String username){
@@ -80,5 +86,30 @@ public class UserManager {
 
         Role newRole = new Role(roleName,roleDesc);
         roles.add(newRole);
+    }
+    public synchronized List<User> getUsers() {
+        return users;
+    }
+
+    public synchronized void updateUserRoles(UserDTO userUpdateRoles) {
+        User user = nameToUser.get(userUpdateRoles.getUsername());
+        List<Role> newRoles = new ArrayList<>();
+        List<String> userNewRolesName = new ArrayList<>();
+        userUpdateRoles.getRoles().forEach(r -> userNewRolesName.add(r.getRoleName()));
+
+        this.roles.forEach(role -> {
+            if(userNewRolesName.contains(role.getRoleName()))
+                newRoles.add(role);
+        });
+        user.setUserRoles(newRoles);
+
+    }
+    public synchronized void updateUserManager(String username, boolean isManager){
+        User user = this.nameToUser.get(username);
+        user.setManager(isManager);
+    }
+
+    public void logout(String usernameFromSession) {
+        nameToUser.get(usernameFromSession).setLogin(false);
     }
 }

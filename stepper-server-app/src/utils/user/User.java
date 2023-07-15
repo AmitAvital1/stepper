@@ -10,6 +10,7 @@ public class User {
     private List<Role> userRoles = new ArrayList<>();
     private final String name;
     private boolean isManager = false;
+    private boolean login = true;
 
     private final List<FlowExecution> flowExecutions = new ArrayList<>();
 
@@ -36,5 +37,17 @@ public class User {
     }
     public List<FlowExecution> getFlowExecutions() {
         return flowExecutions;
+    }
+
+    public synchronized void setUserRoles(List<Role> userRoles) {
+        this.userRoles = userRoles;
+    }
+
+    public boolean isLogin() {
+        return login;
+    }
+
+    public void setLogin(boolean login) {
+        this.login = login;
     }
 }

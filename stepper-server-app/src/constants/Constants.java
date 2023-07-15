@@ -24,6 +24,7 @@ public class Constants {
     public static final String EXECUTION_CONTINUATION = "/execute-continuation";
     public static final String EXECUTION_HISTORY = "/history";
     public static final String STATISTICS = "/statistics";
+    public static final String USERS = "/users";
 
     //roles
     public static final String ALL_FLOWS = "All flows";

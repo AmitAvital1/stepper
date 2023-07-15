@@ -18,7 +18,7 @@ public class RoleDTO {
         this.flowsPermissions = new ArrayList<>();
     }
 
-    RoleDTO(Role role){
+    public RoleDTO(Role role){
         this.roleName = role.getRoleName();
         this.userString = role.getUserString();
         this.flowsPermissions = convertFlowPermissions(role.getFlowsPermissions());

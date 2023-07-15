@@ -1,12 +1,16 @@
 package servlets;
 
 import com.google.gson.Gson;
+import dto.FlowDefinitionDTO;
 import dto.HeaderDetails;
+import dto.StepperDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import project.java.stepper.flow.definition.api.FlowDefinition;
+import project.java.stepper.flow.manager.DataManager;
 import utils.SessionUtils;
 import utils.user.User;
 import utils.user.UserManager;
@@ -14,6 +18,8 @@ import utils.context.ServerContextManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static constants.Constants.USER_HEAD_DETAILS;
 
@@ -40,5 +46,4 @@ public class UserDetailsServlet extends HttpServlet {
             }
         }
     }
-
 }

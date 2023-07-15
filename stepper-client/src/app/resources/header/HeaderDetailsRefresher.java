@@ -24,7 +24,6 @@ public class HeaderDetailsRefresher extends TimerTask {
 
     @Override
     public void run() {
-
         String finalUrl = HttpUrl
                 .parse(USER_HEAD_DETAILS)
                 .newBuilder()

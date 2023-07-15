@@ -36,7 +36,7 @@ public class UserLoginServlet extends HttpServlet {
                 usernameFromParameter = usernameFromParameter.trim();
                 synchronized (this) {
                     if (userManager.isUserExists(usernameFromParameter)) {
-                        String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
+                        String errorMessage = "Username " + usernameFromParameter + " already logged in. Please enter a different username.";
                         response.setStatus(USERNAME_EXIST);
                         out.print(errorMessage);
                     } else {
@@ -48,5 +48,13 @@ public class UserLoginServlet extends HttpServlet {
                 }
             }
         }
+    }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        String usernameFromSession = SessionUtils.getUsername(request);
+        UserManager userManager = ServerContextManager.getUserManager(getServletContext());
+        userManager.logout(usernameFromSession);
     }
 }

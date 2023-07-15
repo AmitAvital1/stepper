@@ -77,4 +77,23 @@ public class LoadXmlServlet extends HttpServlet {
     private String readFromInputStream(InputStream inputStream) {
         return new Scanner(inputStream).useDelimiter("\\Z").next();
     }
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse response) throws IOException, ServletException {
+        DataManager dataManager = ServerContextManager.getStepperManager(getServletContext());
+
+        List<FlowDefinition> flows = dataManager.getFlows();
+        List<FlowDefinitionDTO> dto = new ArrayList<>();
+        for(FlowDefinition flow : flows)
+            dto.add(new FlowDefinitionDTO(flow));
+        StepperDTO stepper = new StepperDTO(dto);
+
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(stepper);
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(jsonResponse);
+            out.flush();
+        }
+    }
+
 }
