@@ -8,6 +8,7 @@ import dto.HeaderDetails;
 import dto.HistoryFlowsDTO;
 import dto.StepperDTO;
 import dto.execution.FlowExecutionDTO;
+import dto.roles.RoleDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,6 +19,7 @@ import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.manager.DataManager;
 import utils.SessionUtils;
 import utils.context.ServerContextManager;
+import utils.user.Role;
 import utils.user.User;
 import utils.user.UserManager;
 
@@ -41,9 +43,12 @@ public class FlowsRefreshServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
         else {
-            List<FlowDefinition> flows = dataManager.getFlows();
-            //Todo all roles
-
+            User user = userManager.getUser(username);
+            List<FlowDefinition> flows;
+            if(user.isManager())
+                flows = dataManager.getFlows();
+            else
+                flows = user.getFlowsPermission();
 
             List<FlowDefinitionDTO> dto = new ArrayList<>();
             for(FlowDefinition flow : flows)

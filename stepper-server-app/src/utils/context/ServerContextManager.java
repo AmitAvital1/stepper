@@ -9,10 +9,10 @@ import utils.user.UserManager;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
-import static constants.Constants.STEPPER_DATA_MANAGER;
-import static constants.Constants.STEPPER_USER_MANAGER;
+import static constants.Constants.*;
 
 public class ServerContextManager {
 
@@ -35,6 +35,16 @@ public class ServerContextManager {
         newFlows.stream().forEach(flow -> {
            data.addFlow(flow);
         });
+        UserManager userManager = ServerContextManager.getUserManager(servletContext);
+        userManager.getRoles().stream().filter(role -> role.getRoleName().equals(ALL_FLOWS)).findFirst().get().setFlowsPermissions(data.getFlows());//Update all flows role
+
+        List<FlowDefinition> readOnlyFlows = new ArrayList<>();
+        data.getFlows().stream().forEach(flow -> {
+            if(flow.isReadOnly())
+                readOnlyFlows.add(flow);
+        });
+        userManager.getRoles().stream().filter(role -> role.getRoleName().equals(READ_ONLY)).findFirst().get().setFlowsPermissions(readOnlyFlows);//Update all flows role
+
     }
 
     public static UserManager getUserManager(ServletContext servletContext) {

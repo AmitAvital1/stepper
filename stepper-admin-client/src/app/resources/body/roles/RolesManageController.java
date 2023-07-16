@@ -125,6 +125,9 @@ public class RolesManageController implements AdminBodyControllerDefinition {
             rolesFlows.add(flowPre.getName());
 
         ListSelectionView<String> roleFlowsList = new ListSelectionView<>();
+        if(role.getRoleName().equals(ALL_FLOWS) || role.getRoleName().equals(READ_ONLY))
+            roleFlowsList.setDisable(true);
+
         Label f1 = new Label("Flows available to add");
         f1.setFont(Font.font("System", FontWeight.BOLD, 14));
         Label f2 = new Label("Role current flows");
@@ -207,7 +210,7 @@ public class RolesManageController implements AdminBodyControllerDefinition {
 
         Label addRole = new Label("Role Details:");
 
-        Label roleName = new Label("Role name");
+        Label roleName = new Label("*Role name:");
         roleName.setStyle("-fx-font-size: 20px;");
         TextField nametextField = new TextField();
         HBox roleNameHBOX = new HBox(10,roleName,nametextField);

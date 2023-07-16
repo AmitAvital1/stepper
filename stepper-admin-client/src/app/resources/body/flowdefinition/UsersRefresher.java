@@ -35,9 +35,6 @@ public class UsersRefresher extends TimerTask {
 
     @Override
     public void run() {
-
-        System.out.println("Hi");
-
         String finalUrl = HttpUrl
                 .parse(USERS)
                 .newBuilder()

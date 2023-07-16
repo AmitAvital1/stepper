@@ -44,16 +44,22 @@ public class RerunFlowServlet extends HttpServlet {
             Gson gson = new Gson();
             FlowExecutionUUIDDTO flowExecutionUUIDDTO = gson.fromJson(requestBodyString, FlowExecutionUUIDDTO.class);
             FlowExecution flowExecution = dataManager.getFlowExecutionByUUID(flowExecutionUUIDDTO.getUuid());
-            FlowExecution newFlow = flowExecution.reRunFlow();
+            if(userManager.getUser(username).getFlowsPermissionNames().contains(flowExecution.getFlowDefinition().getName()) || userManager.getUser(username).isManager()) {
+                FlowExecution newFlow = flowExecution.reRunFlow();
 
-            userManager.addFlowExecutionToRerun(username,newFlow);
-            dataManager.addFlowExecution(newFlow);
+                userManager.addFlowExecutionToRerun(username, newFlow);
+                dataManager.addFlowExecution(newFlow);
 
-            FlowExecutionDTO flowExecutionDTO = new FlowExecutionDTO(newFlow);
-            String jsonResponse = gson.toJson(flowExecutionDTO);
-            try (PrintWriter out = response.getWriter()) {
-                out.print(jsonResponse);
-                out.flush();
+                FlowExecutionDTO flowExecutionDTO = new FlowExecutionDTO(newFlow);
+                String jsonResponse = gson.toJson(flowExecutionDTO);
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(jsonResponse);
+                    out.flush();
+                }
+            }
+            else{
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getOutputStream().print("You have no permission to run " + flowExecution.getFlowDefinition().getName() + " flow");
             }
         }
     }

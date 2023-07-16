@@ -9,10 +9,12 @@ import project.java.stepper.flow.manager.DataManager;
 import java.util.*;
 
 import static constants.Constants.ALL_FLOWS;
+import static constants.Constants.READ_ONLY;
 
 public class UserManager {
     private final List<User> users = new ArrayList<>();
     private final Map<String,User> nameToUser = new HashMap<>();
+    private boolean isAdminLogin = false;
 
     private final List<Role> roles = new ArrayList<>();
     private final Map<Role,List<User>> rolesToUsers = new HashMap<>();
@@ -21,8 +23,11 @@ public class UserManager {
 
     public UserManager(){
         Role allFlows = new Role(ALL_FLOWS, ALL_FLOWS);
+        Role readOnly = new Role(READ_ONLY, "Read-Only flows");
         roles.add(allFlows);
+        roles.add(readOnly);
         rolesToUsers.put(allFlows,new ArrayList<>());
+        rolesToUsers.put(readOnly,new ArrayList<>());
     }
 
     public boolean addUser(String name){
@@ -107,9 +112,19 @@ public class UserManager {
     public synchronized void updateUserManager(String username, boolean isManager){
         User user = this.nameToUser.get(username);
         user.setManager(isManager);
+
     }
 
     public void logout(String usernameFromSession) {
         nameToUser.get(usernameFromSession).setLogin(false);
     }
+
+    public boolean isAdminLogin() {
+        return isAdminLogin;
+    }
+
+    public void setAdminLogin(boolean adminLogin) {
+        isAdminLogin = adminLogin;
+    }
+
 }

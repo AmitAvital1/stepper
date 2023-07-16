@@ -57,4 +57,34 @@ public class UserLoginServlet extends HttpServlet {
         UserManager userManager = ServerContextManager.getUserManager(getServletContext());
         userManager.logout(usernameFromSession);
     }
+    //Admin Login/Logout
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        UserManager userManager = ServerContextManager.getUserManager(getServletContext());
+
+        String loginParam = request.getParameter(ADMIN_LOGIN);
+        if (loginParam == null || loginParam.isEmpty()) {
+            response.setStatus(NO_USERNAME);
+            out.print("Invalid request");
+        }else{
+            if(loginParam.equals("login")){
+                if(userManager.isAdminLogin()) {
+                    out.print("Admin already login to the server. Please try later.");
+                    response.setStatus(510);
+                }
+                else
+                    userManager.setAdminLogin(true);
+            }else if(loginParam.equals("logout")){
+                userManager.setAdminLogin(false);
+            }
+            else{
+                response.setStatus(510);
+                out.print("Invalid request");
+            }
+        }
+
+    }
+
 }

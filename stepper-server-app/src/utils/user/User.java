@@ -1,5 +1,6 @@
 package utils.user;
 
+import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
 
 import java.util.ArrayList;
@@ -13,6 +14,10 @@ public class User {
     private boolean login = true;
 
     private final List<FlowExecution> flowExecutions = new ArrayList<>();
+
+    private List<FlowDefinition> flowsPermission = new ArrayList<>();
+
+    private List<String> flowsPermissionNames = new ArrayList<>();
 
     User(String name){this.name = name;}
 
@@ -43,11 +48,42 @@ public class User {
         this.userRoles = userRoles;
     }
 
+    public List<String> getFlowsPermissionNames() {
+        List<FlowDefinition> userFlows = new ArrayList<>();
+        List<String> userFlowsName = new ArrayList<>();
+        for(Role role : this.userRoles){
+            role.getFlowsPermissions().stream().forEach(f -> {
+                if(!userFlowsName.contains(f.getName())) {
+                    userFlows.add(f);
+                    userFlowsName.add(f.getName());
+                }
+            });
+        }
+        flowsPermission = userFlows;
+        flowsPermissionNames = userFlowsName;
+        return flowsPermissionNames;
+    }
+
     public boolean isLogin() {
         return login;
     }
 
     public void setLogin(boolean login) {
         this.login = login;
+    }
+    public List<FlowDefinition> getFlowsPermission() {
+        List<FlowDefinition> userFlows = new ArrayList<>();
+        List<String> userFlowsName = new ArrayList<>();
+        for(Role role : this.userRoles){
+            role.getFlowsPermissions().stream().forEach(f -> {
+                if(!userFlowsName.contains(f.getName())) {
+                    userFlows.add(f);
+                    userFlowsName.add(f.getName());
+                }
+            });
+        }
+        flowsPermission = userFlows;
+        flowsPermissionNames = userFlowsName;
+        return flowsPermission;
     }
 }

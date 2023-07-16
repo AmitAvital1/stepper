@@ -51,19 +51,21 @@ public class ContinuationFlowRunnerServlet extends HttpServlet {
                     .filter(continuationFlowDetails -> continuationFlowDetails.getTargetFlow().getName().equals(flowName)).
                     findFirst().
                     get();
+            if(userManager.getUser(username).getFlowsPermissionNames().contains(contFlow.getTargetFlow().getName()) || userManager.getUser(username).isManager()) {
+                FlowExecution newFlow = flowExecution.runContinuationFlow(contFlow);
 
-            //Check that he can do this continuation!!!!!
+                userManager.addFlowExecutionToRerun(username, newFlow);
+                dataManager.addFlowExecution(newFlow);
 
-            FlowExecution newFlow = flowExecution.runContinuationFlow(contFlow);
-
-            userManager.addFlowExecutionToRerun(username,newFlow);
-            dataManager.addFlowExecution(newFlow);
-
-            FlowExecutionDTO flowExecutionDTO = new FlowExecutionDTO(newFlow);
-            String jsonResponse = gson.toJson(flowExecutionDTO);
-            try (PrintWriter out = response.getWriter()) {
-                out.print(jsonResponse);
-                out.flush();
+                FlowExecutionDTO flowExecutionDTO = new FlowExecutionDTO(newFlow);
+                String jsonResponse = gson.toJson(flowExecutionDTO);
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(jsonResponse);
+                    out.flush();
+                }
+            }else{
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getOutputStream().print("You have no permission to run " + contFlow.getTargetFlow().getName() + " flow");
             }
         }
     }

@@ -79,7 +79,8 @@ public class ExecutionServlet extends HttpServlet {
         try{
             if(freeInputDTO.getInputFinalName() != null)
                 flowExecution.addFreeInputForStart(freeInputDTO.getInputFinalName(), flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().get(freeInputDTO.getInputFinalName()), freeInputDTO.getInputData());
-            flowExecution.validateToExecute();
+            if(flowExecution != null)
+                flowExecution.validateToExecute();
         }catch (MissMandatoryInput e) {
             response.setStatus(402);
         }catch (StepperExeption e){

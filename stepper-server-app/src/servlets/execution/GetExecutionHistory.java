@@ -13,6 +13,7 @@ import project.java.stepper.flow.execution.FlowExecutionResult;
 import project.java.stepper.flow.manager.DataManager;
 import utils.SessionUtils;
 import utils.context.ServerContextManager;
+import utils.user.User;
 import utils.user.UserManager;
 
 import java.io.IOException;
@@ -37,11 +38,20 @@ public class GetExecutionHistory extends HttpServlet {
         else {
             List<FlowExecution> flows = userManager.getUser(username).getFlowExecutions();
             List<FlowExecutionDTO> dto = new ArrayList<>();
-            for(FlowExecution flow : flows) {
-                if(flow.getFlowExecutionResult() != FlowExecutionResult.NA)
-                    dto.add(new FlowExecutionDTO(flow));
+            if(userManager.getUser(username).isManager()) {
+                for (User user : userManager.getUsers()) {
+                    user.getFlowExecutions().stream().forEach(f -> {
+                        if(f.getFlowExecutionResult() != FlowExecutionResult.NA)
+                            dto.add(new FlowExecutionDTO(f, user.getName()));
+                    });
+                }
+            }else {
+                for (FlowExecution flow : flows) {
+                    if (flow.getFlowExecutionResult() != FlowExecutionResult.NA) {
+                        dto.add(new FlowExecutionDTO(flow, userManager.getUser(username).getFlowsPermissionNames(), username));
+                    }
+                }
             }
-
             HistoryFlowsDTO history = new HistoryFlowsDTO(dto);
 
             Gson gson = new Gson();

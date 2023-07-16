@@ -28,11 +28,22 @@ public class FlowExecutionDTO {
     private final List<flowOutputsDataDTO> outputsStepData;
     private Integer stepFinished = new Integer(0);
     private Map<String, String> formalOutputNameToClass = new HashMap<>();
+    private String usernameExe;
 
     private List<String> flowsContinuation;
 
     private final List<String> AllFreeInputsWithDataToPrintList;
     private final List<String> AllOutPutsWithDataToPrintList;
+
+    public FlowExecutionDTO(FlowExecution flowExecution,String username){
+        this(flowExecution);
+        usernameExe = username;
+    }
+
+    public FlowExecutionDTO(FlowExecution flowExecution,List<String> contPermissions,String username){
+        this(flowExecution,contPermissions);
+        usernameExe = username;
+    }
 
     public FlowExecutionDTO(FlowExecution flowExecution){
         this.uniqueId = flowExecution.getUniqueId();
@@ -49,7 +60,27 @@ public class FlowExecutionDTO {
         this.AllOutPutsWithDataToPrintList = flowExecution.getAllOutPutsWithDataToPrintList();
 
     }
+    public FlowExecutionDTO(FlowExecution flowExecution,List<String> contPermissions){
+        this.uniqueId = flowExecution.getUniqueId();
+        this.flowDefinition = new FlowDefinitionDTO(flowExecution.getFlowDefinition());
+        this.flowContexts = new StepExecutionContextDTO(flowExecution.getFlowContexts());
+        this.totalTime = flowExecution.getDuration();
+        this.startedTime = flowExecution.getStartedTime();
+        this.flowExecutionResult = flowExecution.getFlowExecutionResult();
+        this.startersFreeInputForContext = flowExecution.getStartersFreeInputForContext();
+        this.outputsStepData = convertoutputsStepData(flowExecution.getOutputsStepData());
+        this.stepFinished = flowExecution.getStepFinishedProperty().get();
+        this.AllFreeInputsWithDataToPrintList = flowExecution.getAllFreeInputsWithDataToPrintList();
+        this.AllOutPutsWithDataToPrintList = flowExecution.getAllOutPutsWithDataToPrintList();
 
+        List<String> allCont =  flowExecution.getFlowDefinition().getFlowsContinuations().stream().map(continuationFlowDetails -> continuationFlowDetails.getTargetFlow().getName()).collect(Collectors.toList());
+        List<String> userCont = new ArrayList<>();
+        allCont.stream().forEach(cont -> {
+            if(contPermissions.contains(cont))
+                userCont.add(cont);
+        });
+        flowsContinuation = userCont;
+    }
     private List<flowOutputsDataDTO> convertoutputsStepData(List<FlowExecution.flowOutputsData> outputsStepData) {
         List<flowOutputsDataDTO> res = new ArrayList<>();
         for(FlowExecution.flowOutputsData data : outputsStepData){
@@ -176,5 +207,12 @@ public class FlowExecutionDTO {
     public List<FlowExecutionDTO.flowOutputsDataDTO> getOutputsStepData(){return outputsStepData; }
     public List<String> getAllOutPutsWithDataToPrintList() {
         return AllOutPutsWithDataToPrintList;
+    }
+    public String getUsernameExe() {
+        return usernameExe;
+    }
+
+    public void setUsernameExe(String usernameExe) {
+        this.usernameExe = usernameExe;
     }
 }
