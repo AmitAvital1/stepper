@@ -12,6 +12,7 @@ public class AdminConstants {
     public static final String USERS = FULL_SERVER_PATH + "/users";
     public static final String USER_HEAD_DETAILS = FULL_SERVER_PATH + "/header-details";
     public static final String ADMIN_LOGIN = FULL_SERVER_PATH + "/login";
+    public static final String EXECUTION_HISTORY = FULL_SERVER_PATH + "/history";
 
     //statics roles
     public static final String ALL_FLOWS = "All flows";

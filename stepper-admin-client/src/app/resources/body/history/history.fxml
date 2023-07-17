@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.resources.body.history.AdminHistoryController">
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="TOP_RIGHT">
+               <children>
+                  <Label text="Filter:">
+                     <padding>
+                        <Insets top="3.0" />
+                     </padding>
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="sortTableChoice" prefHeight="25.0" prefWidth="67.0" />
+               </children>
+            </HBox>
+            <TableView fx:id="historyOfExecutionsFlowsTable" prefHeight="245.0" prefWidth="488.0">
+              <columns>
+                  <TableColumn fx:id="usernameColumn" minWidth="0.0" prefWidth="66.0" text="Username" />
+                <TableColumn fx:id="nameColumn" minWidth="0.0" prefWidth="66.0" text="Flow name" />
+                <TableColumn fx:id="executionTimeColum" prefWidth="100.0" text="Execution time" />
+                  <TableColumn fx:id="resultColumn" prefWidth="71.0" text="Result" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <StackPane minHeight="400.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox>
+               <children>
+                  <VBox fx:id="flowChooseVBOX" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="flowChooseName" text="Flow Name">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </Label>
+                        <HBox spacing="15.0">
+                           <children>
+                              <Label fx:id="flowChooseId" text="flow id" />
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" />
+                           </padding>
+                        </HBox>
+                        <Accordion VBox.vgrow="ALWAYS">
+                          <panes>
+                            <TitledPane alignment="TOP_LEFT" animated="false" text="Free inputs">
+                              <content>
+                                <AnchorPane>
+                                       <children>
+                                          <ListView fx:id="freeInputsList" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                              <TitledPane alignment="TOP_LEFT" text="Flow outputs">
+                                 <content>
+                                    <ScrollPane>
+                                       <content>
+                                          <AnchorPane>
+                                             <children>
+                                                <VBox fx:id="flowOutputsList" spacing="5.0">
+                                                   <padding>
+                                                      <Insets left="5.0" />
+                                                   </padding>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                       </content>
+                                    </ScrollPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane alignment="TOP_LEFT" animated="false" text="All Step Details">
+                                 <content>
+                                    <AnchorPane>
+                                       <children>
+                                          <TreeView fx:id="stepDetailsTree" showRoot="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                          </panes>
+                        </Accordion>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="2.0" right="2.0" />
+         </BorderPane.margin>
+      </StackPane>
+   </center>
+</BorderPane>

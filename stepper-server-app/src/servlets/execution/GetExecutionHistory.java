@@ -26,10 +26,9 @@ import static constants.Constants.EXECUTION_HISTORY;
 @WebServlet(name = "historyServlet", urlPatterns = {EXECUTION_HISTORY})
 public class GetExecutionHistory extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         UserManager userManager = ServerContextManager.getUserManager(getServletContext());
-        DataManager dataManager = ServerContextManager.getStepperManager(getServletContext());
 
         String username = SessionUtils.getUsername(request);
         if (username == null) {
@@ -62,5 +61,28 @@ public class GetExecutionHistory extends HttpServlet {
                 out.flush();
             }
         }
+    }
+    //Admin History Req
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        UserManager userManager = ServerContextManager.getUserManager(getServletContext());
+            List<FlowExecutionDTO> dto = new ArrayList<>();
+
+                for (User user : userManager.getUsers()) {
+                    user.getFlowExecutions().stream().forEach(f -> {
+                        if(f.getFlowExecutionResult() != FlowExecutionResult.NA)
+                            dto.add(new FlowExecutionDTO(f, user.getName()));
+                    });
+                }
+            HistoryFlowsDTO history = new HistoryFlowsDTO(dto);
+
+            Gson gson = new Gson();
+            String jsonResponse = gson.toJson(history);
+
+            try (PrintWriter out = response.getWriter()) {
+                out.print(jsonResponse);
+                out.flush();
+            }
     }
 }
