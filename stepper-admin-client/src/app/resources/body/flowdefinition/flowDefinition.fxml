@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="576.0" prefWidth="866.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.resources.body.flowdefinition.UserManagementController">
+   <center>
+      <HBox alignment="TOP_CENTER" prefHeight="547.0" prefWidth="866.0" BorderPane.alignment="TOP_CENTER">
+         <children>
+            <VBox fx:id="flowListOfButtons" alignment="TOP_CENTER" spacing="20.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label alignment="CENTER" prefHeight="50.0" prefWidth="330.0" styleClass="semiTitles" text="Available flows:" VBox.vgrow="ALWAYS">
+                     <font>
+                        <Font size="25.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="flowDetailsBox" nodeOrientation="LEFT_TO_RIGHT" prefHeight="401.0" prefWidth="410.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <HBox spacing="5.0">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <children>
+                        <Label fx:id="FlowNameTL" styleClass="names" text="Name of the flow">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Label>
+                        <ImageView id="readOnlyImage" fx:id="readOnlyImage" fitHeight="23.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER">
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                           <image>
+                              <Image url="app/resources/img/read-only.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </HBox>
+                  <Label fx:id="flowDescribtionTL" alignment="TOP_LEFT" styleClass="descreptions" text="The flow describes" />
+                  <GridPane prefHeight="284.0" prefWidth="415.0" VBox.vgrow="ALWAYS">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" />
+                        <RowConstraints maxHeight="142.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <TreeView fx:id="flowDetailsTreeView" fixedCellSize="30.0" showRoot="false" styleClass="flowDetailsTree" />
+                        <GridPane minHeight="100.0" prefHeight="62.0" prefWidth="415.0" GridPane.rowIndex="1">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints maxHeight="88.0" minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+                            <RowConstraints maxHeight="93.0" minHeight="10.0" prefHeight="20.0" vgrow="ALWAYS" />
+                          </rowConstraints>
+                           <children>
+                              <Button fx:id="executeFlowDFButton" alignment="TOP_LEFT" mnemonicParsing="false" text="Execute Flow" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin></Button>
+                           </children>
+                        </GridPane>
+                     </children>
+                  </GridPane>
+               </children>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+               <padding>
+                  <Insets left="50.0" />
+               </padding>
+            </VBox>
+            <fx:include fx:id="bodyForFlowDefinition" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="0.0" prefWidth="0.0" source="../body.fxml" />
+         </children>
+         <padding>
+            <Insets bottom="4.0" left="5.0" right="5.0" top="4.0" />
+         </padding>
+         <BorderPane.margin>
+            <Insets top="15.0" />
+         </BorderPane.margin>
+      </HBox>
+   </center>
+</BorderPane>

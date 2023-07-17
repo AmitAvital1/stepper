@@ -1,0 +1,174 @@
+
+.root {
+    -fx-font-family: Trebuchet MS;
+    -fx-text-fill: #6433E0;
+    -fx-background: #222225;
+    -fx-font-size: 13px
+}
+#stepperTitle {
+    -fx-font-size: 40px; /* Updated size to 40px */
+    -fx-font-weight: bold;
+    -fx-text-fill: #45a049; /* Vibrant orange */
+    -fx-padding: 20px 0;
+}
+/* Buttons */
+.button {
+    -fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);
+    -fx-background-radius: 8px;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-font-style: normal;
+    -fx-padding: 8px 16px;
+    -fx-border-radius: 10px;
+    -fx-display-caret: inline-flex;
+    -fx-alignment: center;
+    -fx-text-fill: white;
+}
+.button:pressed {
+    -fx-scale-x: 0.90;
+    -fx-scale-y: 0.90;
+}
+#loginButton {
+    -fx-background-image: url('/app/resources/img/header/upload.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: left;
+    -fx-background-size: 30px 30px;
+    -fx-padding: 8 15 8 35px;
+}
+#flowDefinitionButtom {
+    -fx-background-image: url('/app/resources/img/header/flow-definition-icon.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: left;
+    -fx-background-size: 30px 30px;
+    -fx-padding: 8 15 8 35px;
+}
+#flowExecutionButton {
+    -fx-background-image: url('/app/resources/img/header/execution-logo.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: left;
+    -fx-background-size: 30px 30px;
+    -fx-padding: 8 15 8 35px;
+}
+#executionHistoryButton {
+    -fx-background-image: url('/app/resources/img/header/history-logo.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: left;
+    -fx-background-size: 30px 30px;
+    -fx-padding: 8 15 8 35px;
+}
+#statisticsFlowsButton {
+    -fx-background-image: url('/app/resources/img/header/statistics-logo.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: left;
+    -fx-background-size: 30px 30px;
+    -fx-padding: 8 15 8 35px;
+}
+.button:hover {
+    -fx-background-color: #5482d0; /* Darker green */
+}
+.text-field {
+    -fx-width: 100%;
+    -fx-text-fill: rgb(0, 0, 0);
+    -fx-font-size: 16px;
+    -fx-line-height: 15px;
+    -fx-min-height: 30px;
+    -fx-border-radius: 4px;
+    -fx-padding: 8px 16px;
+    -fx-border-width: 2px;
+    -fx-border-color: transparent;
+    -fx-background-color: rgb(251, 251, 251);
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 0, 1, 0, 1);
+    -fx-transition: all 0.1s ease 0s;
+}
+
+#usernameTextField {
+    -fx-width: 100%;
+    -fx-text-fill: rgb(0, 0, 0);
+    -fx-font-size: 16px;
+    -fx-line-height: 20px;
+    -fx-min-height: 40px;
+    -fx-border-radius: 4px;
+    -fx-padding: 8px 16px;
+    -fx-border-width: 2px;
+    -fx-border-color: transparent;
+    -fx-background-color: rgb(251, 251, 251);
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 0, 1, 0, 1);
+    -fx-transition: all 0.1s ease 0s;
+}
+
+/* Labels */
+.execution .label{
+    -fx-font-family: "Consolas";
+    -fx-font-size: 22px;
+    -fx-padding: 7px;
+    -fx-text-fill: #6433E0;
+}
+.semiTitles {
+    -fx-font-family: "Lucida Sans Unicode";
+    -fx-font-size: 30px;
+    /* other styles... */
+}
+.names {
+    -fx-font-family: "Lucida Sans Unicode";
+    -fx-font-size: 20px;
+    /* other styles... */
+}
+.descreptions {
+    -fx-font-family: "Lucida Sans Unicode";
+    -fx-font-size: 15px;
+    /* other styles... */
+}
+    /* Hyperlinks */
+.hyperlink {
+    -fx-font-size: 14px;
+    -fx-text-fill: #0645AD; /* Blue */
+    -fx-cursor: hand;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #0B0080; /* Darker blue */
+}
+
+/* List Views */
+.list-view {
+    -fx-font-size: 14px;
+}
+
+.list-cell {
+    -fx-padding: 6px;
+    -fx-text-fill: white;
+    -fx-background-color: #222225;
+}
+
+.list-cell:selected {
+    -fx-background-color: white;
+    -fx-text-fill: #222225;
+}
+
+/* Table Views */
+.table-view {
+    -fx-background-color: #f1f1f1;
+    -fx-font-size: 14px;
+    -fx-text-fill: #222225;
+}
+
+.table-cell {
+    -fx-padding: 6px;
+    -fx-text-fill: #222225;
+}
+.tree-view{
+    -fx-background-color: #222225;
+    -fx-cell-size: 40;
+    -fx-text-fill: white;
+}
+.tree-view .cell {
+    -fx-background-color: #222225;
+    -fx-text-fill: white;
+}
+.flowDetailsTree {
+    -fx-font-size: 15px;
+    -fx-cell-size: 40;
+    -fx-text-fill: white;
+}
