@@ -27,14 +27,8 @@ public class StatisticsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
-        UserManager userManager = ServerContextManager.getUserManager(getServletContext());
         DataManager dataManager = ServerContextManager.getStepperManager(getServletContext());
 
-        String username = SessionUtils.getUsername(request);
-        if (username == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
-        else {
             List<FlowDefinition> flows = dataManager.getFlows();
             List<FlowStatisticsDTO> dto = new ArrayList<>();
             for(FlowDefinition flow : flows)
@@ -50,5 +44,4 @@ public class StatisticsServlet extends HttpServlet {
                 out.flush();
             }
         }
-    }
 }
