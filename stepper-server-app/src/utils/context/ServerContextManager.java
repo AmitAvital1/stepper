@@ -31,7 +31,7 @@ public class ServerContextManager {
     public static void addFlows(ServletContext servletContext, byte[] bytes) throws JAXBException, StepperExeption, FileNotFoundException {
 
         DataManager data = ServerContextManager.getStepperManager(servletContext);
-        List<FlowDefinition> newFlows = LoadStepperDataFromXml.load(bytes,data.getFlowsExecutionManager());
+        List<FlowDefinition> newFlows = LoadStepperDataFromXml.load(bytes,data.getFlowsExecutionManager(),data.getFlows());
         newFlows.stream().forEach(flow -> {
            data.addFlow(flow);
         });

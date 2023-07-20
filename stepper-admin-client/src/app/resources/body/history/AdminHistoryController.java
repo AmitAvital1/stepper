@@ -2,19 +2,13 @@ package app.resources.body.history;
 
 import app.resources.body.AdminBodyController;
 import app.resources.body.AdminBodyControllerDefinition;
-import app.resources.body.flowdefinition.UserManagementController;
-import app.resources.body.flowdefinition.UsersRefresher;
 import app.resources.util.http.AdminHttpClientUtil;
 import com.google.gson.Gson;
 import dto.FlowDefinitionDTO;
 import dto.HistoryFlowsDTO;
 import dto.StepUsageDeclarationImplDTO;
 import dto.execution.FlowExecutionDTO;
-import dto.execution.FlowExecutionUUIDDTO;
 import dto.execution.StepExecutionContextDTO;
-import dto.users.UpdateManagerDTO;
-import dto.users.UserDTO;
-import dto.users.UsersDTO;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -23,15 +17,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -39,15 +30,9 @@ import javafx.util.Duration;
 import okhttp3.*;
 import org.controlsfx.control.PopOver;
 import org.jetbrains.annotations.NotNull;
-import project.java.stepper.dd.impl.DataDefinitionRegistry;
-import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.flow.definition.api.FlowDefinition;
-import project.java.stepper.flow.definition.api.FlowDefinitionImpl;
-import project.java.stepper.flow.definition.api.StepUsageDeclaration;
-import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
-import project.java.stepper.flow.execution.context.StepExecutionContextImpl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +42,6 @@ import java.util.TimerTask;
 import java.util.function.Predicate;
 
 import static app.resources.util.AdminConstants.EXECUTION_HISTORY;
-import static app.resources.util.AdminConstants.USERS;
 
 public class AdminHistoryController implements AdminBodyControllerDefinition {
     private AdminBodyController bodyForHistoryExecutionController;
@@ -94,7 +78,6 @@ public class AdminHistoryController implements AdminBodyControllerDefinition {
 
 
     private List<FlowExecutionDTO> flowExecutions  = new ArrayList<>();
-    private List<FlowDefinition> flows;
     private PopOver errorPopOver;
 
     private Timer timer;
@@ -157,8 +140,8 @@ public class AdminHistoryController implements AdminBodyControllerDefinition {
     }
 
     @Override
-    public void setFlowsDetails(List<FlowDefinition> flow, List<FlowDefinitionDTO> flowDTO) {
-        flows = flow;
+    public void setFlowsDetails(List<FlowDefinitionDTO> flowDTO) {
+
     }
 
     @Override

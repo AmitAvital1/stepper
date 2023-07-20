@@ -80,6 +80,29 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 0, 1, 0, 1);
     -fx-transition: all 0.1s ease 0s;
 }
+.segmented-button {
+    /* Add your styles here */
+    -fx-background-color: rgb(251, 251, 251);
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+.segmented-button .toggle-button {
+    /* Styles for the individual toggle buttons within the segmented button */
+    -fx-background-color: rgb(251, 251, 251);
+    -fx-text-fill: #333;
+    -fx-border-color: linear-gradient(to right,#196BCA ,#6433E0);
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-font-size: 14px;
+}
+
+.segmented-button .toggle-button:selected {
+    /* Styles for the selected toggle button within the segmented button */
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+}
 
 #usernameTextField {
     -fx-width: 100%;

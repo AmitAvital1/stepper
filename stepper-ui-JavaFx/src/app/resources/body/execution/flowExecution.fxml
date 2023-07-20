@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="theAllBorderOfExecute" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.resources.body.execution.AdminFlowsExecutionController">
+<BorderPane fx:id="theAllBorderOfExecute" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.resources.body.execution.FlowsExecutionController">
    <center>
       <HBox alignment="TOP_CENTER" prefHeight="781.0" prefWidth="2105.0" BorderPane.alignment="TOP_CENTER">
          <padding>

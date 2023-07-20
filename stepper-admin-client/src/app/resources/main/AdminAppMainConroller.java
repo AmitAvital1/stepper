@@ -13,8 +13,6 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import project.java.stepper.flow.execution.FlowExecution;
-import project.java.stepper.flow.execution.runner.FlowsExecutionManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,10 +31,6 @@ public class AdminAppMainConroller {
     private Stage primaryStage;
 
     private List<FlowDefinitionDTO> flows = new ArrayList<>();
-    private final List<FlowExecution> flowExecutions = new ArrayList<>();
-
-
-    private FlowsExecutionManager flowsExecutionManager = new FlowsExecutionManager();
 
     @FXML
     public void initialize() {
@@ -57,16 +51,6 @@ public class AdminAppMainConroller {
     public void showFlowExectuion(){ bodyComponentController.showFlowExecution(); }
     public void addFlows(List<FlowDefinitionDTO> newFlows){flows = newFlows;}
     public List<FlowDefinitionDTO> getFlows(){return flows;}
-    public void addExecutorFlow(FlowExecution flowExecution){
-        this.flowExecutions.add(flowExecution);
-        headerComponentController.setFlowHistory();//Set the button available
-    }
-    public List<FlowExecution> getFlowExecutions(){return flowExecutions;}
-
-    public FlowsExecutionManager getFlowsExecutionManager() {
-        return flowsExecutionManager;
-    }
-
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;

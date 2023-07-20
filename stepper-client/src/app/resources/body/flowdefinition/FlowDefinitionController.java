@@ -2,10 +2,12 @@ package app.resources.body.flowdefinition;
 
 import app.resources.body.BodyController;
 import app.resources.body.BodyControllerDefinition;
+import app.resources.main.FlowDefinitionRefresher;
 import dto.DataDefinitionDeclarationDTO;
 import dto.FlowDefinitionDTO;
 import dto.StepUsageDeclarationImplDTO;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
@@ -19,6 +21,9 @@ import project.java.stepper.step.api.DataDefinitionDeclaration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+
+import static app.resources.util.Constants.REFRESH_RATE;
 
 public class FlowDefinitionController implements BodyControllerDefinition {
     @FXML private Parent bodyForFlowDefinition;
@@ -35,21 +40,44 @@ public class FlowDefinitionController implements BodyControllerDefinition {
     private List<FlowDefinition> flows;
     private List<FlowDefinitionDTO> flowsDTO;
     private List<Button> allFlowsButtons = new ArrayList<>();
+    private String lastButton = new String("");
+    private Timer timer;
 
     @Override
     public void show() {
         flowDetailsBox.setVisible(false);
+        startFlowsDefinitionRefresher();
+    }
+    public void startFlowsDefinitionRefresher() {
+        FlowDefinitionRefresher FlowDefinitionRefresher = new FlowDefinitionRefresher(this);
+        timer = new Timer();
+        timer.schedule(FlowDefinitionRefresher, 0, REFRESH_RATE);
+        bodyForFlowDefinitionController.setTimer(timer);
+    }
+    public void updateFlows(){
+        Label title = (Label)flowListOfButtons.getChildren().get(0);
+        title.setText("Available flows:");
+        if(flowsDTO.size() == 0) {
+            flowDetailsBox.setVisible(false);
+            title.setText("No flows available");
+            lastButton = "";
+        }
+        flowListOfButtons.getChildren().clear();
+        flowListOfButtons.getChildren().add(title);
         for (FlowDefinitionDTO flow : flowsDTO) {
             Button button = new Button(flow.getName());
             allFlowsButtons.add(button);
             button.setOnAction(e -> handleButtonAction(flow,button));
             flowListOfButtons.getChildren().add(button);
+            if(flow.getName().equals(lastButton))
+                button.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
         }
-    }
 
+    }
     private void handleButtonAction(FlowDefinitionDTO flowButton, Button button) {
         allFlowsButtons.stream().forEach(b -> b.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);"));
         button.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
+        lastButton = button.getText();
 
         flowDetailsBox.setVisible(true);
         FlowNameTL.setText(flowButton.getName());
@@ -74,16 +102,7 @@ public class FlowDefinitionController implements BodyControllerDefinition {
                 flowStepsItem.getChildren().add(new TreeItem<>(step.getStepDefinition().name() + " Alias to:" + step.getFinalStepName() + ", Read Only:" + step.getStepDefinition().isReadonly()));
         }
         TreeItem<String> freeInputsItem = new TreeItem<>("Free inputs");
-       /* for(Map.Entry<StepUsageDeclarationImplDTO, List<DataDefinitionDeclarationDTO>> entry : flowButton.getFlowFreeInputs().entrySet()) {
-            StepUsageDeclarationImplDTO key = entry.getKey();
-            List<DataDefinitionDeclarationDTO> value = entry.getValue();
-            for(DataDefinitionDeclarationDTO data : value) {
-                freeInputsItem.getChildren().add(new TreeItem<>(key.getinputToFinalName().get(data.getName()) + ":" + data.userString() +
-                        "(" + (!flowButton.getInitialValues().containsKey(key.getinputToFinalName().get(data.getName())) ? data.necessity() : "INITIANAL") + ")"));
-                freeInputsItem.getChildren().add(new TreeItem<>("Data type:" + data.dataDefinition().getName()));
-                freeInputsItem.getChildren().add(new TreeItem<>(""));
-            }
-        }*/
+
         for(Map.Entry<String, DataDefinitionDeclarationDTO> entry : flowButton.getFreeInputFinalNameToDD().entrySet()) {
             String key = entry.getKey();
             DataDefinitionDeclarationDTO value = entry.getValue();

@@ -62,6 +62,9 @@ public class ExecutionServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         StringBuilder requestBody = new StringBuilder();
         DataManager dataManager = ServerContextManager.getStepperManager(getServletContext());
+        UserManager userManager = ServerContextManager.getUserManager(getServletContext());
+
+        String username = SessionUtils.getUsername(req);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
             String line;
@@ -75,18 +78,23 @@ public class ExecutionServlet extends HttpServlet {
         Gson gson = new Gson();
         FreeInputDTO freeInputDTO = gson.fromJson(requestBodyString, FreeInputDTO.class);
         FlowExecution flowExecution = dataManager.getFlowExecutionByUUID(freeInputDTO.getUUID());
-
-        try{
-            if(freeInputDTO.getInputFinalName() != null)
-                flowExecution.addFreeInputForStart(freeInputDTO.getInputFinalName(), flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().get(freeInputDTO.getInputFinalName()), freeInputDTO.getInputData());
-            if(flowExecution != null)
-                flowExecution.validateToExecute();
-        }catch (MissMandatoryInput e) {
-            response.setStatus(402);
-        }catch (StepperExeption e){
+        if(userManager.getUser(username).getFlowsPermissionNames().contains(flowExecution.getFlowDefinition().getName()) || userManager.getUser(username).isManager()) {
+            try {
+                if (freeInputDTO.getInputFinalName() != null)
+                    flowExecution.addFreeInputForStart(freeInputDTO.getInputFinalName(), flowExecution.getFlowDefinition().getFreeInputFinalNameToDD().get(freeInputDTO.getInputFinalName()), freeInputDTO.getInputData());
+                if (flowExecution != null)
+                    flowExecution.validateToExecute();
+            } catch (MissMandatoryInput e) {
+                response.setStatus(402);
+            } catch (StepperExeption e) {
+                response.setStatus(403);
+                out.print(e.getMessage());
+            }
+        }else{
             response.setStatus(403);
-            out.print(e.getMessage());
+            out.print("You have no permission to run");
         }
+
     }
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse response) throws IOException, ServletException {

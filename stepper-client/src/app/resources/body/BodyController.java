@@ -18,6 +18,7 @@ import project.java.stepper.flow.execution.runner.FlowsExecutionManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Timer;
 
 public class BodyController {
 
@@ -37,6 +38,8 @@ public class BodyController {
     }
 
     FlowExecutionDTO currentFlow = null;
+
+    private Timer timer = null;
 
     public void setMainController(AppMainConroller mainController) {
         this.mainController = mainController;
@@ -155,5 +158,13 @@ public class BodyController {
 
     public void setCurrentUUID(String currentUUID) {
         CurrentUUID = currentUUID;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+    public void shutDown(){
+        if(timer != null)
+            timer.cancel();
     }
 }

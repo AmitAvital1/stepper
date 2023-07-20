@@ -1,4 +1,4 @@
-package app.resources.body.flowdefinition;
+package app.resources.body.usermanagement;
 
 import app.resources.body.AdminBodyController;
 import app.resources.body.AdminBodyControllerDefinition;
@@ -64,6 +64,13 @@ public class UserManagementController implements AdminBodyControllerDefinition {
     @Override
     public void show() {
         userDetailsVBOX.setVisible(false);
+
+        Label placeholderLabel = new Label("There are no flows permissions to this user");
+        userAvailableFlowsList.setPlaceholder(placeholderLabel);
+
+        Label placeholderLabel2 = new Label("There are no users sing to stepper yet");
+        usersList.setPlaceholder(placeholderLabel2);
+
         geAllUsers();
     }
 
@@ -267,13 +274,10 @@ public class UserManagementController implements AdminBodyControllerDefinition {
     }
 
     @Override
-    public void setFlowsDetails(List<FlowDefinition> flow,List<FlowDefinitionDTO> flowDTO) {
+    public void setFlowsDetails(List<FlowDefinitionDTO> flowDTO) {
 
     }
 
-    void executeFlowDFButton(FlowDefinition flow) {
-        bodyForFlowDefinitionController.executeExistFlowScreen(flow);
-    }
     @Override
     public void setBodyController(AdminBodyController bodyCTRL) {
         bodyForFlowDefinitionController = bodyCTRL;

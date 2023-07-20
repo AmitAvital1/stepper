@@ -15,7 +15,7 @@ public class FileDumperStep extends AbstractStepDefinition {
         super("File Dumper", true);
 
         addInput(new DataDefinitionDeclarationImpl("CONTENT", DataNecessity.MANDATORY, "Content", DataDefinitionRegistry.STRING, UIDDPresent.NA));
-        addInput(new DataDefinitionDeclarationImpl("FILE_NAME", DataNecessity.MANDATORY, "Target file path", DataDefinitionRegistry.STRING,UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("FILE_NAME", DataNecessity.MANDATORY, "Target file path", DataDefinitionRegistry.STRING,UIDDPresent.FILE_CHOOSER));
 
         addOutput(new DataDefinitionDeclarationImpl("RESULT", DataNecessity.NA, "File Creation Result", DataDefinitionRegistry.STRING, UIDDPresent.NA));
     }

@@ -1,14 +1,11 @@
-package app.resources.body.flowdefinition;
+package app.resources.body.usermanagement;
 
 import app.resources.util.http.AdminHttpClientUtil;
 import com.google.gson.Gson;
-import dto.HeaderDetails;
-import dto.users.UpdateManagerDTO;
 import dto.users.UserDTO;
 import dto.users.UsersDTO;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +15,6 @@ import java.util.List;
 import java.util.TimerTask;
 
 import static app.resources.util.AdminConstants.USERS;
-import static app.resources.util.AdminConstants.USER_HEAD_DETAILS;
 
 
 public class UsersRefresher extends TimerTask {

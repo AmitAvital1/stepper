@@ -16,7 +16,10 @@ public enum StepDefinitionRegistry {
     PROPERTIES_EXPORTER_STEP(new PropertiesExporterStep()),
     FILE_DUMPER_STEP(new FileDumperStep()),
     ZIPPER_STEP(new ZipperStep()),
-    COMMAND_LINE_STEP(new CommandLineStep())
+    COMMAND_LINE_STEP(new CommandLineStep()),
+    HTTP_CALL(new HttpCallStep()),
+    TO_JSON(new ToJsonStep()),
+    JSON_EXTRACTOR(new JsonDataExtractor())
     ;
 
     private final StepDefinition stepDefinition;

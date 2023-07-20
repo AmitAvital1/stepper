@@ -23,7 +23,7 @@ public class LoadStepperDataFromXml {
     This function load data from xml path. Using JAXB to get data from xml, and make deep copy to Flows in our system
      */
     private final static String JAXB_XML_PACKAGE_NAME = "project.java.stepper.schema.generated";
-    public static List<FlowDefinition> load(byte[] xmlBytes, FlowsExecutionManager flowsExecutionManager) throws FileNotFoundException, JAXBException, StepperExeption {
+    public static List<FlowDefinition> load(byte[] xmlBytes, FlowsExecutionManager flowsExecutionManager, List<FlowDefinition> flows) throws FileNotFoundException, JAXBException, StepperExeption {
         List<FlowDefinition> flowList = new ArrayList<>();
         InputStream inputStream = new ByteArrayInputStream(xmlBytes);
         STStepper genStepper = deserializeFrom(inputStream);
@@ -35,6 +35,7 @@ public class LoadStepperDataFromXml {
                 flowList.add(systemFlow);//Add the flow to the list
             }
         }
+        flowList.addAll(flows);
         addContinuations(flowList, genStepper);
 
         if(genStepper.getSTThreadPool() <= 0)

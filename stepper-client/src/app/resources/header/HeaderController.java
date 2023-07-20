@@ -108,8 +108,8 @@ public class HeaderController implements Closeable {
                         flowDefinitionButtom.setDisable(false);
                         flowExecutionButton.setDisable(true);
                         statisticsFlowsButton.setDisable(false);
+                        executionHistoryButton.setDisable(false);
                     });
-                    mainController.startFlowsDefinitionRefresher();
                 }
             }
         });

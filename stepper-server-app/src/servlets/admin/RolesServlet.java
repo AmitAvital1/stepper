@@ -35,7 +35,7 @@ public class RolesServlet extends HttpServlet {
         UserManager userManager = ServerContextManager.getUserManager(getServletContext());
 
         List<Role> roles = userManager.getRoles();
-        RolesDTO roleList = new RolesDTO(roles);
+        RolesDTO roleList = new RolesDTO(roles,userManager.getRolesToUsers());
 
         Gson gson = new Gson();
         String jsonResponse = gson.toJson(roleList);

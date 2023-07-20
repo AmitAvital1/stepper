@@ -106,7 +106,7 @@ public class AdminStatisticsController implements AdminBodyControllerDefinition 
     }
 
     @Override
-    public void setFlowsDetails(List<FlowDefinition> flow, List<FlowDefinitionDTO> flowDTO) {
+    public void setFlowsDetails(List<FlowDefinitionDTO> flowDTO) {
 
     }
 

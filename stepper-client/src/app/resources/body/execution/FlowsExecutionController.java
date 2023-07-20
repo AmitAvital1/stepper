@@ -32,6 +32,7 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 import okhttp3.*;
 import org.controlsfx.control.PopOver;
+import org.controlsfx.control.SegmentedButton;
 import org.jetbrains.annotations.NotNull;
 import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
@@ -121,12 +122,6 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 }
             }
         }
-        for (FlowDefinitionDTO flow : flowsDTO) {
-            Button button = new Button(flow.getName());
-            allFlowsButtons.add(button);
-            button.setOnAction(e -> {handleFlowButtonAction(flow); allFlowsButtons.stream().forEach(b -> b.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);"));
-                button.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");});
-        }
     }
 
     public void handleFlowButtonAction(FlowDefinitionDTO flowButton) {
@@ -141,6 +136,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flowExecutionInfo.setVisible(false);
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
+        SegmentedButton segmentedButton = new SegmentedButton();
         Map<String, DataDefinitionDeclarationDTO> freeInputs = flowButton.getFreeInputFinalNameToDD();
         for (Map.Entry<String, DataDefinitionDeclarationDTO> entry : freeInputs.entrySet()) {
             String key = entry.getKey();
@@ -155,6 +151,33 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     button.setOnAction(e -> handleFreeInputButtonAction(button, UUID, key, dd, textField));
                     if(dd.UIPresent() == UIDDPresent.FOLDER_DIALOG){
                         textField.setOnMouseClicked(e -> freeInputDialog(textField));
+                    }else if(dd.UIPresent() == UIDDPresent.ENUM){
+                        if(dd.dataDefinition().getType().equals("MethodEnum")){
+                            ToggleButton button1 = new ToggleButton("GET");
+                            ToggleButton button2 = new ToggleButton("PUT");
+                            ToggleButton button3 = new ToggleButton("POST");
+                            ToggleButton button4 = new ToggleButton("DELETE");
+                            button1.setOnAction(e -> handleFreeInputEnumAction(button1, UUID, key, dd));
+                            button2.setOnAction(e -> handleFreeInputEnumAction(button2, UUID, key, dd));
+                            button3.setOnAction(e -> handleFreeInputEnumAction(button3, UUID, key, dd));
+                            button4.setOnAction(e -> handleFreeInputEnumAction(button4, UUID, key, dd));
+
+                            segmentedButton.getButtons().addAll(button1, button2, button3, button4);
+                        }else if(dd.dataDefinition().getType().equals("ProtocolEnum")){
+                            ToggleButton button1 = new ToggleButton("https");
+                            ToggleButton button2 = new ToggleButton("http");
+                            button1.setOnAction(e -> handleFreeInputEnumAction(button1, UUID, key, dd));
+                            button2.setOnAction(e -> handleFreeInputEnumAction(button2, UUID, key, dd));
+                            segmentedButton.getButtons().addAll(button1, button2);
+                        }else if(dd.dataDefinition().getType().equals("ZipEnum")){
+                            ToggleButton button1 = new ToggleButton("ZIP");
+                            ToggleButton button2 = new ToggleButton("UNZIP");
+                            button1.setOnAction(e -> handleFreeInputEnumAction(button1, UUID, key, dd));
+                            button2.setOnAction(e -> handleFreeInputEnumAction(button2, UUID, key, dd));
+                            segmentedButton.getButtons().addAll(button1, button2);
+                        }
+                    }else if(dd.UIPresent() == UIDDPresent.FILE_CHOOSER){
+                        textField.setOnMouseClicked(e -> fileChooser(textField));
                     }
                     Label isMandatory = new Label(dd.necessity().toString());
                     if (dd.necessity() == DataNecessity.MANDATORY)
@@ -165,7 +188,11 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     hbox.setSpacing(5);
                     textField.setMaxWidth(250);
                     hbox.setHgrow(textField, Priority.ALWAYS);
-                    hbox.getChildren().addAll(stepName, textField, button, isMandatory);
+                    segmentedButton.setMinWidth(250);
+                    if(dd.UIPresent() == UIDDPresent.ENUM)
+                        hbox.getChildren().addAll(stepName, segmentedButton, isMandatory);
+                    else
+                        hbox.getChildren().addAll(stepName, textField, button, isMandatory);
                     freeInputToMandatory.put(hbox,dd.necessity() == DataNecessity.MANDATORY ? true : false);
             }
         }
@@ -178,6 +205,22 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         executeFlowButtonFinish.setOnAction(e -> executeFlow());
 
        flowDetailsExecutionBox.setVisible(true);
+    }
+
+    private void fileChooser(TextField textField) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Choose Save Directory");
+        File selectedDirectory = directoryChooser.showDialog(null);
+
+        if (selectedDirectory != null) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Save File");
+            dialog.setHeaderText("Enter file name with extension:");
+            dialog.setContentText("File Name:");
+
+            // Show the text input dialog and wait for the user's input
+            dialog.showAndWait().ifPresent(fileName -> textField.setText(selectedDirectory.getAbsolutePath() + "\\" + fileName));
+        }
     }
 
     private void makeExecutionFlowMakeRequest(FlowDefinitionDTO flowButton) {
@@ -365,8 +408,54 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 }
             });
     }
+    private void handleFreeInputEnumAction(ToggleButton button, String flowUUID, String inputFinalName, DataDefinitionDeclarationDTO dd) {
+        if(!button.isSelected()) {
+            if(dd.necessity() == DataNecessity.MANDATORY)
+                executeFlowButtonFinish.setDisable(true);
+            return;
+        }
+        String text = button.getText();
+        String finalUrl = HttpUrl
+                .parse(FLOW_EXECUTION)
+                .newBuilder()
+                .build()
+                .toString();
 
-    private void showErrorMessage(Button button,String message) {
+        Gson gson = new Gson();
+        String json = gson.toJson(new FreeInputDTO(inputFinalName, text, flowUUID));
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(requestBody)
+                .build();
+
+        HttpClientUtil.runAsync(request, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() -> {
+                    showErrorMessage(button, e.getMessage());
+                });
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String responseBody = response.body().string();
+                if (response.code() == 200) {
+                    Platform.runLater(() -> {
+                        executeFlowButtonFinish.setDisable(false);
+                    });
+                } else if (response.code() == 403) {
+                    Platform.runLater(() -> {
+                        showErrorMessage(button, responseBody);
+                    });
+                }
+            }
+        });
+    }
+
+    private void showErrorMessage(Node button,String message) {
         if (errorPopOver != null && errorPopOver.isShowing()) {
             errorPopOver.hide();
         }
@@ -426,7 +515,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
 
         FlowExecutionRefresher refresher = new FlowExecutionRefresher(flowProgressBar, stepResLabel, formalOutPutsVbox,listOfLogs,continuationVBOX);
         timer = new Timer();
-        timer.schedule(refresher, 0, 1000);
+        timer.schedule(refresher, 0, 200);
         bodyForFlowExecutionController.setCurrentUUID(UUID);
 
         executeFlowButtonFinish.setText("Rerun flow");

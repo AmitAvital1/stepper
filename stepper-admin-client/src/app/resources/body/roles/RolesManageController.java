@@ -12,12 +12,14 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -32,7 +34,6 @@ import okhttp3.*;
 import org.controlsfx.control.ListSelectionView;
 import org.controlsfx.control.PopOver;
 import org.jetbrains.annotations.NotNull;
-import project.java.stepper.flow.definition.api.FlowDefinition;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ public class RolesManageController implements AdminBodyControllerDefinition {
 
     @FXML
     private Label roleDescription;
+
+    @FXML
+    private ListView<String> roleUsersList;
 
     @FXML
     private StackPane flowRoleDefinitionList;
@@ -103,18 +107,21 @@ public class RolesManageController implements AdminBodyControllerDefinition {
                     List<RoleDTO> roles = dto.getRolesList();
                     allRolesButtons.clear();
                     Platform.runLater(()-> rolesList.getChildren().clear());
+                    int i = 0;
                     for (RoleDTO role : roles) {
                         Button button = new Button(role.getRoleName());
                         allRolesButtons.add(button);
-                        button.setOnAction(e -> handleButtonAction(role,button));
+                        int finalI = i;
+                        button.setOnAction(e -> handleButtonAction(role,button,dto.getRoleToUser().get(finalI)));
                         Platform.runLater(()-> rolesList.getChildren().add(button));
+                        i++;
                     }
                 }
             }
         });
     }
 
-    private void handleButtonAction(RoleDTO role, Button button) {
+    private void handleButtonAction(RoleDTO role, Button button, List<String> usernames) {
         allRolesButtons.stream().forEach(b -> b.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);"));
         button.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
         roleDetails.setVisible(true);
@@ -149,6 +156,10 @@ public class RolesManageController implements AdminBodyControllerDefinition {
         roleFlowsList.getTargetItems().addListener((ListChangeListener<String>) change -> {
             updateRolesFlows(role.getRoleName(),roleFlowsList);
         });
+        roleUsersList.getItems().clear();
+        Label placeholderLabel = new Label("No users in this role");
+        roleUsersList.setPlaceholder(placeholderLabel);
+        roleUsersList.setItems(FXCollections.observableArrayList(usernames));
 
     }
 
@@ -192,7 +203,7 @@ public class RolesManageController implements AdminBodyControllerDefinition {
         bodyForStatisticsController = bodyCTRL;
     }
     @Override
-    public void setFlowsDetails(List<FlowDefinition> flow,List<FlowDefinitionDTO> flowDTO) {
+    public void setFlowsDetails(List<FlowDefinitionDTO> flowDTO) {
         flowsDefinitions = flowDTO;
     }
     @FXML

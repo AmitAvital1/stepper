@@ -91,6 +91,7 @@ public class UserManager {
 
         Role newRole = new Role(roleName,roleDesc);
         roles.add(newRole);
+        rolesToUsers.put(newRole,new ArrayList<>());
     }
     public synchronized List<User> getUsers() {
         return users;
@@ -103,8 +104,14 @@ public class UserManager {
         userUpdateRoles.getRoles().forEach(r -> userNewRolesName.add(r.getRoleName()));
 
         this.roles.forEach(role -> {
-            if(userNewRolesName.contains(role.getRoleName()))
+            if(userNewRolesName.contains(role.getRoleName())) {
                 newRoles.add(role);
+                if (!rolesToUsers.get(role).contains(user)) {
+                    rolesToUsers.get(role).add(user);
+                }
+            }else{
+                rolesToUsers.get(role).remove(user);
+            }
         });
         user.setUserRoles(newRoles);
 
@@ -127,4 +134,7 @@ public class UserManager {
         isAdminLogin = adminLogin;
     }
 
+    public Map<Role, List<User>> getRolesToUsers() {
+        return rolesToUsers;
+    }
 }

@@ -27,7 +27,6 @@ public class AppMainConroller {
     @FXML private BodyController bodyComponentController;
 
     private Stage primaryStage;
-    private Timer timer = null;
 
     private List<FlowDefinition> flows = new ArrayList<>();
     private final List<FlowExecution> flowExecutions = new ArrayList<>();
@@ -43,12 +42,6 @@ public class AppMainConroller {
             headerComponentController.setMainController(this);
             bodyComponentController.setMainController(this);
         }
-    }
-
-    public void startFlowsDefinitionRefresher() {
-        FlowDefinitionRefresher FlowDefinitionRefresher = new FlowDefinitionRefresher(this);
-        timer = new Timer();
-        timer.schedule(FlowDefinitionRefresher, 0, REFRESH_RATE);
     }
 
     public void showFlowDefinition() {
@@ -95,8 +88,7 @@ public class AppMainConroller {
     }
 
     public void shutDown(){
-        if(timer != null)
-            timer.cancel();
+        bodyComponentController.shutDown();
         headerComponentController.close();
     }
 }

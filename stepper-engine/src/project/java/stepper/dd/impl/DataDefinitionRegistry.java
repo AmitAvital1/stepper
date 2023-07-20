@@ -1,9 +1,11 @@
 package project.java.stepper.dd.impl;
 
+import com.google.gson.JsonSyntaxException;
 import project.java.stepper.dd.api.DataDefinition;
-import project.java.stepper.dd.impl.enumerator.ZipEnum;
-import project.java.stepper.dd.impl.enumerator.ZipEnumeratorDefinition;
+import project.java.stepper.dd.impl.enumerator.*;
 import project.java.stepper.dd.impl.file.FileDataDefinition;
+import project.java.stepper.dd.impl.json.JsonData;
+import project.java.stepper.dd.impl.json.JsonDataDefinition;
 import project.java.stepper.dd.impl.list.ListDataDefinition;
 import project.java.stepper.dd.impl.mapping.MappingDataDefinition;
 import project.java.stepper.dd.impl.number.DoubleDataDefinition;
@@ -23,7 +25,10 @@ public enum DataDefinitionRegistry implements DataDefinition{
     LIST(new ListDataDefinition()),
     FILE(new FileDataDefinition()),
     MAPPING(new MappingDataDefinition()),
-    ZIPENUMERATOR(new ZipEnumeratorDefinition())
+    ZIPENUMERATOR(new ZipEnumeratorDefinition()),
+    JSON(new JsonDataDefinition()),
+    METHODENUMERATOR(new MethodEnumeratorDefinition()),
+    PROTOCOLENUMERATOR(new ProtocolEnumeratorDefinition())
     ;
 
     DataDefinitionRegistry(DataDefinition dataDefinition) {
@@ -67,9 +72,25 @@ public enum DataDefinitionRegistry implements DataDefinition{
                     return expectedDataType.cast(ZipEnum.ZIP);
                 else
                     return expectedDataType.cast(ZipEnum.UNZIP);
+            }else if(this == JSON){
+                return expectedDataType.cast(new JsonData(input));
+            }else if (this == METHODENUMERATOR){
+                try{
+                    return expectedDataType.cast(MethodEnum.valueOf(input));
+                }catch (IllegalArgumentException e){
+                    throw new InvalidUserDataTypeInput("This input have to be one of <GET>,<PUT>,<POST> or <DELETE>");
+                }
+            }else if(this == PROTOCOLENUMERATOR){
+                try{
+                    return expectedDataType.cast(ProtocolEnum.valueOf(input.toUpperCase()));
+                }catch (IllegalArgumentException e){
+                    throw new InvalidUserDataTypeInput("This input have to be one of <HTTP> or <HTTPS>");
+                }
             }
         }catch (NumberFormatException e) {
             throw new InvalidUserDataTypeInput("This input have to be a " + expectedDataType.getSimpleName());
+        }catch (JsonSyntaxException e) {
+            throw new InvalidUserDataTypeInput("Invalid Json Format: " + e.getMessage());
         }
         return null;
     }

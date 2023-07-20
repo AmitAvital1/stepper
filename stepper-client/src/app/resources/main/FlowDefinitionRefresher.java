@@ -1,5 +1,6 @@
 package app.resources.main;
 
+import app.resources.body.flowdefinition.FlowDefinitionController;
 import app.resources.util.http.HttpClientUtil;
 import com.google.gson.Gson;
 import dto.FlowDefinitionDTO;
@@ -20,10 +21,10 @@ import static app.resources.util.Constants.FLOW_DEFINITION;
 import static app.resources.util.Constants.USER_HEAD_DETAILS;
 
 public class FlowDefinitionRefresher extends TimerTask {
-    private AppMainConroller mainController;
+    private FlowDefinitionController flowDefinitionController;
 
-    public FlowDefinitionRefresher(AppMainConroller mainController){
-        this.mainController = mainController;
+    public FlowDefinitionRefresher(FlowDefinitionController flowDefinitionController){
+        this.flowDefinitionController = flowDefinitionController;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class FlowDefinitionRefresher extends TimerTask {
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    mainController.addFlows(new ArrayList<>(),new ArrayList<>());
+
             }
 
             @Override
@@ -52,7 +53,8 @@ public class FlowDefinitionRefresher extends TimerTask {
                     String rawBody = response.body().string();
                     StepperDTO stepper = gson.fromJson(rawBody, StepperDTO.class);
                   //  System.out.println(stepper.getFlows().get(0).getDescription());
-                    mainController.addFlows(new ArrayList<>(),stepper.getFlows());
+                    flowDefinitionController.setFlowsDetails(new ArrayList<>(),stepper.getFlows());
+                    Platform.runLater(() -> flowDefinitionController.updateFlows());
                 }
             }
         });
