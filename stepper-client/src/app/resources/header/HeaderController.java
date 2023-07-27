@@ -51,8 +51,7 @@ public class HeaderController implements Closeable {
     private Button flowExecutionButton;
     @FXML
     private Button executionHistoryButton;
-    @FXML
-    private Button statisticsFlowsButton;
+
     @FXML
     private ToggleSwitch darkModeToggle;
 
@@ -107,10 +106,10 @@ public class HeaderController implements Closeable {
                         userNameDetails.setText("Name: " + userName);
                         flowDefinitionButtom.setDisable(false);
                         flowExecutionButton.setDisable(true);
-                        statisticsFlowsButton.setDisable(false);
                         executionHistoryButton.setDisable(false);
                     });
                 }
+                response.body().close();
             }
         });
     }
@@ -153,12 +152,6 @@ public class HeaderController implements Closeable {
         executionHistoryButton.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
         mainController.showFlowsHistory();
     }
-    @FXML
-    void statisticsFlowsButtonListen(ActionEvent event) {
-        resetButtonsColor();
-        statisticsFlowsButton.setStyle("-fx-background-color: #5482d0;" + "-fx-scale-x: 0.95;" + "-fx-scale-y: 0.95;");
-        mainController.showFlowsStats();
-    }
 
     public void setFlowHistory() {
         executionHistoryButton.setDisable(false);
@@ -167,7 +160,6 @@ public class HeaderController implements Closeable {
     public void resetButtonsColor(){
         flowDefinitionButtom.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);");
         flowExecutionButton.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);");
-        statisticsFlowsButton.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);");
         executionHistoryButton.setStyle("-fx-background-color: linear-gradient(to right,#196BCA ,#6433E0);");
     }
 

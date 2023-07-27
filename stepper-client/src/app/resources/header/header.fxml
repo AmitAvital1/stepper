@@ -70,7 +70,6 @@
                   <Button fx:id="flowDefinitionButtom" disable="true" mnemonicParsing="false" onAction="#flowDefinitionButtonListen" text="Flow Definition" HBox.hgrow="ALWAYS" />
                   <Button fx:id="flowExecutionButton" disable="true" mnemonicParsing="false" onAction="#flowExecutionListener" text="Flows Execution" HBox.hgrow="ALWAYS" />
                   <Button fx:id="executionHistoryButton" disable="true" mnemonicParsing="false" onAction="#executionHistoryButtonListen" text="Executions History" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="statisticsFlowsButton" disable="true" mnemonicParsing="false" onAction="#statisticsFlowsButtonListen" text="Statistics" HBox.hgrow="ALWAYS" />
                </children>
                <opaqueInsets>
                   <Insets bottom="10.0" />

@@ -201,7 +201,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         dummy.setVisible(false);
         freeInputsList.getChildren().add(dummy);
         freeInputToMandatory.entrySet().stream().forEach(set -> {if(set.getValue() == false) freeInputsList.getChildren().add(set.getKey());});
-        checkValidToExecute(executeFlowButtonFinish);
+        //checkValidToExecute(executeFlowButtonFinish);
         executeFlowButtonFinish.setOnAction(e -> executeFlow());
 
        flowDetailsExecutionBox.setVisible(true);
@@ -250,7 +250,6 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     FlowExecutionUUIDDTO FlowExecutionUUIDDTO = gson.fromJson(rawBody, FlowExecutionUUIDDTO.class);
                     UUID = FlowExecutionUUIDDTO.getUuid();
                     checkValidToExecute(executeFlowButtonFinish);
-                    System.out.println(UUID);
                 }
             }
         });
@@ -270,6 +269,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         freeInputsList.getChildren().clear();
         Map<HBox,Boolean> freeInputToMandatory = new HashMap<>();
         Map<String, DataDefinitionDeclarationDTO> freeInputs = flowExe.getFlowDefinition().getFreeInputFinalNameToDD();
+        SegmentedButton segmentedButton = new SegmentedButton();
         for (Map.Entry<String, DataDefinitionDeclarationDTO> entry : freeInputs.entrySet()) {
             String key = entry.getKey();
             DataDefinitionDeclarationDTO dd = entry.getValue();
@@ -280,6 +280,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 TextField textField = new TextField();
                 Button button;
                 if (flowExe.getStartersFreeInputForContext().containsKey(key)) {
+                    textField.setPromptText(dd.userString() + "[" + dd.dataDefinition().getName() + "]");
                     textField.setText(flowExe.getStartersFreeInputForContext().get(key).toString());
                     button = new Button("Edit");
                     textField.setDisable(true);
@@ -290,6 +291,32 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 button.setOnAction(e -> handleFreeInputButtonAction(button, UUID, key, dd, textField));
                 if(dd.UIPresent() == UIDDPresent.FOLDER_DIALOG){
                     textField.setOnMouseClicked(e -> freeInputDialog(textField));
+                }else if(dd.UIPresent() == UIDDPresent.ENUM){
+                    if(dd.dataDefinition().getType().equals("MethodEnum")){
+                        ToggleButton button1 = new ToggleButton("GET");
+                        ToggleButton button2 = new ToggleButton("PUT");
+                        ToggleButton button3 = new ToggleButton("POST");
+                        ToggleButton button4 = new ToggleButton("DELETE");
+                        button1.setOnAction(e -> handleFreeInputEnumAction(button1, UUID, key, dd));
+                        button2.setOnAction(e -> handleFreeInputEnumAction(button2, UUID, key, dd));
+                        button3.setOnAction(e -> handleFreeInputEnumAction(button3, UUID, key, dd));
+                        button4.setOnAction(e -> handleFreeInputEnumAction(button4, UUID, key, dd));
+                        segmentedButton.getButtons().addAll(button1, button2, button3, button4);
+                    }else if(dd.dataDefinition().getType().equals("ProtocolEnum")){
+                        ToggleButton button1 = new ToggleButton("https");
+                        ToggleButton button2 = new ToggleButton("http");
+                        button1.setOnAction(e -> handleFreeInputEnumAction(button1, UUID, key, dd));
+                        button2.setOnAction(e -> handleFreeInputEnumAction(button2, UUID, key, dd));
+                        segmentedButton.getButtons().addAll(button1, button2);
+                    }else if(dd.dataDefinition().getType().equals("ZipEnum")){
+                        ToggleButton button1 = new ToggleButton("ZIP");
+                        ToggleButton button2 = new ToggleButton("UNZIP");
+                        button1.setOnAction(e -> handleFreeInputEnumAction(button1, UUID, key, dd));
+                        button2.setOnAction(e -> handleFreeInputEnumAction(button2, UUID, key, dd));
+                        segmentedButton.getButtons().addAll(button1, button2);
+                    }
+                }else if(dd.UIPresent() == UIDDPresent.FILE_CHOOSER){
+                    textField.setOnMouseClicked(e -> fileChooser(textField));
                 }
                 Label isMandatory = new Label(dd.necessity().toString());
                 if (dd.necessity() == DataNecessity.MANDATORY)
@@ -300,7 +327,15 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                 hbox.setSpacing(5);
                 textField.setMaxWidth(250);
                 hbox.setHgrow(textField, Priority.ALWAYS);
-                hbox.getChildren().addAll(stepName, textField, button, isMandatory);
+                segmentedButton.setMinWidth(250);
+                if(dd.UIPresent() == UIDDPresent.ENUM) {
+                    if (flowExe.getStartersFreeInputForContext().containsKey(key)) {
+                        segmentedButton.getButtons().stream().filter(b -> b.getText().toUpperCase().equals(flowExe.getStartersFreeInputForContext().get(key).toString())).findFirst().get().setSelected(true);
+                    }
+                    hbox.getChildren().addAll(stepName, segmentedButton, isMandatory);
+                }
+                else
+                    hbox.getChildren().addAll(stepName, textField, button, isMandatory);
                 freeInputToMandatory.put(hbox,dd.necessity() == DataNecessity.MANDATORY ? true : false);
             }
         }
@@ -790,6 +825,8 @@ public class FlowsExecutionController implements BodyControllerDefinition {
             this.formalOutPutsVbox = formalOutPutsVbox;
             this.listOfLogs = listOfLogs;
             this.continuationVBOX = continuationVBOX;
+            stepsProgressTreeView.getRoot().getChildren().clear();
+            listOfLogs.getItems().clear();
         }
 
         @Override
@@ -867,26 +904,29 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                             }
                                 timer.cancel();
                             }
-                            stepsProgressTreeView.getRoot().getChildren().clear();
-                            listOfLogs.getItems().clear();
+                            //stepsProgressTreeView.getRoot().getChildren().clear();
+                            //listOfLogs.getItems().clear();
                             for (StepUsageDeclarationImplDTO step : flow.getFlowDefinition().getFlowSteps()) {
                                 StepExecutionContextDTO.stepDataDTO data = flow.getFlowContexts().getStepData(step);
-                                TreeItem<String> stepNameItem = new TreeItem<>(step.getFinalStepName());
-                                TreeItem<String> stepDetails;
-                                if (data != null) {
+                                if (stepsProgressTreeView.getRoot().getChildren().stream().noneMatch(t -> t.getValue().equals(step.getFinalStepName())))
+                                {
+                                    TreeItem<String> stepNameItem = new TreeItem<>(step.getFinalStepName());
+                                    TreeItem<String> stepDetails;
+                                    if (data != null) {
 
-                                    if (!data.step.getFinalStepName().equals(data.step.getStepDefinition().name()))
-                                        stepNameItem.setValue(step.getFinalStepName() + "(" + step.getStepDefinition().name() + ")");
+                                        if (!data.step.getFinalStepName().equals(data.step.getStepDefinition().name()))
+                                            stepNameItem.setValue(step.getFinalStepName() + "(" + step.getStepDefinition().name() + ")");
 
-                                    stepDetails = new TreeItem<>("Total Time:[" + data.time.toMillis() + ".ms]" + ", Result:" + data.result);
-                                    TreeItem<String> stepSummaryLine = new TreeItem<>(data.stepSummaryLine);
-                                    TreeItem<String> totalLogs = new TreeItem<>("Total logs(" + data.logs.getStepLogs().size() + ")");
-                                    for (String log : data.logs.getStepLogs()) {
-                                        totalLogs.getChildren().add(new TreeItem<>(log));
-                                        listOfLogs.getItems().add(step.getFinalStepName() + ":" + log);
+                                        stepDetails = new TreeItem<>("Total Time:[" + data.time.toMillis() + ".ms]" + ", Result:" + data.result);
+                                        TreeItem<String> stepSummaryLine = new TreeItem<>(data.stepSummaryLine);
+                                        TreeItem<String> totalLogs = new TreeItem<>("Total logs(" + data.logs.getStepLogs().size() + ")");
+                                        for (String log : data.logs.getStepLogs()) {
+                                            totalLogs.getChildren().add(new TreeItem<>(log));
+                                            listOfLogs.getItems().add(step.getFinalStepName() + ":" + log);
+                                        }
+                                        stepNameItem.getChildren().addAll(stepDetails, stepSummaryLine, totalLogs);
+                                        stepsProgressTreeView.getRoot().getChildren().addAll(stepNameItem);
                                     }
-                                    stepNameItem.getChildren().addAll(stepDetails, stepSummaryLine, totalLogs);
-                                    stepsProgressTreeView.getRoot().getChildren().addAll(stepNameItem);
                                 }
                             }
                         });

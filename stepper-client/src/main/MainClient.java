@@ -1,4 +1,3 @@
-
 package main;
 
 import app.resources.main.AppMainConroller;
@@ -8,8 +7,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainClient extends Application {
     public static final String APP_FXML_INCLUDE_RESOURCE = "/app/resources/main/app.fxml";

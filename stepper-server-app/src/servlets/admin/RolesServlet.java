@@ -93,4 +93,31 @@ public class RolesServlet extends HttpServlet {
 
         }
     }
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("application/json");
+        UserManager userManager = ServerContextManager.getUserManager(getServletContext());
+        DataManager dataManager = ServerContextManager.getStepperManager(getServletContext());
+
+        StringBuilder requestBody = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                requestBody.append(line);
+            }
+        }
+        String requestBodyString = requestBody.toString();
+        Gson gson = new Gson();
+        RoleDTO updateRole = gson.fromJson(requestBodyString, RoleDTO.class);
+        synchronized (this) {
+            try{
+                userManager.removeRole(updateRole.getRoleName());
+            }catch (ServerException e){
+                PrintWriter out = response.getWriter();
+                response.setStatus(504);
+                out.print(e.getMessage());
+            }
+
+        }
+    }
 }

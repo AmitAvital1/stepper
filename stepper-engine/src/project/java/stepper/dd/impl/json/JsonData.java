@@ -1,15 +1,14 @@
 package project.java.stepper.dd.impl.json;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 
 public class JsonData {
-    private JsonObject jsonObject;
+    private JsonElement jsonObject;
+    private Gson gson = new Gson();
 
     public JsonData(String json) throws JsonSyntaxException {
-        jsonObject = JsonParser.parseString(json).getAsJsonObject();
+        Object o = gson.fromJson(json, Object.class);
+        jsonObject = JsonParser.parseString(json);
     }
     @Override
     public String toString(){

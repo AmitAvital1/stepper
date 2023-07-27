@@ -137,4 +137,14 @@ public class UserManager {
     public Map<Role, List<User>> getRolesToUsers() {
         return rolesToUsers;
     }
+
+    public synchronized void removeRole(String roleName) throws ServerException{
+        Role role = roles.stream().filter(r -> r.getRoleName().equals(roleName)).findFirst().get();
+        if(rolesToUsers.get(role).size() > 0)
+            throw new ServerException("There are users on this role");
+        else{
+            roles.remove(role);
+            rolesToUsers.remove(role);
+        }
+    }
 }

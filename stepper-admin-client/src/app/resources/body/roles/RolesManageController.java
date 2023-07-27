@@ -16,11 +16,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -109,11 +111,23 @@ public class RolesManageController implements AdminBodyControllerDefinition {
                     Platform.runLater(()-> rolesList.getChildren().clear());
                     int i = 0;
                     for (RoleDTO role : roles) {
+                        HBox roleAndDelete = new HBox(10);
                         Button button = new Button(role.getRoleName());
+                        roleAndDelete.getChildren().add(button);
+                        if(!(role.getRoleName().equals(ALL_FLOWS) || role.getRoleName().equals(READ_ONLY))) {
+                            Image trashIcon = new Image("/app/resources/img/trash.png");
+                            ImageView trashImageView = new ImageView(trashIcon);
+                            trashImageView.setTranslateY(8);
+                            trashImageView.setFitHeight(20); // Set the desired height of the icon
+                            trashImageView.setFitWidth(20);  // Set the desired width of the icon
+                            roleAndDelete.getChildren().add(trashImageView);
+                            addRemoveRole(trashImageView,role.getRoleName());
+                        }
+                        roleAndDelete.setAlignment(Pos.TOP_CENTER);
                         allRolesButtons.add(button);
                         int finalI = i;
                         button.setOnAction(e -> handleButtonAction(role,button,dto.getRoleToUser().get(finalI)));
-                        Platform.runLater(()-> rolesList.getChildren().add(button));
+                        Platform.runLater(()-> rolesList.getChildren().add(roleAndDelete));
                         i++;
                     }
                 }
@@ -293,6 +307,78 @@ public class RolesManageController implements AdminBodyControllerDefinition {
         Label errorLabel = new Label(message);
         errorLabel.setStyle("-fx-text-fill: red;");
         errorPopOver = new PopOver();
+        errorPopOver.setContentNode(new HBox(errorLabel));
+        errorPopOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+        errorPopOver.setDetached(true);
+        errorPopOver.show(button);
+
+        // Hide the popover after 2 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(2));
+        pause.setOnFinished(event -> errorPopOver.hide());
+        pause.play();
+    }
+    private void addRemoveRole(ImageView trash,String roleName) {
+            Tooltip tooltip = new Tooltip();
+            tooltip.setStyle("-fx-font-size: 12px;");
+            trash.setOnMouseEntered(event -> showDeleteRole(tooltip,trash,event));
+            trash.setOnMouseExited(event -> {
+                tooltip.hide();
+            });
+        trash.setOnMouseClicked(event -> removeRole(roleName,trash));
+    }
+    private void showDeleteRole(Tooltip tooltip, ImageView data, MouseEvent event) {
+        tooltip.setText("Delete Role");
+        tooltip.show(data, event.getScreenX() + 5, event.getScreenY() + 5);
+    }
+    private void removeRole(String roleNamer, ImageView trash) {
+        String finalUrl = HttpUrl
+                .parse(ROLES)
+                .newBuilder()
+                .build()
+                .toString();
+
+
+
+        Gson gson = new Gson();
+        String json = gson.toJson(new UpdateRoleDTO(roleNamer,null));
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .delete(requestBody)
+                .build();
+
+        AdminHttpClientUtil.runAsync(request, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    if(roleName.getText().equals("Role name: " + roleNamer))
+                        Platform.runLater(() -> roleDetails.setVisible(false));
+                    updateRoles();
+                }else{
+                    String responseBody = response.body().string();
+                    Platform.runLater(() -> {
+                        showErrorMessage(trash, responseBody);
+                    });
+                }
+            }
+        });
+    }
+    private void showErrorMessage(Node button, String message) {
+        if (errorPopOver != null && errorPopOver.isShowing()) {
+            errorPopOver.hide();
+        }
+
+        Label errorLabel = new Label(message);
+        errorLabel.setStyle("-fx-text-fill: red;");
+        errorPopOver = new PopOver();
+        errorPopOver.setTitle("Error");
         errorPopOver.setContentNode(new HBox(errorLabel));
         errorPopOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
         errorPopOver.setDetached(true);

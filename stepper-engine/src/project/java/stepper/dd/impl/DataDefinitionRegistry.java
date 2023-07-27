@@ -90,7 +90,7 @@ public enum DataDefinitionRegistry implements DataDefinition{
         }catch (NumberFormatException e) {
             throw new InvalidUserDataTypeInput("This input have to be a " + expectedDataType.getSimpleName());
         }catch (JsonSyntaxException e) {
-            throw new InvalidUserDataTypeInput("Invalid Json Format: " + e.getMessage());
+            throw new InvalidUserDataTypeInput("Invalid Json Format");
         }
         return null;
     }

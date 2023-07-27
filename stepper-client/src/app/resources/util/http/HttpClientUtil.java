@@ -6,6 +6,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HttpClientUtil {
 
@@ -25,7 +27,6 @@ public class HttpClientUtil {
     }
 
     public static void runAsync(Request request, Callback callback) {
-
         Call call = HttpClientUtil.HTTP_CLIENT.newCall(request);
 
         call.enqueue(callback);
