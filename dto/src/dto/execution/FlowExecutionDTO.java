@@ -149,6 +149,10 @@ public class FlowExecutionDTO {
         public Object getData() {
             return data;
         }
+        public RelationData getItsRelation() {
+            return itsRelation;
+        }
+
     }
 
 

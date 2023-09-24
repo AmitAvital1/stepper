@@ -19,7 +19,8 @@ public enum StepDefinitionRegistry {
     COMMAND_LINE_STEP(new CommandLineStep()),
     HTTP_CALL(new HttpCallStep()),
     TO_JSON(new ToJsonStep()),
-    JSON_EXTRACTOR(new JsonDataExtractor())
+    JSON_EXTRACTOR(new JsonDataExtractor()),
+    DATA_TABLE_RETRIEVE(new DataTableRetrieveStep())
     ;
 
     private final StepDefinition stepDefinition;

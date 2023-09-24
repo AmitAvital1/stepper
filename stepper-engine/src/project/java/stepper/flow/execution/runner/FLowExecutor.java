@@ -62,9 +62,10 @@ public class FLowExecutor implements Runnable {
 
             if(!stepUsageDeclaration.skipIfFail() && stepResult == StepResult.FAILURE){
                 //context.addStepSummaryLine("The step failed before finish: " + stepUsageDeclaration.getFinalStepName() + " FAILED");
-                StepLogs log = new StepLogs(stepUsageDeclaration.getFinalStepName());
-                log.addLogLine("FAILED and stopped the flow");
-                context.addStepLog(log);
+                flowExecution.getFlowContexts().getFlowLogs().get(flowExecution.getFlowContexts().getFlowLogs().size()-1).addLogLine("FAILED and stopped the flow");
+//                StepLogs log = new StepLogs(stepUsageDeclaration.getFinalStepName());
+//                log.addLogLine("FAILED and stopped the flow");
+//                context.addStepLog(log);
                 flowExecution.setFlowExecutionResult(FlowExecutionResult.FAILURE);
                 theStepFinishWithFailure = true;
                 stopTheFlow = true;

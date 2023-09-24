@@ -1,75 +1,78 @@
 package project.java.stepper.step.impl;
 
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
-import project.java.stepper.dd.impl.file.FileData;
-import project.java.stepper.dd.impl.list.ListData;
+import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
 import project.java.stepper.step.api.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class DataTableRetrieveStep extends AbstractStepDefinition {
     public DataTableRetrieveStep() {
         super("Data Table Retrieve", true);
 
-        addInput(new DataDefinitionDeclarationImpl("", DataNecessity.MANDATORY, "Folder name to scan", DataDefinitionRegistry.STRING, UIDDPresent.FOLDER_DIALOG));
-        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter only these files", DataDefinitionRegistry.STRING,UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("TABLE_NAME", DataNecessity.MANDATORY, "Table name to retrieve data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter only this id's", DataDefinitionRegistry.STRING,UIDDPresent.NA));
 
-        addOutput(new DataDefinitionDeclarationImpl("FILES_LIST", DataNecessity.NA, "Files list", DataDefinitionRegistry.LIST, UIDDPresent.NA));
-        addOutput(new DataDefinitionDeclarationImpl("TOTAL_FOUND", DataNecessity.NA, "Total files found", DataDefinitionRegistry.INTEGER,UIDDPresent.NA));
+        addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data table", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
+        addOutput(new DataDefinitionDeclarationImpl("TOTAL_FOUND", DataNecessity.NA, "Total rows", DataDefinitionRegistry.INTEGER,UIDDPresent.NA));
     }
 
 
     @Override
     public StepResult invoke(StepExecutionContext context) throws NoStepInput {
-
-        String filePath = context.getDataValue("FOLDER_NAME", String.class);
+        String tableName = context.getDataValue("TABLE_NAME", String.class);
         Optional<String> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", String.class));
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
-        String filter = maybeFilter.orElse(""); // "" says not filter
+        String filter = maybeFilter.orElse(null); // "" says not filter
+        RelationData dataRelation;
+        List<String> columnNames = new ArrayList<>();
 
-        ListData<FileData> filesList = new ListData();
+        String sql = "SELECT * FROM " + tableName + (filter != null ? (" WHERE id = '" + filter + "'") : "");
+        try (PreparedStatement preparedStatement = SQLDataApi.CONNECTION.prepareStatement(sql)) {
+            logs.addLogLine("Executing Query: " + sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            logs.addLogLine("Fetching data from table..");
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
 
-        try {
-            List<Path> fileList = Files.walk(new File(filePath).toPath())
-                    .filter(Files::isRegularFile)
-                    .filter((path) -> path.toString().endsWith(filter))
-                    .map(Path::toAbsolutePath)
-                    .collect(Collectors.toList());
-            logs.addLogLine("Reading folder " + filePath + (filter != "" ? (" content with filter " + filter) : ""));
-            for (Path path : fileList) {
-                FileData f = new FileData(path.toString());
-                filesList.addData(f);
+            for(int i = 1; i <= columnCount; i++)
+                columnNames.add(metaData.getColumnName(i));
+
+            dataRelation = new RelationData(columnNames.toArray(new String[0]));
+
+            List<String> datas = new ArrayList<>();
+            while (resultSet.next()) {
+                for (int i = 1; i <= columnCount; i++) {
+                    datas.add( resultSet.getString(i));
+                }
+                dataRelation.addRow(datas.toArray(datas.toArray(new String[0])));
+                datas.clear();
             }
-            context.storeDataValue("FILES_LIST", filesList);
-            context.storeDataValue("TOTAL_FOUND", filesList.size());
-            logs.addLogLine("Found " +  filesList.size() + " files in folder" + (filter != "" ? (" matching the filter") : ""));
+            context.storeDataValue("DATA", dataRelation);
+            context.storeDataValue("TOTAL_FOUND", dataRelation.getRowsSize());
+            logs.addLogLine("Found " + dataRelation.getRowsSize() + " Rows");
             context.addStepLog(logs);
-            if(filesList.size() == 0)
+            if(columnCount == 0)
             {
-                context.addStepSummaryLine("Step finish with no files to collect");
-                logs.addLogLine("STEP WARNING:There are no files exist in the folder path");
-                context.addStepLog(logs);
+                context.addStepSummaryLine("Step finish with no rows retrieved");
                 return StepResult.WARNING;
-            }
-            else{
-                context.addStepSummaryLine("Finish to collect all " + filesList.size() + " files");
-                context.addStepLog(logs);
+            }else{
+                context.addStepSummaryLine("Finish to retrieved all " + dataRelation.getRowsSize() + " rows");
                 return StepResult.SUCCESS;
             }
-        }
-        catch (IOException e)
-        {
-            context.addStepSummaryLine("Failure because there is no folder in the path");
-            logs.addLogLine("STEP FAILURE: There is no folder or wrong path folder");
+        } catch (SQLException e) {
+            logs.addLogLine("STEP FAILURE: Failed to executing query: " + e.getMessage());
+            logs.addLogLine("STEP FAILURE: Failed to executing query: " + sql);
+            context.addStepSummaryLine("STEP FAILURE: Failed to executing query: " + sql);
             context.addStepLog(logs);
             return StepResult.FAILURE;
         }
