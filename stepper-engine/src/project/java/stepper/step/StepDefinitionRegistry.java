@@ -20,7 +20,11 @@ public enum StepDefinitionRegistry {
     HTTP_CALL(new HttpCallStep()),
     TO_JSON(new ToJsonStep()),
     JSON_EXTRACTOR(new JsonDataExtractor()),
-    DATA_TABLE_RETRIEVE(new DataTableRetrieveStep())
+    TABLE_RETRIEVE(new TableRetrieveStep()),
+    DATA_TABLE_MODIFIER(new TableModifierStep()),
+    DATA_TABLE_RETRIEVE(new DataTableRetrieveStep()),
+    JSON_VALUE_MODIFIER(new JsonValueModifierStep())
+
     ;
 
     private final StepDefinition stepDefinition;

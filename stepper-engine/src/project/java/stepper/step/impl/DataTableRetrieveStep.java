@@ -20,55 +20,42 @@ public class DataTableRetrieveStep extends AbstractStepDefinition {
         super("Data Table Retrieve", true);
 
         addInput(new DataDefinitionDeclarationImpl("TABLE_NAME", DataNecessity.MANDATORY, "Table name to retrieve data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
-        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter only this id's", DataDefinitionRegistry.STRING,UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.MANDATORY, "Filter only this id's", DataDefinitionRegistry.STRING,UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("COLUMN_TARGET", DataNecessity.MANDATORY, "Column name to get value", DataDefinitionRegistry.STRING,UIDDPresent.NA));
 
-        addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data table", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
-        addOutput(new DataDefinitionDeclarationImpl("TOTAL_FOUND", DataNecessity.NA, "Total rows", DataDefinitionRegistry.INTEGER,UIDDPresent.NA));
+        addOutput(new DataDefinitionDeclarationImpl("VALUE", DataNecessity.NA, "Expected Value", DataDefinitionRegistry.STRING, UIDDPresent.NA));
     }
-
-
     @Override
     public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         String tableName = context.getDataValue("TABLE_NAME", String.class);
-        Optional<String> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", String.class));
+        String columnTargetName = context.getDataValue("COLUMN_TARGET", String.class);
+        String filter = context.getDataValue("FILTER", String.class);
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
-        String filter = maybeFilter.orElse(null); // "" says not filter
-        RelationData dataRelation;
-        List<String> columnNames = new ArrayList<>();
-
-        String sql = "SELECT * FROM " + tableName + (filter != null ? (" WHERE id = '" + filter + "'") : "");
+        String value = "null";
+        StepResult res;
+        String sql = "SELECT * FROM " + tableName + " WHERE id = '" + filter + "'";
         try (PreparedStatement preparedStatement = SQLDataApi.CONNECTION.prepareStatement(sql)) {
             logs.addLogLine("Executing Query: " + sql);
             ResultSet resultSet = preparedStatement.executeQuery();
-            logs.addLogLine("Fetching data from table..");
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            for(int i = 1; i <= columnCount; i++)
-                columnNames.add(metaData.getColumnName(i));
-
-            dataRelation = new RelationData(columnNames.toArray(new String[0]));
-
-            List<String> datas = new ArrayList<>();
-            while (resultSet.next()) {
-                for (int i = 1; i <= columnCount; i++) {
-                    datas.add( resultSet.getString(i));
+            if (resultSet.next()) {
+                value = resultSet.getString(columnTargetName);
+                logs.addLogLine("Data successfully retrieved");
+                if(value != null){
+                    context.addStepSummaryLine("Step finish with retrieve the data successfully from column '" + columnTargetName + "' inside the table '" + tableName + "'");
+                    res = StepResult.SUCCESS;
+                } else{
+                    context.addStepSummaryLine("Step finish - no content in the column '" + columnTargetName + "' inside the table '" + tableName + "'");
+                    res = StepResult.WARNING;
                 }
-                dataRelation.addRow(datas.toArray(datas.toArray(new String[0])));
-                datas.clear();
             }
-            context.storeDataValue("DATA", dataRelation);
-            context.storeDataValue("TOTAL_FOUND", dataRelation.getRowsSize());
-            logs.addLogLine("Found " + dataRelation.getRowsSize() + " Rows");
+            else{
+                logs.addLogLine("STEP FAILURE: Failed due that have no content in the table '" + tableName + "'");
+                context.addStepSummaryLine("Step Failure - no content inside the table '" + tableName + "'");
+                res = StepResult.FAILURE;
+            }
+            context.storeDataValue("VALUE", value);
             context.addStepLog(logs);
-            if(columnCount == 0)
-            {
-                context.addStepSummaryLine("Step finish with no rows retrieved");
-                return StepResult.WARNING;
-            }else{
-                context.addStepSummaryLine("Finish to retrieved all " + dataRelation.getRowsSize() + " rows");
-                return StepResult.SUCCESS;
-            }
+            return res;
         } catch (SQLException e) {
             logs.addLogLine("STEP FAILURE: Failed to executing query: " + e.getMessage());
             logs.addLogLine("STEP FAILURE: Failed to executing query: " + sql);
@@ -77,4 +64,5 @@ public class DataTableRetrieveStep extends AbstractStepDefinition {
             return StepResult.FAILURE;
         }
     }
+
 }
