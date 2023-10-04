@@ -1,6 +1,7 @@
 package project.java.stepper.step.impl;
 
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
+import project.java.stepper.dd.impl.SqlFilter.SqlFilter;
 import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
@@ -20,7 +21,7 @@ public class TableRetrieveStep extends AbstractStepDefinition {
         super("Table Retrieve", true);
 
         addInput(new DataDefinitionDeclarationImpl("TABLE_NAME", DataNecessity.MANDATORY, "Table name to retrieve data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
-        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter only this id's", DataDefinitionRegistry.STRING,UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter only this id's", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
 
         addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data table", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
         addOutput(new DataDefinitionDeclarationImpl("TOTAL_FOUND", DataNecessity.NA, "Total rows", DataDefinitionRegistry.INTEGER,UIDDPresent.NA));
@@ -30,13 +31,13 @@ public class TableRetrieveStep extends AbstractStepDefinition {
     @Override
     public StepResult invoke(StepExecutionContext context) throws NoStepInput {
         String tableName = context.getDataValue("TABLE_NAME", String.class);
-        Optional<String> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", String.class));
+        Optional<SqlFilter> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", SqlFilter.class));
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
-        String filter = maybeFilter.orElse(null); // "" says not filter
+        SqlFilter filter = maybeFilter.orElse(null); // "" says not filter
         RelationData dataRelation;
         List<String> columnNames = new ArrayList<>();
 
-        String sql = "SELECT * FROM " + tableName + (filter != null ? (" WHERE id = '" + filter + "'") : "");
+        String sql = "SELECT * FROM " + tableName + (filter != null ? filter.toSql() : "");
         try (PreparedStatement preparedStatement = SQLDataApi.CONNECTION.prepareStatement(sql)) {
             logs.addLogLine("Executing Query: " + sql);
             ResultSet resultSet = preparedStatement.executeQuery();

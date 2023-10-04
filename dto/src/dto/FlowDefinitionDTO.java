@@ -1,10 +1,13 @@
 package dto;
 
+import dto.execution.SqlFilterDTO;
 import project.java.stepper.dd.api.DataDefinition;
+import project.java.stepper.dd.impl.SqlFilter.SqlFilter;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.definition.api.StepUsageDeclaration;
 import project.java.stepper.step.api.DataDefinitionDeclaration;
 import project.java.stepper.step.api.DataDefinitionDeclarationImpl;
+import project.java.stepper.step.api.UIDDPresent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ public class FlowDefinitionDTO {
     private final Map<String, DataDefinitionDeclarationDTO> freeInputFinalNameToDD;
     private final Map<String, DataDefinitionDeclarationDTO> formalFinalOutPutNameToDD;
     private final Map<String, Object> initialValues;
+    private final Map<String, SqlFilterDTO> initialValueForSqlFilter = new HashMap<>();
 
 
     public FlowDefinitionDTO(FlowDefinition flow){
@@ -29,10 +33,26 @@ public class FlowDefinitionDTO {
         steps = converStepsToDTO(flow.getFlowSteps());
         freeInputFinalNameToDD = castToDDDeclerationImpl(flow.getFreeInputFinalNameToDD());
         formalFinalOutPutNameToDD = castToDDDeclerationImpl(flow.getFormalOutput());
-        initialValues = flow.getInitialValues();
+        initialValues = getInitialsValues(flow);
         
     }
-
+    private Map<String, Object> getInitialsValues(FlowDefinition flow){
+        Map<String, Object> initValues = new HashMap<>();
+        for (Map.Entry<String, Object> initVals : flow.getInitialValues().entrySet()) {
+            String key = initVals.getKey();
+            Object value = initVals.getValue();
+            if(flow.getFreeInputFinalNameToDD().get(key).UIPresent() == UIDDPresent.SQL_FILTER){
+                SqlFilter filter = (SqlFilter)value;
+                SqlFilterDTO filterDTO = new SqlFilterDTO();
+                for (String filter_key : filter.getKeys()) {
+                    filterDTO.addKey(filter_key,filter.getOperation(filter_key) != null ? filter.getOperation(filter_key).toString() : null ,filter.getValue(filter_key));
+                }
+                initialValueForSqlFilter.put(key,filterDTO);
+            }
+            initValues.put(key,value);
+        }
+        return initValues;
+    }
     private Map<StepUsageDeclarationImplDTO, List<DataDefinitionDeclarationDTO>> convertStepToFreeInputFinalNameToDD(Map<StepUsageDeclaration, List<DataDefinitionDeclaration>> flowFreeInputs) {
         Map<StepUsageDeclarationImplDTO,List<DataDefinitionDeclarationDTO>> res = new HashMap<>();
         for(Map.Entry<StepUsageDeclaration, List<DataDefinitionDeclaration>> entry : flowFreeInputs.entrySet()) {
@@ -88,5 +108,8 @@ public class FlowDefinitionDTO {
 
     public Map<String, Object> getInitialValues() {
         return initialValues;
+    }
+    public Map<String, SqlFilterDTO> getInitialValueForSqlFilter() {
+        return initialValueForSqlFilter;
     }
 }

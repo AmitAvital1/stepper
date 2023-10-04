@@ -7,10 +7,7 @@ import com.google.gson.Gson;
 import dto.DataDefinitionDeclarationDTO;
 import dto.FlowDefinitionDTO;
 import dto.StepUsageDeclarationImplDTO;
-import dto.execution.FlowExecutionDTO;
-import dto.execution.FlowExecutionUUIDDTO;
-import dto.execution.FreeInputDTO;
-import dto.execution.StepExecutionContextDTO;
+import dto.execution.*;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
@@ -34,6 +31,7 @@ import okhttp3.*;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.SegmentedButton;
 import org.jetbrains.annotations.NotNull;
+import project.java.stepper.dd.impl.SqlFilter.SqlFilter;
 import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.flow.definition.api.FlowDefinition;
@@ -137,13 +135,15 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
         SegmentedButton segmentedButton = new SegmentedButton();
+        VBox sql_filter_vbox = null;
+        List<HBox> sqlFilterDetails = null;
         Map<String, DataDefinitionDeclarationDTO> freeInputs = flowButton.getFreeInputFinalNameToDD();
         for (Map.Entry<String, DataDefinitionDeclarationDTO> entry : freeInputs.entrySet()) {
             String key = entry.getKey();
             DataDefinitionDeclarationDTO dd = entry.getValue();
                 HBox hbox = new HBox();
                 hbox.setPadding(new Insets(10));
-                if(!flowButton.getInitialValues().containsKey(key)) {
+                if(!flowButton.getInitialValues().containsKey(key) || dd.UIPresent() == UIDDPresent.SQL_FILTER) {
                     Label stepName = new Label(key);
                     TextField textField = new TextField();
                     textField.setPromptText(dd.userString() + "[" + dd.dataDefinition().getName() + "]");
@@ -178,6 +178,48 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                         }
                     }else if(dd.UIPresent() == UIDDPresent.FILE_CHOOSER){
                         textField.setOnMouseClicked(e -> fileChooser(textField));
+                    }else if(dd.UIPresent() == UIDDPresent.SQL_FILTER){
+                        sql_filter_vbox = new VBox();
+                        sqlFilterDetails = new ArrayList<>();
+                        if(flowButton.getInitialValues().containsKey(key)){
+                            SqlFilterDTO filter = flowButton.getInitialValueForSqlFilter().get(key);
+                            for(String filterKey : filter.getKeys()){
+                                HBox filterHbox = new HBox();
+                                ComboBox<String> operatorComboBox = new ComboBox<>();
+                                operatorComboBox.getItems().addAll("=", "LIKE");
+                                TextField filterKeyText = new TextField(filterKey);
+                                TextField value = new TextField();
+                                value.setPromptText("Enter value");
+                                filterKeyText.setDisable(true);
+                                if(filter.getOperation(filterKey) != null) {
+                                    operatorComboBox.setValue(filter.getOperation(filterKey));
+                                    operatorComboBox.setDisable(true);
+                                }
+                                if(filter.getValue(filterKey) != null){
+                                    value.setText(filter.getValue(filterKey));
+                                    value.setDisable(true);
+                                }
+                                filterHbox.setSpacing(5);
+                                filterHbox.setAlignment(Pos.CENTER);
+                                filterHbox.getChildren().addAll(filterKeyText,operatorComboBox,value);
+                                sql_filter_vbox.getChildren().add(filterHbox);
+                                sqlFilterDetails.add(filterHbox);
+                            }
+                        }
+                        else{
+                            HBox filterHbox = new HBox();
+                            ComboBox<String> operatorComboBox = new ComboBox<>();
+                            operatorComboBox.getItems().addAll("=", "LIKE");
+                            TextField filterKeyText = new TextField();
+                            filterKeyText.setPromptText("Add search key");
+                            TextField value = new TextField();
+                            value.setPromptText("Enter value");
+                            filterHbox.setSpacing(5);
+                            filterHbox.setAlignment(Pos.CENTER);
+                            filterHbox.getChildren().addAll(filterKeyText,operatorComboBox,value);
+                            sql_filter_vbox.getChildren().add(filterHbox);
+                            sqlFilterDetails.add(filterHbox);
+                        }
                     }
                     Label isMandatory = new Label(dd.necessity().toString());
                     if (dd.necessity() == DataNecessity.MANDATORY)
@@ -191,6 +233,15 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     segmentedButton.setMinWidth(250);
                     if(dd.UIPresent() == UIDDPresent.ENUM)
                         hbox.getChildren().addAll(stepName, segmentedButton, isMandatory);
+                    else if(dd.UIPresent() == UIDDPresent.SQL_FILTER) {
+                        List<HBox> finalSqlFilterDetails = sqlFilterDetails;
+                        VBox finalSql_filter_vbox = sql_filter_vbox;
+                        button.setAlignment(Pos.CENTER);
+                        isMandatory.setAlignment(Pos.CENTER);
+                        hbox.setAlignment(Pos.CENTER_LEFT);
+                        button.setOnAction(e -> handleSqlFreeInputButtonAction(button, UUID, key, dd, finalSqlFilterDetails, finalSql_filter_vbox));
+                        hbox.getChildren().addAll(stepName, sql_filter_vbox, button, isMandatory);
+                    }
                     else
                         hbox.getChildren().addAll(stepName, textField, button, isMandatory);
                     freeInputToMandatory.put(hbox,dd.necessity() == DataNecessity.MANDATORY ? true : false);
@@ -383,7 +434,84 @@ public class FlowsExecutionController implements BodyControllerDefinition {
             }
         });
     }
+    private void handleSqlFreeInputButtonAction(Button button, String uuid, String inputFinalName, DataDefinitionDeclarationDTO dd, List<HBox> sqlFilterDetails, VBox sql_filter_vbox) {
+        if(button.getText() == "Edit"){
+            button.setText("Add");
+            sql_filter_vbox.setDisable(false);
+            if(dd.necessity() == DataNecessity.MANDATORY)
+                executeFlowButtonFinish.setDisable(true);
+            return;
+        }
+        int counter = 0;
+        String freeInput = "";
+        for(HBox filterHbox : sqlFilterDetails){
+            TextField filterKey = (TextField)filterHbox.getChildren().get(0);
+            String operator = ((ComboBox<String>) filterHbox.getChildren().get(1)).getValue();
+            TextField filterValue = (TextField)filterHbox.getChildren().get(2);
+            if(filterKey.getText().trim().isEmpty()){
+                showErrorMessage(button,"Missing filter key data.");
+                return;
+            }
+            if(operator == null){
+                showErrorMessage(button,"Missing filter operator.");
+                return;
+            }
+            if(filterValue.getText().trim().isEmpty()){
+                showErrorMessage(button,"Missing filter value data.");
+                return;
+            }
+            counter++;
+            freeInput += filterKey.getText() + "," + ((operator.equals("=")) ? "EQUAL" : operator) + "," + filterValue.getText();
+            if(counter < sqlFilterDetails.size())
+                freeInput += "|";
+        }
+        String finalUrl = HttpUrl
+                .parse(FLOW_EXECUTION)
+                .newBuilder()
+                .build()
+                .toString();
 
+        Gson gson = new Gson();
+        String json = gson.toJson(new FreeInputDTO(inputFinalName, freeInput, uuid));
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(requestBody)
+                .build();
+
+        HttpClientUtil.runAsync(request, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() -> {
+                    showErrorMessage(button, e.getMessage());
+                });
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String responseBody = response.body().string();
+                if (response.code() == 200) {
+                    Platform.runLater(() -> {
+                        sql_filter_vbox.setDisable(true);
+                        button.setText("Edit");
+                        executeFlowButtonFinish.setDisable(false);
+                    });
+                } else if (response.code() == 402) {
+                    Platform.runLater(() -> {
+                        sql_filter_vbox.setDisable(true);
+                        button.setText("Edit");
+                    });
+                } else if (response.code() == 403) {
+                    Platform.runLater(() -> {
+                        showErrorMessage(button, responseBody);
+                    });
+                }
+            }
+        });
+
+    }
     private void handleFreeInputButtonAction(Button button, String flowUUID, String inputFinalName, DataDefinitionDeclarationDTO dd, TextField textField) {
         if(textField.isDisable()) {
             button.setText("Add");

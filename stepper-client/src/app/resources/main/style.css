@@ -197,3 +197,45 @@
     -fx-font-size: 15px;
     -fx-cell-size: 40;
 }
+/* ComboBox */
+.combo-box {
+    -fx-font-family: Trebuchet MS;
+    -fx-font-size: 13px;
+    -fx-background-color: #ffffff; /* Background color */
+    -fx-border-color: linear-gradient(to right, #196BCA, #6433E0); /* Border color */
+    -fx-border-radius: 4px; /* Border radius */
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: linear-gradient(to right, #196BCA, #6433E0); /* Arrow button background color */
+    -fx-background-radius: 0px 4px 4px 0px; /* Rounded corners for the arrow button */
+}
+
+.combo-box .list-view {
+    -fx-font-size: 13px; /* Font size for the dropdown list */
+    -fx-background-color: #ffffff; /* Dropdown background color */
+    -fx-border-color: linear-gradient(to right, #196BCA, #6433E0); /* Dropdown border color */
+}
+.combo-box .list-cell:selected {
+    -fx-background-color: #ffffff; /* Selected item background color */
+    -fx-text-fill: rgb(0, 0, 0); /* Text color */
+}
+
+.combo-box .list-cell {
+    -fx-padding: 6px; /* Padding for each item in the dropdown list */
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: rgba(3, 3, 231, 0.56); /* Hover background color */
+    -fx-text-fill: black;
+}
+
+/* ComboBox Text */
+.combo-box .text {
+    -fx-text-fill: rgb(0, 0, 0); /* Text color */
+    -fx-font-size: 13px; /* Font size */
+    -fx-line-height: 15px; /* Line height */
+    -fx-min-height: 30px; /* Minimum height */
+    -fx-padding: 8px 16px; /* Padding */
+}
+
