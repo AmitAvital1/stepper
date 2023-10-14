@@ -22,7 +22,7 @@ public class JsonValueModifierStep extends AbstractStepDefinition {
         addInput(new DataDefinitionDeclarationImpl("JSON_PATH", DataNecessity.MANDATORY, "Data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
         addInput(new DataDefinitionDeclarationImpl("VALUE", DataNecessity.MANDATORY, "New value to change", DataDefinitionRegistry.STRING, UIDDPresent.NA));
 
-            addOutput(new DataDefinitionDeclarationImpl("NEW_JSON_STRING", DataNecessity.NA, "New Json", DataDefinitionRegistry.STRING, UIDDPresent.NA));
+        addOutput(new DataDefinitionDeclarationImpl("NEW_JSON_STRING", DataNecessity.NA, "New Json", DataDefinitionRegistry.STRING, UIDDPresent.NA));
     }
 
     @Override

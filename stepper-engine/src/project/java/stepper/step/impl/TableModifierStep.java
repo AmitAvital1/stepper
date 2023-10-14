@@ -1,6 +1,7 @@
 package project.java.stepper.step.impl;
 
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
+import project.java.stepper.dd.impl.SqlFilter.SqlFilter;
 import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
@@ -22,7 +23,7 @@ public class TableModifierStep extends AbstractStepDefinition {
         addInput(new DataDefinitionDeclarationImpl("TABLE_NAME", DataNecessity.MANDATORY, "Table name to retrieve data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
         addInput(new DataDefinitionDeclarationImpl("COLUMN_TARGET", DataNecessity.MANDATORY, "Column name to change", DataDefinitionRegistry.STRING,UIDDPresent.NA));
         addInput(new DataDefinitionDeclarationImpl("VALUE", DataNecessity.MANDATORY, "New value data to insert", DataDefinitionRegistry.STRING,UIDDPresent.NA));
-        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.MANDATORY, "SQL Table Filter query", DataDefinitionRegistry.STRING,UIDDPresent.NA));
+        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter options", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
 
         //addOutput(new DataDefinitionDeclarationImpl("OLD_VALUE", DataNecessity.NA, "Old data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
         //addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data table", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
@@ -33,14 +34,12 @@ public class TableModifierStep extends AbstractStepDefinition {
         String tableName = context.getDataValue("TABLE_NAME", String.class);
         String columnTargetName = context.getDataValue("COLUMN_TARGET", String.class);
         String newValue = context.getDataValue("VALUE", String.class);
-        Optional<String> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", String.class));
+        Optional<SqlFilter> maybeFilter = Optional.ofNullable(context.getDataValue("FILTER", SqlFilter.class));
         StepLogs logs = new StepLogs(context.getCurrentWorkingStep().getFinalStepName());
-        String filter = maybeFilter.orElse(null); // "" says not filter
+        SqlFilter filter = maybeFilter.orElse(null); // "" says not filter
         Integer rowsAffected;
         List<String> columnNames = new ArrayList<>();
-
-        String updateQuery = "UPDATE " + tableName + " SET " + columnTargetName + " = ?" + (filter != null ? (" WHERE id = '" + filter + "'") : "");
-        //String sql = "SELECT * FROM " + tableName + (filter != null ? (" WHERE id = '" + filter + "'") : "");
+        String updateQuery = "UPDATE " + tableName + " SET " + columnTargetName + " = ?" + (filter != null ? filter.toSql() : "");
         try (PreparedStatement preparedStatement = SQLDataApi.CONNECTION.prepareStatement(updateQuery)) {
             preparedStatement.setString(1, newValue);
             logs.addLogLine("Executing Query: " + preparedStatement.toString());
