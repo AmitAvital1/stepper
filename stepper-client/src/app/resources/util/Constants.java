@@ -1,5 +1,4 @@
 package app.resources.util;
-
 public class Constants {
 
     public final static Integer REFRESH_RATE = 2000;

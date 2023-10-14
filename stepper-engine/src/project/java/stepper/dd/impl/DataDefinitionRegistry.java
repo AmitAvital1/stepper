@@ -2,6 +2,8 @@ package project.java.stepper.dd.impl;
 
 import com.google.gson.JsonSyntaxException;
 import project.java.stepper.dd.api.DataDefinition;
+import project.java.stepper.dd.impl.SqlFilter.SqlFilter;
+import project.java.stepper.dd.impl.SqlFilter.SqlFilterDataDefinition;
 import project.java.stepper.dd.impl.enumerator.*;
 import project.java.stepper.dd.impl.file.FileDataDefinition;
 import project.java.stepper.dd.impl.json.JsonData;
@@ -13,9 +15,12 @@ import project.java.stepper.dd.impl.number.IntegerDataDefinition;
 import project.java.stepper.dd.impl.relation.RelationDataDefinition;
 import project.java.stepper.dd.impl.string.StringDataDefinition;
 import project.java.stepper.exceptions.InvalidUserDataTypeInput;
+import project.java.stepper.exceptions.SqlFilterException;
 import project.java.stepper.exceptions.StepperExeption;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public enum DataDefinitionRegistry implements DataDefinition{
     STRING(new StringDataDefinition()),
@@ -28,7 +33,8 @@ public enum DataDefinitionRegistry implements DataDefinition{
     ZIPENUMERATOR(new ZipEnumeratorDefinition()),
     JSON(new JsonDataDefinition()),
     METHODENUMERATOR(new MethodEnumeratorDefinition()),
-    PROTOCOLENUMERATOR(new ProtocolEnumeratorDefinition())
+    PROTOCOLENUMERATOR(new ProtocolEnumeratorDefinition()),
+    SQLFILTER(new SqlFilterDataDefinition())
     ;
 
     DataDefinitionRegistry(DataDefinition dataDefinition) {
@@ -85,6 +91,12 @@ public enum DataDefinitionRegistry implements DataDefinition{
                     return expectedDataType.cast(ProtocolEnum.valueOf(input.toUpperCase()));
                 }catch (IllegalArgumentException e){
                     throw new InvalidUserDataTypeInput("This input have to be one of <HTTP> or <HTTPS>");
+                }
+            }else if(this == SQLFILTER){
+                try{
+                    return expectedDataType.cast(new SqlFilter(input));
+                } catch (SqlFilterException e) {
+                    throw new InvalidUserDataTypeInput(e.getMessage());
                 }
             }
         }catch (NumberFormatException e) {

@@ -270,7 +270,7 @@ public class HistoryController implements BodyControllerDefinition {
                         hyperlink.setOnAction(event -> showListPopup(output));
                         hbox.getChildren().add(hyperlink);
                         flowOutputsList.getChildren().add(hbox);
-                    } else if (output.getOutputDD().dataDefinition().getType().equals("Relation")) {
+                    } else if (output.getOutputDD().dataDefinition().getType().equals("RelationData")) {
                         outText = new Label(outputLine);
                         HBox hbox = new HBox();
                         hbox.setSpacing(5);
@@ -353,7 +353,7 @@ public class HistoryController implements BodyControllerDefinition {
         tableView.setColumnResizePolicy(historyOfExecutionsFlowsTable.getColumnResizePolicy());
 
         ObservableList<ObservableList<StringPropertyWrapper>> data = FXCollections.observableArrayList();
-        RelationData table = (RelationData) flowData.getData();
+        RelationData table = flowData.getItsRelation();
 
         for (String columnName : table.getColumns()) {
             final int columnIndex = table.getColumns().indexOf(columnName);
