@@ -100,4 +100,8 @@ public class SqlFilter {
         sql.setLength(sql.length() - 5);
         return sql.toString();
     }
+    @Override
+    public String toString() {
+        return this.toSql();
+    }
 }

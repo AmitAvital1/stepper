@@ -318,6 +318,8 @@ public class FlowsExecutionController implements BodyControllerDefinition {
         flowExecutionInfo.setVisible(false);
         flowExecuteNameLabel.setText(flowButton.getName());
         freeInputsList.getChildren().clear();
+        VBox sql_filter_vbox = null;
+        List<HBox> sqlFilterDetails = null;
         Map<HBox,Boolean> freeInputToMandatory = new HashMap<>();
         Map<String, DataDefinitionDeclarationDTO> freeInputs = flowExe.getFlowDefinition().getFreeInputFinalNameToDD();
         SegmentedButton segmentedButton = new SegmentedButton();
@@ -326,7 +328,7 @@ public class FlowsExecutionController implements BodyControllerDefinition {
             DataDefinitionDeclarationDTO dd = entry.getValue();
             HBox hbox = new HBox();
             hbox.setPadding(new Insets(10));
-            if (!flowButton.getInitialValues().containsKey(key)) {
+            if (!flowButton.getInitialValues().containsKey(key) || dd.UIPresent() == UIDDPresent.SQL_FILTER) {
                 Label stepName = new Label(key);
                 TextField textField = new TextField();
                 Button button;
@@ -368,6 +370,60 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                     }
                 }else if(dd.UIPresent() == UIDDPresent.FILE_CHOOSER){
                     textField.setOnMouseClicked(e -> fileChooser(textField));
+                }else if(dd.UIPresent() == UIDDPresent.SQL_FILTER){
+                    sql_filter_vbox = new VBox();
+                    sqlFilterDetails = new ArrayList<>();
+                    if(flowExe.getStartersFreeInputForContext().containsKey(key)){
+                        SqlFilterDTO filter;
+                        filter = (SqlFilterDTO) flowExe.getStartersFreeInputForContextForSqlFilter().get(key);
+
+                        SqlFilterDTO filterFromInitialToCancelEdit = null;
+                        if(flowButton.getInitialValues().containsKey(key))
+                            filterFromInitialToCancelEdit = flowButton.getInitialValueForSqlFilter().get(key);
+
+                        for(String filterKey : filter.getKeys()){
+                            HBox filterHbox = new HBox();
+                            ComboBox<String> operatorComboBox = new ComboBox<>();
+                            operatorComboBox.getItems().addAll("=", "LIKE");
+                            TextField filterKeyText = new TextField(filterKey);
+                            TextField value = new TextField();
+                            value.setPromptText("Enter value");
+                            filterKeyText.setDisable(true);
+                            if(filter.getOperation(filterKey) != null) {
+                                operatorComboBox.setValue(filter.getOperation(filterKey));
+                                operatorComboBox.setDisable(true);
+                            }
+                            if(filter.getValue(filterKey) != null){
+                                value.setText(filter.getValue(filterKey));
+                                value.setDisable(true);
+                                if(filterFromInitialToCancelEdit != null){
+                                    if(filterFromInitialToCancelEdit.getValue(filterKey) == null)
+                                        value.setDisable(false);
+                                }
+                            }
+                            if(filter.getValue(filterKey) != null)
+                                sql_filter_vbox.setDisable(true);
+                            filterHbox.setSpacing(5);
+                            filterHbox.setAlignment(Pos.CENTER);
+                            filterHbox.getChildren().addAll(filterKeyText,operatorComboBox,value);
+                            sql_filter_vbox.getChildren().add(filterHbox);
+                            sqlFilterDetails.add(filterHbox);
+                        }
+                    }
+                    else{
+                        HBox filterHbox = new HBox();
+                        ComboBox<String> operatorComboBox = new ComboBox<>();
+                        operatorComboBox.getItems().addAll("=", "LIKE");
+                        TextField filterKeyText = new TextField();
+                        filterKeyText.setPromptText("Add search key");
+                        TextField value = new TextField();
+                        value.setPromptText("Enter value");
+                        filterHbox.setSpacing(5);
+                        filterHbox.setAlignment(Pos.CENTER);
+                        filterHbox.getChildren().addAll(filterKeyText,operatorComboBox,value);
+                        sql_filter_vbox.getChildren().add(filterHbox);
+                        sqlFilterDetails.add(filterHbox);
+                    }
                 }
                 Label isMandatory = new Label(dd.necessity().toString());
                 if (dd.necessity() == DataNecessity.MANDATORY)
@@ -384,6 +440,14 @@ public class FlowsExecutionController implements BodyControllerDefinition {
                         segmentedButton.getButtons().stream().filter(b -> b.getText().toUpperCase().equals(flowExe.getStartersFreeInputForContext().get(key).toString())).findFirst().get().setSelected(true);
                     }
                     hbox.getChildren().addAll(stepName, segmentedButton, isMandatory);
+                } else if(dd.UIPresent() == UIDDPresent.SQL_FILTER) {
+                    List<HBox> finalSqlFilterDetails = sqlFilterDetails;
+                    VBox finalSql_filter_vbox = sql_filter_vbox;
+                    button.setAlignment(Pos.CENTER);
+                    isMandatory.setAlignment(Pos.CENTER);
+                    hbox.setAlignment(Pos.CENTER_LEFT);
+                    button.setOnAction(e -> handleSqlFreeInputButtonAction(button, UUID, key, dd, finalSqlFilterDetails, finalSql_filter_vbox));
+                    hbox.getChildren().addAll(stepName, sql_filter_vbox, button, isMandatory);
                 }
                 else
                     hbox.getChildren().addAll(stepName, textField, button, isMandatory);

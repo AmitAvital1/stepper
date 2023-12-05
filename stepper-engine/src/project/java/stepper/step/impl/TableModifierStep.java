@@ -23,7 +23,7 @@ public class TableModifierStep extends AbstractStepDefinition {
         addInput(new DataDefinitionDeclarationImpl("TABLE_NAME", DataNecessity.MANDATORY, "Table name to retrieve data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
         addInput(new DataDefinitionDeclarationImpl("COLUMN_TARGET", DataNecessity.MANDATORY, "Column name to change", DataDefinitionRegistry.STRING,UIDDPresent.NA));
         addInput(new DataDefinitionDeclarationImpl("VALUE", DataNecessity.MANDATORY, "New value data to insert", DataDefinitionRegistry.STRING,UIDDPresent.NA));
-        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter options", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
+        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.MANDATORY, "Filter options", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
 
         //addOutput(new DataDefinitionDeclarationImpl("OLD_VALUE", DataNecessity.NA, "Old data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
         //addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data table", DataDefinitionRegistry.RELATION, UIDDPresent.NA));

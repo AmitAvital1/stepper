@@ -21,7 +21,7 @@ public class TableRetrieveStep extends AbstractStepDefinition {
         super("Table Retrieve", true);
 
         addInput(new DataDefinitionDeclarationImpl("TABLE_NAME", DataNecessity.MANDATORY, "Table name to retrieve data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
-        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter only this id's", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
+        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.MANDATORY, "Filter only this id's", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
 
         addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data table", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
         addOutput(new DataDefinitionDeclarationImpl("TOTAL_FOUND", DataNecessity.NA, "Total rows", DataDefinitionRegistry.INTEGER,UIDDPresent.NA));

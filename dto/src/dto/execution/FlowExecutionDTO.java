@@ -3,16 +3,14 @@ package dto.execution;
 import dto.DataDefinitionDeclarationDTO;
 import dto.FlowDefinitionDTO;
 import dto.StepUsageDeclarationImplDTO;
-import javafx.beans.property.IntegerProperty;
+import project.java.stepper.dd.impl.SqlFilter.SqlFilter;
 import project.java.stepper.dd.impl.file.FileData;
 import project.java.stepper.dd.impl.list.ListData;
 import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.flow.definition.api.FlowDefinition;
 import project.java.stepper.flow.execution.FlowExecution;
 import project.java.stepper.flow.execution.FlowExecutionResult;
-import project.java.stepper.flow.execution.context.StepExecutionContext;
-import project.java.stepper.step.api.DataDefinitionDeclaration;
-import project.java.stepper.step.api.DataNecessity;
+import project.java.stepper.step.api.UIDDPresent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +23,7 @@ public class FlowExecutionDTO {
     private final String startedTime;
     private final FlowExecutionResult flowExecutionResult;
     private final Map<String, Object> startersFreeInputForContext;
+    private final Map<String, SqlFilterDTO> startersFreeInputForContextForSqlFilter = new HashMap<>();
     private final List<flowOutputsDataDTO> outputsStepData;
     private Integer stepFinished = new Integer(0);
     private Map<String, String> formalOutputNameToClass = new HashMap<>();
@@ -52,7 +51,7 @@ public class FlowExecutionDTO {
         this.totalTime = flowExecution.getDuration();
         this.startedTime = flowExecution.getStartedTime();
         this.flowExecutionResult = flowExecution.getFlowExecutionResult();
-        this.startersFreeInputForContext = flowExecution.getStartersFreeInputForContext();
+        this.startersFreeInputForContext = convertStartersFreeInputForContext(flowExecution.getStartersFreeInputForContext(),flowExecution.getFlowDefinition());
         this.outputsStepData = convertoutputsStepData(flowExecution.getOutputsStepData());
         this.stepFinished = flowExecution.getStepFinishedProperty().get();
         this.flowsContinuation = flowExecution.getFlowDefinition().getFlowsContinuations().stream().map(continuationFlowDetails -> continuationFlowDetails.getTargetFlow().getName()).collect(Collectors.toList());
@@ -67,7 +66,7 @@ public class FlowExecutionDTO {
         this.totalTime = flowExecution.getDuration();
         this.startedTime = flowExecution.getStartedTime();
         this.flowExecutionResult = flowExecution.getFlowExecutionResult();
-        this.startersFreeInputForContext = flowExecution.getStartersFreeInputForContext();
+        this.startersFreeInputForContext = convertStartersFreeInputForContext(flowExecution.getStartersFreeInputForContext(),flowExecution.getFlowDefinition());
         this.outputsStepData = convertoutputsStepData(flowExecution.getOutputsStepData());
         this.stepFinished = flowExecution.getStepFinishedProperty().get();
         this.AllFreeInputsWithDataToPrintList = flowExecution.getAllFreeInputsWithDataToPrintList();
@@ -81,6 +80,26 @@ public class FlowExecutionDTO {
         });
         flowsContinuation = userCont;
     }
+
+    private Map<String, Object> convertStartersFreeInputForContext(Map<String, Object> startersFreeInputForContext, FlowDefinition flowDefinition) {
+        Map<String, Object> res = new HashMap<>();
+        for (Map.Entry<String, Object> entry : startersFreeInputForContext.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if(flowDefinition.getFreeInputFinalNameToDD().get(key).UIPresent() == UIDDPresent.SQL_FILTER){
+                SqlFilter filter = (SqlFilter)value;
+                SqlFilterDTO filterDTO = new SqlFilterDTO();
+                for (String filter_key : filter.getKeys()) {
+                    filterDTO.addKey(filter_key,filter.getOperation(filter_key) != null ? filter.getOperation(filter_key).toString() : null ,filter.getValue(filter_key));
+                }
+                res.put(key,filterDTO);
+                startersFreeInputForContextForSqlFilter.put(key,filterDTO);
+            }else
+                res.put(key,value);
+        }
+        return res;
+    }
+
     private List<flowOutputsDataDTO> convertoutputsStepData(List<FlowExecution.flowOutputsData> outputsStepData) {
         List<flowOutputsDataDTO> res = new ArrayList<>();
         for(FlowExecution.flowOutputsData data : outputsStepData){
@@ -218,5 +237,9 @@ public class FlowExecutionDTO {
 
     public void setUsernameExe(String usernameExe) {
         this.usernameExe = usernameExe;
+    }
+
+    public Map<String, SqlFilterDTO> getStartersFreeInputForContextForSqlFilter() {
+        return startersFreeInputForContextForSqlFilter;
     }
 }

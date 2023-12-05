@@ -21,7 +21,7 @@ public class DataTableRetrieveStep extends AbstractStepDefinition {
         super("Data Table Retrieve", true);
 
         addInput(new DataDefinitionDeclarationImpl("TABLE_NAME", DataNecessity.MANDATORY, "Table name to retrieve data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
-        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.OPTIONAL, "Filter options", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
+        addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.MANDATORY, "Filter options", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
         addInput(new DataDefinitionDeclarationImpl("COLUMN_TARGET", DataNecessity.MANDATORY, "Column name to get value", DataDefinitionRegistry.STRING,UIDDPresent.NA));
 
         addOutput(new DataDefinitionDeclarationImpl("VALUE", DataNecessity.NA, "Expected Value", DataDefinitionRegistry.STRING, UIDDPresent.NA));
