@@ -2,7 +2,6 @@ package project.java.stepper.step.impl;
 
 import project.java.stepper.dd.impl.DataDefinitionRegistry;
 import project.java.stepper.dd.impl.SqlFilter.SqlFilter;
-import project.java.stepper.dd.impl.relation.RelationData;
 import project.java.stepper.exceptions.NoStepInput;
 import project.java.stepper.flow.execution.context.StepExecutionContext;
 import project.java.stepper.flow.execution.context.logs.StepLogs;
@@ -10,7 +9,6 @@ import project.java.stepper.step.api.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +16,7 @@ import java.util.Optional;
 
 public class TableModifierStep extends AbstractStepDefinition {
     public TableModifierStep() {
-        super("Table Modifier", true);
+        super("Table Modifier", false);
 
         addInput(new DataDefinitionDeclarationImpl("TABLE_NAME", DataNecessity.MANDATORY, "Table name to retrieve data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
         addInput(new DataDefinitionDeclarationImpl("COLUMN_TARGET", DataNecessity.MANDATORY, "Column name to change", DataDefinitionRegistry.STRING,UIDDPresent.NA));
@@ -41,6 +39,12 @@ public class TableModifierStep extends AbstractStepDefinition {
         List<String> columnNames = new ArrayList<>();
         String updateQuery = "UPDATE " + tableName + " SET " + columnTargetName + " = ?" + (filter != null ? filter.toSql() : "");
         try (PreparedStatement preparedStatement = SQLDataApi.CONNECTION.prepareStatement(updateQuery)) {
+            if(!verifyTableWithOneRow(tableName, logs, filter, context)){
+                logs.addLogLine("STEP FAILURE: Multiple rows has been found.");
+                context.addStepSummaryLine("STEP FAILURE: Multiple rows has been found.");
+                context.addStepLog(logs);
+                return StepResult.FAILURE;
+            }
             preparedStatement.setString(1, newValue);
             logs.addLogLine("Executing Query: " + preparedStatement.toString());
             rowsAffected = preparedStatement.executeUpdate();
@@ -49,8 +53,8 @@ public class TableModifierStep extends AbstractStepDefinition {
             context.addStepLog(logs);
             if(rowsAffected == 0)
             {
-                context.addStepSummaryLine("Step finish with no rows affected");
-                return StepResult.WARNING;
+                context.addStepSummaryLine("STEP FAILURE: Step finish with no rows affected");
+                return StepResult.FAILURE;
             }else{
                 context.addStepSummaryLine("Finish to update all " + rowsAffected + " rows");
                 return StepResult.SUCCESS;
@@ -60,6 +64,20 @@ public class TableModifierStep extends AbstractStepDefinition {
             context.addStepSummaryLine("STEP FAILURE: Failed to executing query: " + updateQuery);
             context.addStepLog(logs);
             return StepResult.FAILURE;
+        }
+    }
+
+    private boolean verifyTableWithOneRow(String tableName, StepLogs logs, SqlFilter filter, StepExecutionContext context) throws SQLException {
+        String sql = "SELECT * FROM " + tableName + (filter != null ? filter.toSql() : "");
+        try (PreparedStatement preparedStatement = SQLDataApi.CONNECTION.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            int rowsNum = 0;
+            while (resultSet.next()) {
+                rowsNum++;
+                if(rowsNum > 1)
+                    return false;
+            }
+            return true;
         }
     }
 }

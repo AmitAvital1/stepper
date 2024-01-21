@@ -44,7 +44,6 @@ public class TableRetrieveStep extends AbstractStepDefinition {
             logs.addLogLine("Fetching data from table..");
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
-
             for(int i = 1; i <= columnCount; i++)
                 columnNames.add(metaData.getColumnName(i));
 
@@ -62,9 +61,15 @@ public class TableRetrieveStep extends AbstractStepDefinition {
             context.storeDataValue("TOTAL_FOUND", dataRelation.getRowsSize());
             logs.addLogLine("Found " + dataRelation.getRowsSize() + " Rows");
             context.addStepLog(logs);
+            if(dataRelation.getRowsSize() == 0){
+                logs.addLogLine("STEP WARNING: Row not found");
+                context.addStepSummaryLine("STEP WARNING: Row not found");
+                context.addStepLog(logs);
+                return StepResult.WARNING;
+            }
             if(columnCount == 0)
             {
-                context.addStepSummaryLine("Step finish with no rows retrieved");
+                context.addStepSummaryLine("Step finish with no columns retrieved");
                 return StepResult.WARNING;
             }else{
                 context.addStepSummaryLine("Finish to retrieved all " + dataRelation.getRowsSize() + " rows");
