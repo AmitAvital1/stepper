@@ -23,7 +23,7 @@ public class TableModifierStep extends AbstractStepDefinition {
         addInput(new DataDefinitionDeclarationImpl("VALUE", DataNecessity.MANDATORY, "New value data to insert", DataDefinitionRegistry.STRING,UIDDPresent.NA));
         addInput(new DataDefinitionDeclarationImpl("FILTER", DataNecessity.MANDATORY, "Filter options", DataDefinitionRegistry.SQLFILTER,UIDDPresent.SQL_FILTER));
 
-        //addOutput(new DataDefinitionDeclarationImpl("OLD_VALUE", DataNecessity.NA, "Old data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
+        addOutput(new DataDefinitionDeclarationImpl("OLD_VALUE", DataNecessity.NA, "Old data", DataDefinitionRegistry.STRING, UIDDPresent.NA));
         //addOutput(new DataDefinitionDeclarationImpl("DATA", DataNecessity.NA, "Data table", DataDefinitionRegistry.RELATION, UIDDPresent.NA));
         addOutput(new DataDefinitionDeclarationImpl("TOTAL", DataNecessity.NA, "Total rows changed", DataDefinitionRegistry.INTEGER,UIDDPresent.NA));
     }
@@ -39,7 +39,7 @@ public class TableModifierStep extends AbstractStepDefinition {
         List<String> columnNames = new ArrayList<>();
         String updateQuery = "UPDATE " + tableName + " SET " + columnTargetName + " = ?" + (filter != null ? filter.toSql() : "");
         try (PreparedStatement preparedStatement = SQLDataApi.CONNECTION.prepareStatement(updateQuery)) {
-            if(!verifyTableWithOneRow(tableName, logs, filter, context)){
+            if(!verifyTableWithOneRow(tableName, columnTargetName, filter, context)){
                 logs.addLogLine("STEP FAILURE: Multiple rows has been found.");
                 context.addStepSummaryLine("STEP FAILURE: Multiple rows has been found.");
                 context.addStepLog(logs);
@@ -67,15 +67,20 @@ public class TableModifierStep extends AbstractStepDefinition {
         }
     }
 
-    private boolean verifyTableWithOneRow(String tableName, StepLogs logs, SqlFilter filter, StepExecutionContext context) throws SQLException {
+    private boolean verifyTableWithOneRow(String tableName,String columnTargetName, SqlFilter filter, StepExecutionContext context) throws SQLException {
         String sql = "SELECT * FROM " + tableName + (filter != null ? filter.toSql() : "");
         try (PreparedStatement preparedStatement = SQLDataApi.CONNECTION.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             int rowsNum = 0;
+            String oldValue = null;
             while (resultSet.next()) {
                 rowsNum++;
                 if(rowsNum > 1)
                     return false;
+                oldValue = resultSet.getString(columnTargetName);
+            }
+            if(rowsNum == 1){
+                context.storeDataValue("OLD_VALUE", oldValue);
             }
             return true;
         }
